@@ -39,3 +39,13 @@
 
 # debug information files
 *.dwo
+
+# CMake files
+CMakeUserPresets.json
+
+# Build directories
+build/
+
+# IDE specific files
+.vscode/
+.idea/
