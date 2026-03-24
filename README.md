@@ -69,7 +69,7 @@ the following. The debug preset is optional.
 }
 ```
 
-## Configure And Build 
+## Configure And Build
 
 ### VS Code
 
@@ -89,6 +89,49 @@ If this is not enabled, VS Code may stay in Kit workflow and commands like prese
 3. Choose a preset available on your machine (from tracked presets and any local user presets).
 4. Run `CMake: Delete Cache and Reconfigure`.
 5. Run `CMake: Build`.
+
+
+### EditorConfig Setup
+
+This project uses an [.editorconfig](.editorconfig) file to enforce consistent coding styles across editors and platforms. It ensures settings like UTF-8 encoding, LF line endings, final newlines, and tab/space indentation are applied automatically.
+
+- **Recommended Extension:** [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+- **Note:**
+  - VS Code setting: `"files.insertFinalNewline": true` might be needed to enforce final newline for `.json` files
+
+
+### Clang-Format Setup
+
+Code formatting is managed by a [.clang-format](.clang-format) file, based on the LLVM style with project-specific tweaks (tab indentation, 4-space width, 120-column limit, etc.).
+
+- **VS Code integration:**
+  - Set C++ formatter to clang-format: `"C_Cpp.formatting": "clangFormat"`
+  - Use the style from file: `"C_Cpp.clang_format_style": "file"`
+  - Format on save: `"editor.formatOnSave": true`, `"editor.formatOnSaveMode": "file"`
+  - Default formatter for C/C++: `"editor.defaultFormatter": "ms-vscode.cpptools"` in `[cpp]` and `[c]`
+
+### IntelliSense Setup
+
+VS Code C++ IntelliSense is configured for best compatibility with CMake:
+
+- `"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"` (CMake Tools integration)
+- `"C_Cpp.intelliSenseEngine": "default"`
+- `"C_Cpp.autocomplete": "default"`
+
+
+### Note: Git LF/CRLF Warnings
+
+If you see warnings `LF will be replaced by CRLF the next time Git touches it` during `git add`, Git line-ending conversion is enabled in your Git config.
+
+Important: `.editorconfig` controls how your editor writes files, but Git warnings come from Git settings.
+
+End-of-file LF for tracked text files is enforced by a `.gitattributes` file at repository root.
+
+To disable conversion for this repository manually run following command.
+
+```powershell
+git config --local core.autocrlf false
+```
 
 ### Terminal
 
