@@ -1,0 +1,55 @@
+name: C++ CI Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+    - name: Configure CMake
+      run: cmake --preset vcpkg
+    - name: Build Project
+      run: cmake --build --preset vcpkg --config Release
+    - name: Run Tests (Catch2)
+      run: ctest --test-dir build -C Release --output-on-failure
+
+  clang-format:
+    name: Clang-Format Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install clang-format
+      run: sudo apt-get update && sudo apt-get install -y clang-format
+    - name: Check Style
+      run: |
+        find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run --Werror
+
+  clang-tidy:
+    name: Clang-Tidy Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Tools
+      run: sudo apt-get update && sudo apt-get install -y clang-tidy
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+    - name: Configure with Tidy
+      run: cmake --preset vcpkg -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
+    - name: Build & Lint
+      run: cmake --build --preset vcpkg --config Release
