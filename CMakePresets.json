@@ -10,5 +10,12 @@
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
 			}
 		}
-	]
+	],
+	"buildPresets": [
+    {
+      "name": "vcpkg",
+      "configurePreset": "vcpkg",
+      "configuration": "Release"
+    }
+  ]
 }
