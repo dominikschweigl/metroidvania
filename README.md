@@ -2,6 +2,49 @@
 
 This project uses CMake presets and vcpkg manifest mode. The repository itself does not require a specific compiler family, but local MinGW setup is recommended for this workspace.
 
+## Project Structure
+
+The project is organised in different folders serving the following purposes:
+
+---
+
+### Overview
+
+```
+assets/            # Images, audio, fonts
+build/             # Build output (ignored in git)
+data/              # This data serves as an inbetween step, between raw assets and usage in code.
+  ├── animations/  # .anim/-files, which define the animations
+  ├── entities/    # .entity-files, which are like blueprints for entity-objects
+  └── maps/        # .json-files for defining worlds
+dependencies/      # Third-party libraries (e.g. SFML)
+docs/              # Documentation, because that is important
+saves/             # Save gamestate (runtime-generated)
+src/               # C++ source code (engine + gameplay)
+  ├── core/        # Game loop, input, timing, window management
+  ├── entities/    # Player, enemies, NPCs, and entity behavior
+  ├── rendering/   # Sprites, animations, UI, HUD
+  ├── utils/       # Helper functions, logging, file handling
+  └── world/       # Maps, rooms, tiles, and environment logic
+  main.cpp         # Entry point of the game.
+tests/             # Unit and integration tests
+  ├── data/        # Test-specific maps and configs
+  ├── integration/
+  └── unit/
+```
+
+---
+
+### Notes
+
+* **src/** contains all game logic and systems
+* **assets/** for images, audio and other assets
+* **data/** defines game objects (map, rooms, entity properties, etc.)
+* **tests/** includes automated tests and their data also for CI
+* **saves/** and **build/** are generated at runtime and not version-controlled
+
+---
+
 ## What The Repository Requires
 
 Required files tracked in git:
