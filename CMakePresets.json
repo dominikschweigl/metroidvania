@@ -1,20 +1,56 @@
 {
-	"version": 2,
-	"configurePresets": [
-		{
-			"name": "vcpkg",
-			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/build",
-			"cacheVariables": {
-				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-			}
-		}
-	],
-	"buildPresets": [
+  "version": 2,
+  "configurePresets": [
     {
-      "name": "vcpkg",
-      "configurePreset": "vcpkg",
+      "name": "vcpkg-linux",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "vcpkg-windows-msvc",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-msvc",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "vcpkg-windows-mingw",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-mingw",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux",
+      "configurePreset": "vcpkg-linux",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-msvc",
+      "configurePreset": "vcpkg-windows-msvc",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-mingw",
+      "configurePreset": "vcpkg-windows-mingw",
       "configuration": "Release"
     }
   ]

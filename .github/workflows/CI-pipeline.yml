@@ -7,76 +7,108 @@ on:
     branches: [ main, dev ]
 
 jobs:
-  build:
-    name: Build & Test (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
+  build-linux:
+    name: Build & Test (Linux)
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-    - name: Install Linux Dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          ninja-build \
-          libx11-dev \
-          libxi-dev \
-          libxrandr-dev \
-          libxcursor-dev \
-          libudev-dev \
-          libgl1-mesa-dev
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v11
-    - name: Configure CMake
-      run: cmake --preset vcpkg
-    - name: Build Project
-      run: cmake --build --preset vcpkg --config Release
-    - name: Run Tests (Catch2)
-      run: ctest --test-dir build -C Release --output-on-failure
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ninja-build \
+            libx11-dev \
+            libxi-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libudev-dev \
+            libgl1-mesa-dev
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+      - name: Configure CMake
+        run: cmake --preset vcpkg-linux
+      - name: Build Project
+        run: cmake --build --preset linux
+      - name: Run Tests
+        run: ctest --test-dir build/linux -C Release --output-on-failure
+
+  build-windows-mingw:
+    name: Build & Test (Windows MinGW)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install MSYS2 + MinGW (UCRT64)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-pkg-config
+
+      - name: Add MSYS2 MinGW UCRT64 to PATH
+        run: echo "C:\\msys64\\ucrt64\\bin" >> $GITHUB_PATH
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgTriplet: x64-mingw-static
+      - name: Install SFML for MinGW
+        run: vcpkg install
+      - name: Clean Build Folder
+        run: Remove-Item -Recurse -Force build/windows-mingw -ErrorAction SilentlyContinue
+      - name: Configure CMake
+        run: cmake --preset vcpkg-windows-mingw
+      - name: Build Project
+        run: cmake --build --preset windows-mingw
+      - name: Run Tests
+        run: ctest --test-dir build/windows-mingw -C Release --output-on-failure
 
   clang-format:
     name: Clang-Format Check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Install clang-format
-      run: sudo apt-get update && sudo apt-get install -y clang-format
-    - name: Check Style
-      run: |
-        find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run --Werror
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: Check Style
+        run: |
+          find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run --Werror
 
   clang-tidy:
     name: Clang-Tidy Analysis
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Install Tools
-      run: sudo apt-get update && sudo apt-get install -y clang-tidy
-    - name: Install Linux Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          ninja-build \
-          libx11-dev \
-          libxi-dev \
-          libxrandr-dev \
-          libxcursor-dev \
-          libudev-dev \
-          libgl1-mesa-dev
-    
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v11
-    - name: Configure with Tidy
-      run: cmake --preset vcpkg -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
-    - name: Build & Lint
-      run: cmake --build --preset vcpkg --config Release
+      - uses: actions/checkout@v4
+      - name: Install Tools
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy ninja-build build-essential
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ninja-build \
+            libx11-dev \
+            libxi-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libudev-dev \
+            libgl1-mesa-dev
+            
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+      - name: Configure with Tidy
+        run: cmake --preset vcpkg-linux -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
+      - name: Build & Lint
+        run: cmake --build --preset linux -C Release
