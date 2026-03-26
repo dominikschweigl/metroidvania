@@ -54,8 +54,8 @@
 %\URL{}
 %\subtitle{}
 
-\footertext{{\LaTeX} beamer theme}
-\date{2017-07-25}
+% \footertext{{\LaTeX} beamer theme}
+% \date{2017-07-25}
 
 \headerimage{3}
 %% ------------------------------------------------------------------
@@ -123,6 +123,14 @@
 
 \end{frame}
 
+\begin{frame}
+	\includegraphics[width=\textwidth]{_images/concept_art.jpeg}
+\end{frame}
+
+\begin{frame}
+	\includegraphics[width=\textwidth]{_images/concept_art_3.jpeg}
+\end{frame}
+
 \subsection{Project Structure}
 
 \begin{frame}
@@ -131,20 +139,41 @@
 	\textbf{Directory Layout:}
 
 	\begin{itemize}
-		\item \file{assets/} - Images, audio, fonts
-		\item \file{build/} - build
-		\item \file{data/} - Maps, entities, animations
-		\item \file{docs/} - documentations
-		\item \file{saves/} - Game state savepoints
-		\item \file{src/} - Game and engine code
+		\item \file{assets/}
+		\item \file{build/}
+		\item \file{data/}
+		\item \file{docs/}
+		\item \file{saves/}
+		\item \file{src/}
 		      \begin{itemize}
-			      \item \file{core/} - Main Game loop, Window Manager
-			      \item \file{entities/} - Entity logic
-			      \item \file{rendering/} - Rendering
-			      \item \file{utils/} - Other helpers/Managers
-			      \item \file{world/} - World building
+			      \item \file{core/}
+			      \item \file{entities/}
+			      \item \file{rendering/}
+			      \item \file{utils/}
+			      \item \file{world/}
 		      \end{itemize}
-		\item \file{tests/} - Unit and integration tests
+		\item \file{tests/}
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Development Setup}
+
+	\textbf{Dev.-Stack:}
+	\begin{itemize}
+		\item Must: git, cmake, clang-format, vcpkg
+		\item CI
+		\item 1 Windows \& 2 Linux
+		\item Assets AI \& manual polishing
+	\end{itemize}
+
+
+	\textbf{Project Management:}
+	\begin{itemize}
+		\item Issues
+		\item Milestones
+		\item Weekly Meetings
 	\end{itemize}
 
 \end{frame}
@@ -177,9 +206,14 @@
 
 	\textbf{Task Distribution:}
 	\begin{itemize}
-		\item Player movement \& combat - Dominik
-		\item Enemies \& menus - Lukas
-		\item Maps \& saving - Emanuel
+		\item (2) two consecutive areas - Emanuel
+		\item (2) basic movement - Dominik
+		\item (1) save / load with dedicated save points (rooms) - Emanuel
+		\item (1) one or more advanced movement mechanics - Dominik
+		\item (1) main combat - Dominik
+		\item (2) enemies - Lukas
+		\item (1) map - Emanuel
+		\item (1) menus - Lukas
 	\end{itemize}
 
 \end{frame}

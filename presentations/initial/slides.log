@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.3.21)  26 MAR 2026 11:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.3.21)  26 MAR 2026 16:56
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -801,16 +801,6 @@ File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
 <use _images//uibk_logo_4c_cmyk.pdf>
 Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 68.
 (pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 68.
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 68.
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-LaTeX Font Info:    Font shape `T1/fvs/m/it' will be
-(Font)              scaled to size 4.49997pt on input line 68.
 LaTeX Font Info:    Font shape `T1/fvs/m/n' will be
 (Font)              scaled to size 5.39996pt on input line 68.
 LaTeX Font Info:    Font shape `T1/fvs/b/n' will be
@@ -843,6 +833,14 @@ LaTeX Font Info:    Font shape `T1/fvs/m/n' will be
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc} <./_images//uibk_logo_4c_cmyk.pdf> <./_images//uibk_header3.png>]
+LaTeX Font Info:    Trying to load font information for U+msa on input line 124.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 124.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
 LaTeX Font Info:    Font shape `T1/fvs/m/n' will be
 (Font)              scaled to size 7.19995pt on input line 124.
 LaTeX Font Info:    Font shape `T1/fvs/m/it' will be
@@ -860,37 +858,70 @@ Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 124.
  [2
 
 ]
-LaTeX Font Info:    Trying to load font information for T1+laett on input line 150.
+<_images/concept_art.jpeg, id=45, 1027.84pt x 561.09625pt>
+File: _images/concept_art.jpeg Graphic file (type jpg)
+<use _images/concept_art.jpeg>
+Package pdftex.def Info: _images/concept_art.jpeg  used on input line 128.
+(pdftex.def)             Requested size: 398.3386pt x 217.45679pt.
+File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
+<use _images//uibk_logo_4c_cmyk.pdf>
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 128.
+(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
+ [3
+
+ <./_images/concept_art.jpeg>]
+<_images/concept_art_3.jpeg, id=51, 1027.84pt x 561.09625pt>
+File: _images/concept_art_3.jpeg Graphic file (type jpg)
+<use _images/concept_art_3.jpeg>
+Package pdftex.def Info: _images/concept_art_3.jpeg  used on input line 132.
+(pdftex.def)             Requested size: 398.3386pt x 217.45679pt.
+File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
+<use _images//uibk_logo_4c_cmyk.pdf>
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 132.
+(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
+ [4
+
+ <./_images/concept_art_3.jpeg>]
+LaTeX Font Info:    Trying to load font information for T1+laett on input line 158.
  (/usr/share/texlive/texmf-dist/tex/latex/ae/t1laett.fd
 File: t1laett.fd 2001/02/12 Font definitions for T1/laett.
 )
 LaTeX Font Info:    Font shape `T1/fvs/b/n' will be
-(Font)              scaled to size 8.99994pt on input line 150.
+(Font)              scaled to size 8.99994pt on input line 158.
 LaTeX Font Info:    Font shape `T1/fvs/m/n' will be
-(Font)              scaled to size 6.29996pt on input line 150.
+(Font)              scaled to size 6.29996pt on input line 158.
 LaTeX Font Info:    Font shape `T1/fvs/m/it' will be
-(Font)              scaled to size 8.99994pt on input line 150.
+(Font)              scaled to size 8.99994pt on input line 158.
 LaTeX Font Info:    Font shape `T1/fvs/m/it' will be
-(Font)              scaled to size 6.29996pt on input line 150.
+(Font)              scaled to size 6.29996pt on input line 158.
+LaTeX Font Info:    Font shape `T1/fvs/m/it' will be
+(Font)              scaled to size 4.49997pt on input line 158.
 File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
 <use _images//uibk_logo_4c_cmyk.pdf>
-Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 150.
-(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
- [3
-
-]
-File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
-<use _images//uibk_logo_4c_cmyk.pdf>
-Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 173.
-(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
- [4
-
-]
-File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
-<use _images//uibk_logo_4c_cmyk.pdf>
-Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 185.
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 158.
 (pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
  [5
+
+]
+File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
+<use _images//uibk_logo_4c_cmyk.pdf>
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 179.
+(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
+ [6
+
+]
+File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
+<use _images//uibk_logo_4c_cmyk.pdf>
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 202.
+(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
+ [7
+
+]
+File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
+<use _images//uibk_logo_4c_cmyk.pdf>
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 219.
+(pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
+ [8
 
 ]
 \tf@nav=\write7
@@ -904,21 +935,21 @@ Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 185.
 
  (./slides.aux)
 Package rerunfilecheck Info: File `slides.out' has not changed.
-(rerunfilecheck)             Checksum: FE2A7BB72F31B0A49C7FEB1395619019;361.
+(rerunfilecheck)             Checksum: D4F8CC66F9D79E2F002CC800B353CEC3;361.
  ) 
 Here is how much of TeX's memory you used:
- 26811 strings out of 476041
- 529943 string characters out of 5793174
- 1860388 words of memory out of 6000000
- 46701 multiletter control sequences out of 15000+600000
+ 26839 strings out of 476041
+ 530449 string characters out of 5793174
+ 1859388 words of memory out of 6000000
+ 46719 multiletter control sequences out of 15000+600000
  590505 words of font info for 95 fonts, out of 8000000 for 9000
  1137 hyphenation exceptions out of 8191
  128i,17n,122p,465b,748s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvsb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvsr8a.pfb>
-Output written on slides.pdf (5 pages, 1237967 bytes).
+Output written on slides.pdf (8 pages, 1545374 bytes).
 PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 61 compressed objects within 1 object stream
- 14 named destinations out of 1000 (max. 500000)
- 77 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 106 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
+ 20 named destinations out of 1000 (max. 500000)
+ 87 words of extra memory for PDF output out of 10000 (max. 10000000)
 
