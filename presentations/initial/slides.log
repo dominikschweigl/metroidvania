@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.3.21)  26 MAR 2026 16:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.3.21)  26 MAR 2026 16:58
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -912,14 +912,14 @@ Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 179.
 ]
 File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
 <use _images//uibk_logo_4c_cmyk.pdf>
-Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 202.
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 194.
 (pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
  [7
 
 ]
 File: _images//uibk_logo_4c_cmyk.pdf Graphic file (type pdf)
 <use _images//uibk_logo_4c_cmyk.pdf>
-Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 219.
+Package pdftex.def Info: _images//uibk_logo_4c_cmyk.pdf  used on input line 211.
 (pdftex.def)             Requested size: 42.67912pt x 16.71696pt.
  [8
 
@@ -946,7 +946,7 @@ Here is how much of TeX's memory you used:
  1137 hyphenation exceptions out of 8191
  128i,17n,122p,465b,748s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvsb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvsr8a.pfb>
-Output written on slides.pdf (8 pages, 1545374 bytes).
+Output written on slides.pdf (8 pages, 1545251 bytes).
 PDF statistics:
  106 PDF objects out of 1000 (max. 8388607)
  76 compressed objects within 1 object stream
