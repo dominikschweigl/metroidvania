@@ -42,7 +42,7 @@
 
 %% information for the title page ('short title' is the pdf-title that is shown in viewer's titlebar)
 \title[Segfault Slayer]{Initial Presentation: Segfault Slayer}
-\subtitle{Name is work in progress}
+% \subtitle{Name is work in progress}
 % \URL{www.uibk.ac.at/statistics}
 
 \author[Schmölz Lukas, Schöpf Emanuel, Schweigl Dominik]{Schmölz Lukas, Schöpf Emanuel, Schweigl Dominik}
@@ -114,11 +114,10 @@
 
 	\bigskip
 
-	\textbf{Brainstorming Examples:}
+	\textbf{World design:}
 	\begin{itemize}
-		\item Infinite loop for Boss
-		\item Segmentation faults for ability
-		\item C++ xvalues as enemies
+		\item First Area: Hardware with Logic Operators
+		\item Second Area: Programming with loops and other concepts
 	\end{itemize}
 
 \end{frame}
@@ -199,13 +198,40 @@
 
 \end{frame}
 
+\subsection{State Loading/Unloading}
+
+\begin{frame}
+	\frametitle{State Loading/Unloading}
+
+	\textbf{Main dynamic JSON-File}
+
+	\begin{itemize}
+		\item player-data (currency, xp, ...)
+		\item room-data (collectables and enenmy booleans)
+	\end{itemize}
+
+	\textbf{Loading}
+
+	\begin{itemize}
+		\item loading static room json
+		\item overwriting with state json
+	\end{itemize}
+
+	\textbf{Unloading}
+
+	\begin{itemize}
+		\item Fixed savepoints for resetting room-data
+	\end{itemize}
+
+\end{frame}
+
 \begin{frame}
 	\frametitle{Development Setup}
 
 	\textbf{Dev.-Stack:}
 	\begin{itemize}
 		\item Must: git, cmake, clang-format, vcpkg
-		\item CI
+		\item CI with clang-tidy
 		\item 1 Windows \& 2 Linux
 		\item Assets: AI \& manual polishing
 	\end{itemize}
@@ -223,7 +249,6 @@
 \begin{frame}
 	\frametitle{Dependencies}
 
-	\textbf{Dependencies:}
 	\begin{itemize}
 		\item SFML
 		\item tilson
