@@ -50,3 +50,12 @@ build/
 # IDE specific files
 .vscode/
 .idea/
+
+# Latex auxiliary files
+*.aux
+*.log
+*.nav
+*.snm
+*.toc
+*.synctex.gz
+*.vrb
