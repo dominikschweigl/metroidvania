@@ -8,6 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(fmt CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Window System)
 
-add_executable(metroidvania main.cpp)
+add_executable(metroidvania src/main.cpp)
 
 target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System)
