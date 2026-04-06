@@ -23,19 +23,37 @@ class Player {
 	const sf::Texture walk_texture{"./assets/images/player/walk.png"};
 	const sf::Texture jump_texture{"./assets/images/player/jump.png"};
 	const sf::Texture run_texture{"./assets/images/player/run.png"};
+	const sf::Texture attack_swing_texture{"./assets/images/player/attack_swing.png"};
+	const sf::Texture attack_overhead_texture{"./assets/images/player/attack_overhead.png"};
 
 	sf::Sprite sprite;
 
 	bool isOnGround = true;
 	sf::Vector2f velocity;
 
-	Player() : sprite(idle_texture) { sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)}); }
+	// Each entry defines one attack in the combo chain.
+	// To extend to 3 combos: push another AttackDef into comboChain in the constructor.
+	struct AttackDef {
+		const sf::Texture *texture;
+		int frameCount;
+		float frameDuration;
+	};
+	std::vector<AttackDef> comboChain;
+
+	Player() : sprite(idle_texture)
+	{
+		sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
+		comboChain = {
+		    {&attack_swing_texture, 8, 0.1f},
+		    {&attack_overhead_texture, 8, 0.1f},
+		};
+	}
 	~Player() = default;
 
-	void update(float deltaTime)
+	void update(float deltaTime, bool attackTriggered = false)
 	{
 		handleMovement(deltaTime);
-		updateAnimation(deltaTime);
+		updateAnimation(deltaTime, attackTriggered);
 	}
 
 	sf::Vector2f getPosition() const { return sprite.getPosition(); }
@@ -46,6 +64,12 @@ class Player {
 
 	int currentFrame = 0;
 	float frameTimer = 0.f;
+
+	// Attack state — independent from jump/walk counters
+	int attackComboIndex = -1; // -1 = not attacking
+	bool comboQueued = false;
+	int attackFrame = 0;
+	float attackFrameTimer = 0.f;
 
 	void handleMovement(float deltaTime)
 	{
@@ -98,8 +122,52 @@ class Player {
 		}
 	}
 
-	void updateAnimation(float deltaTime)
+	void updateAnimation(float deltaTime, bool attackTriggered)
 	{
+		if (attackTriggered) {
+			if (attackComboIndex == -1) {
+				// Start first attack in chain
+				attackComboIndex = 0;
+				attackFrame = 0;
+				attackFrameTimer = 0.f;
+				comboQueued = false;
+			} else if (attackComboIndex < static_cast<int>(comboChain.size()) - 1) {
+				// Queue next attack in chain
+				comboQueued = true;
+			}
+		}
+
+		// --- Advance attack animation ---
+		if (attackComboIndex >= 0) {
+			attackFrameTimer += deltaTime;
+			const AttackDef &attack = comboChain[attackComboIndex];
+			if (attackFrameTimer >= attack.frameDuration) {
+				attackFrameTimer -= attack.frameDuration;
+				attackFrame++;
+				if (attackFrame >= attack.frameCount) {
+					if (comboQueued && attackComboIndex < static_cast<int>(comboChain.size()) - 1) {
+						comboQueued = false;
+						attackComboIndex++;
+						attackFrame = 0;
+						attackFrameTimer = 0.f;
+					} else {
+						attackComboIndex = -1;
+						comboQueued = false;
+					}
+				}
+			}
+		}
+
+		// --- Draw attack over everything else if active ---
+		if (attackComboIndex >= 0) {
+			const AttackDef &attack = comboChain[attackComboIndex];
+			sprite.setTexture(*attack.texture);
+			sprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setScale({direction == Direction::Left ? -1.f : 1.f, 1.f});
+			return;
+		}
+
+		// --- Normal movement animation (only reached when not attacking) ---
 		bool isWalking = velocity.x != 0.f;
 		bool isSprinting = isWalking
 		                   && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)

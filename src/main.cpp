@@ -30,6 +30,7 @@ int main()
 		// Calculate deltatime
 		float deltaTime = clock.restart().asSeconds();
 
+		bool attackTriggered = false;
 		while (const std::optional event = window.pollEvent()) {
 			if (event->is<sf::Event::Closed>()) {
 				window.close();
@@ -46,10 +47,13 @@ int main()
 						view.zoom(1.1f);                                 // Zoom out
 					}
 				}
+			} else if (const auto *mouse = event->getIf<sf::Event::MouseButtonPressed>()) {
+				if (mouse->button == sf::Mouse::Button::Left)
+					attackTriggered = true;
 			}
 		}
 
-		player.update(deltaTime);
+		player.update(deltaTime, attackTriggered);
 		view.setCenter(player.getPosition());
 
 		window.setView(view);
