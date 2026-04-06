@@ -28,6 +28,10 @@ melee and/or ranged
 hitting enemies
 getting hit by enemies
 
+TODO:
+- coyote jump
+- faster down gravity during jump
+
 ## Lukas Schmölz
 
 (2) enemies

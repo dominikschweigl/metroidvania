@@ -20,13 +20,19 @@ class Player {
 	static constexpr float PEAK_THRESHOLD = 250.f; // velocity.y range considered "peak"
 
 	const sf::Texture idle_texture{"./assets/images/player/idle_hat.png"};
+	const sf::Texture idle_lower_texture{"./assets/images/player/idle_lower_body_extended.png"};
 	const sf::Texture walk_texture{"./assets/images/player/walk.png"};
+	const sf::Texture walk_lower_texture{"./assets/images/player/walk_lower_body_extended.png"};
+	const sf::Texture walk_upper_texture{"./assets/images/player/walk_upper_body.png"};
 	const sf::Texture jump_texture{"./assets/images/player/jump.png"};
 	const sf::Texture run_texture{"./assets/images/player/run.png"};
-	const sf::Texture attack_swing_texture{"./assets/images/player/attack_swing.png"};
-	const sf::Texture attack_overhead_texture{"./assets/images/player/attack_overhead.png"};
+	const sf::Texture run_lower_texture{"./assets/images/player/run_lower_body_extended.png"};
+	const sf::Texture run_upper_texture{"./assets/images/player/run_upper_body.png"};
+	const sf::Texture attack_swing_upper_texture{"./assets/images/player/attack_swing_upper_body_extended.png"};
+	const sf::Texture attack_overhead_upper_texture{"./assets/images/player/attack_overhead_upper_body_extended.png"};
 
 	sf::Sprite sprite;
+	sf::Sprite upperSprite;
 
 	bool isOnGround = true;
 	sf::Vector2f velocity;
@@ -34,18 +40,19 @@ class Player {
 	// Each entry defines one attack in the combo chain.
 	// To extend to 3 combos: push another AttackDef into comboChain in the constructor.
 	struct AttackDef {
-		const sf::Texture *texture;
+		const sf::Texture *upperTexture;
 		int frameCount;
 		float frameDuration;
 	};
 	std::vector<AttackDef> comboChain;
 
-	Player() : sprite(idle_texture)
+	Player() : sprite(idle_texture), upperSprite(walk_upper_texture)
 	{
 		sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
+		upperSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 		comboChain = {
-		    {&attack_swing_texture, 8, 0.1f},
-		    {&attack_overhead_texture, 8, 0.1f},
+		    {&attack_swing_upper_texture, 8, 0.09f},
+		    {&attack_overhead_upper_texture, 8, 0.09f},
 		};
 	}
 	~Player() = default;
@@ -54,6 +61,13 @@ class Player {
 	{
 		handleMovement(deltaTime);
 		updateAnimation(deltaTime, attackTriggered);
+	}
+
+	void draw(sf::RenderWindow &window)
+	{
+		window.draw(sprite);
+		if (drawUpperSprite)
+			window.draw(upperSprite);
 	}
 
 	sf::Vector2f getPosition() const { return sprite.getPosition(); }
@@ -70,6 +84,8 @@ class Player {
 	bool comboQueued = false;
 	int attackFrame = 0;
 	float attackFrameTimer = 0.f;
+
+	bool drawUpperSprite = false;
 
 	void handleMovement(float deltaTime)
 	{
@@ -158,16 +174,6 @@ class Player {
 			}
 		}
 
-		// --- Draw attack over everything else if active ---
-		if (attackComboIndex >= 0) {
-			const AttackDef &attack = comboChain[attackComboIndex];
-			sprite.setTexture(*attack.texture);
-			sprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
-			sprite.setScale({direction == Direction::Left ? -1.f : 1.f, 1.f});
-			return;
-		}
-
-		// --- Normal movement animation (only reached when not attacking) ---
 		bool isWalking = velocity.x != 0.f;
 		bool isSprinting = isWalking
 		                   && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
@@ -180,6 +186,59 @@ class Player {
 			currentFrame = 0;
 		}
 
+		// --- Walking/running while attacking: layered sprites ---
+		if (attackComboIndex >= 0 && isWalking && jumpState == JumpState::None) {
+			const AttackDef &attack = comboChain[attackComboIndex];
+			sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
+
+			// Lower body: walk or run legs
+			if (isSprinting) {
+				sprite.setTexture(run_lower_texture);
+				frameTimer += deltaTime;
+				if (frameTimer >= WALK_FRAME_DURATION) {
+					frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;
+					currentFrame = (currentFrame + 1) % 8;
+				}
+			} else {
+				sprite.setTexture(walk_lower_texture);
+				frameTimer += deltaTime;
+				if (frameTimer >= WALK_FRAME_DURATION) {
+					frameTimer -= WALK_FRAME_DURATION;
+					currentFrame = (currentFrame + 1) % 16;
+				}
+			}
+			sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setScale(scale);
+
+			// Upper body: attack upper-body sprite
+			upperSprite.setTexture(*attack.upperTexture);
+			upperSprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			upperSprite.setPosition(sprite.getPosition());
+			upperSprite.setScale(scale);
+			drawUpperSprite = true;
+			return;
+		}
+
+		// --- Attack while standing: idle lower body + attack upper body ---
+		if (attackComboIndex >= 0) {
+			const AttackDef &attack = comboChain[attackComboIndex];
+			sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
+
+			sprite.setTexture(idle_lower_texture);
+			sprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setScale(scale);
+
+			upperSprite.setTexture(*attack.upperTexture);
+			upperSprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			upperSprite.setPosition(sprite.getPosition());
+			upperSprite.setScale(scale);
+			drawUpperSprite = true;
+			return;
+		}
+
+		drawUpperSprite = false;
+
+		// --- Normal movement animation ---
 		switch (jumpState) {
 		case JumpState::None:
 			if (isSprinting) {

@@ -85,7 +85,7 @@ int main()
 			}
 		}
 
-		window.draw(player.sprite);
+		player.draw(window);
 		window.display();
 	}
 }
