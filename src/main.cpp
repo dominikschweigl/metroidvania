@@ -8,6 +8,7 @@ int main()
 {
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktop, "Metroidvania Game", sf::Style::Default);
+	window.setFramerateLimit(60);
 
 	// View that controls how many world units are visible; scaled by PixelSize
 	sf::View view;
@@ -60,16 +61,24 @@ int main()
 		sf::Vector2f viewCenter = view.getCenter();
 		sf::Vector2f viewSize = view.getSize();
 		float left = viewCenter.x - viewSize.x / 2.f;
-		float top = viewCenter.y - viewSize.y / 2.f;
 		float right = viewCenter.x + viewSize.x / 2.f;
 		float bottom = viewCenter.y + viewSize.y / 2.f;
 
 		// Draw ground (below y=0) if visible
-		if (bottom > 0.f) {
-			sf::RectangleShape ground({right - left, bottom - 0.f});
-			ground.setFillColor({60, 60, 60}); // Dark color
-			ground.setPosition({left, 0.f});
-			window.draw(ground);
+		float startX = std::floor(left / 32.f) * 32.f;
+		for (float y = 0.f; y < bottom; y += 32.f) {
+			int iy = static_cast<int>(y / 32.f);
+			for (float x = startX; x < right; x += 32.f) {
+				int ix = static_cast<int>(std::floor(x / 32.f));
+				sf::RectangleShape tile({32.f, 32.f});
+				if ((ix + iy) % 2 == 0) {
+					tile.setFillColor({100, 100, 100}); // Darker gray
+				} else {
+					tile.setFillColor({120, 120, 120}); // Lighter gray
+				}
+				tile.setPosition({x, y});
+				window.draw(tile);
+			}
 		}
 
 		window.draw(player.sprite);

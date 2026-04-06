@@ -9,7 +9,8 @@ class Player {
 	Direction direction = Direction::Left;
 
 	static constexpr float GRAVITY = 1200.f;
-	static constexpr float SPEED = 200.f;
+	static constexpr float WALKING_SPEED = 200.f;
+	static constexpr float RUNNING_SPEED = 350.f;
 	static constexpr float JUMP_SPEED = 500.f;
 
 	static constexpr int FRAME_SIZE = 32;
@@ -21,6 +22,7 @@ class Player {
 	const sf::Texture idle_texture{"./assets/images/player/idle_hat.png"};
 	const sf::Texture walk_texture{"./assets/images/player/walk.png"};
 	const sf::Texture jump_texture{"./assets/images/player/jump.png"};
+	const sf::Texture run_texture{"./assets/images/player/run.png"};
 
 	sf::Sprite sprite;
 
@@ -48,13 +50,16 @@ class Player {
 	void handleMovement(float deltaTime)
 	{
 		velocity.x = 0.f;
+		bool isSprinting = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
+		                   || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
+		float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-			velocity.x = -SPEED;
+			velocity.x = -speed;
 			direction = Direction::Left;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-			velocity.x = SPEED;
+			velocity.x = speed;
 			direction = Direction::Right;
 		}
 
@@ -67,23 +72,27 @@ class Player {
 		}
 
 		// Delay takeoff until pre-jump animation finishes
-		if (jumpState != JumpState::PreJump) {
+		if (jumpState == JumpState::PreJump) {
+			velocity.y = 0.f;
+		} else if (jumpState == JumpState::Ascending && isOnGround) {
+			velocity.y = -JUMP_SPEED;
+			isOnGround = false;
+		}
+		if (!isOnGround) {
+			velocity.y += GRAVITY * deltaTime;
+		}
+
+		sprite.move(velocity * deltaTime);
+
+		if (sprite.getPosition().y >= 0.f && velocity.y > 0.f) {
+			sprite.setPosition({sprite.getPosition().x, 0.f});
+			velocity.y = 0.f;
 			if (!isOnGround) {
-				velocity.y += GRAVITY * deltaTime;
-			}
-
-			sprite.move(velocity * deltaTime);
-
-			if (sprite.getPosition().y >= 0.f) {
-				sprite.setPosition({sprite.getPosition().x, 0.f});
-				velocity.y = 0.f;
-				if (!isOnGround) {
-					isOnGround = true;
-					if (jumpState != JumpState::None) {
-						jumpState = JumpState::Landing;
-						currentFrame = 0;
-						frameTimer = 0.f;
-					}
+				isOnGround = true;
+				if (jumpState != JumpState::None) {
+					jumpState = JumpState::Landing;
+					currentFrame = 0;
+					frameTimer = 0.f;
 				}
 			}
 		}
@@ -92,9 +101,12 @@ class Player {
 	void updateAnimation(float deltaTime)
 	{
 		bool isWalking = velocity.x != 0.f;
+		bool isSprinting = isWalking
+		                   && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
+		                       || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift));
 		bool isJumping = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
-		// Interrupt landing with walk or jump input
+		// Interrupt landing with jump input
 		if (jumpState == JumpState::Landing && isJumping) {
 			jumpState = JumpState::PreJump;
 			currentFrame = 0;
@@ -102,7 +114,15 @@ class Player {
 
 		switch (jumpState) {
 		case JumpState::None:
-			if (isWalking) {
+			if (isSprinting) {
+				sprite.setTexture(run_texture);
+				frameTimer += deltaTime;
+				if (frameTimer >= WALK_FRAME_DURATION) {
+					frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;
+					currentFrame = (currentFrame + 1) % 8;
+				}
+				sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			} else if (isWalking) {
 				sprite.setTexture(walk_texture);
 				frameTimer += deltaTime;
 				if (frameTimer >= WALK_FRAME_DURATION) {
@@ -126,9 +146,6 @@ class Player {
 				frameTimer -= PREJUMP_FRAME_DURATION;
 				currentFrame++;
 				if (currentFrame >= 2) {
-					// Launch
-					velocity.y = -JUMP_SPEED;
-					isOnGround = false;
 					jumpState = JumpState::Ascending;
 					currentFrame = 2;
 				}
