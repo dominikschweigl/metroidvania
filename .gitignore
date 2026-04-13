@@ -41,6 +41,8 @@
 *.dwo
 
 # CMake files
+CMakeCache.txt
+CMakeFiles/
 CMakeUserPresets.json
 compile_commands.json
 
@@ -59,3 +61,6 @@ build/
 *.toc
 *.synctex.gz
 *.vrb
+
+# vcpkg installed libraries
+vcpkg_installed/
