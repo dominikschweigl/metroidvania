@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "../world/world.h"
+
 class Player {
   public:
 	enum class Direction { Left, Right };
@@ -57,9 +59,16 @@ class Player {
 	}
 	~Player() = default;
 
-	void update(float deltaTime, bool attackTriggered = false)
+	sf::FloatRect getBounds() const {
+    return sf::Rect<float>(
+        {sprite.getPosition().x - FRAME_SIZE / 2.f, sprite.getPosition().y - FRAME_SIZE},
+        {FRAME_SIZE, FRAME_SIZE}
+    );
+}
+
+	void update(float deltaTime, const World *world = nullptr, bool attackTriggered = false)
 	{
-		handleMovement(deltaTime);
+		handleMovement(deltaTime, world);
 		updateAnimation(deltaTime, attackTriggered);
 	}
 
@@ -87,7 +96,7 @@ class Player {
 
 	bool drawUpperSprite = false;
 
-	void handleMovement(float deltaTime)
+	void handleMovement(float deltaTime, const World* world = nullptr)
 	{
 		velocity.x = 0.f;
 		bool isSprinting = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
@@ -122,17 +131,47 @@ class Player {
 			velocity.y += GRAVITY * deltaTime;
 		}
 
+		if (world) {
+			sf::FloatRect bounds = getBounds();
+			if (world->willCollideWithWall(bounds, velocity, deltaTime, *world)) {
+				velocity.x = 0.f;
+			}
+		}
+
 		sprite.move(velocity * deltaTime);
 
-		if (sprite.getPosition().y >= 0.f && velocity.y > 0.f) {
-			sprite.setPosition({sprite.getPosition().x, 0.f});
-			velocity.y = 0.f;
-			if (!isOnGround) {
-				isOnGround = true;
-				if (jumpState != JumpState::None) {
-					jumpState = JumpState::Landing;
-					currentFrame = 0;
-					frameTimer = 0.f;
+		if (world) {
+			sf::FloatRect bounds = getBounds();
+			auto groundY = world->getGroundYAt(bounds);
+
+			if (groundY.has_value() && velocity.y > 0.f) {
+				float playerBottom = sprite.getPosition().y;
+				if (playerBottom >= groundY.value()) {
+					sprite.setPosition({sprite.getPosition().x, groundY.value()});
+					velocity.y = 0.f;
+					if (!isOnGround) {
+						isOnGround = true;
+						if (jumpState != JumpState::None) {
+							jumpState = JumpState::Landing;
+							currentFrame = 0;
+							frameTimer = 0.f;
+						}
+					}
+				}
+			} else if (!groundY.has_value() && isOnGround) {
+				isOnGround = false; // Player walked off platform
+			}
+		} else {
+			if (sprite.getPosition().y >= 0.f && velocity.y > 0.f) {
+				sprite.setPosition({sprite.getPosition().x, 0.f});
+				velocity.y = 0.f;
+				if (!isOnGround) {
+					isOnGround = true;
+					if (jumpState != JumpState::None) {
+						jumpState = JumpState::Landing;
+						currentFrame = 0;
+						frameTimer = 0.f;
+					}
 				}
 			}
 		}
