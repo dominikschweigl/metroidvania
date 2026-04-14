@@ -17,7 +17,6 @@ public:
     };
 
     static constexpr float TILE_SIZE = 32.f;
-	static constexpr float UPWARD_CLIP = 10.f; // Amount to clip from player's bottom when checking ground collision, to allow smoother landing on edges
 
     World();
     ~World() = default;
