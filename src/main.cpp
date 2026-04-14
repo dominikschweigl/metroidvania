@@ -20,7 +20,9 @@ int main()
 	Player player;
     World world;
 
-    world.loadFromJson("data/maps/test.json");
+    // world.loadFromJson("data/maps/test.json");
+	world.loadFromTMJ("data/maps/test.tmj");
+	world.loadTileset();
 
 	sf::Clock clock;
 

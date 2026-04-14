@@ -3,6 +3,28 @@
 #include <vector>
 #include <optional>
 
+struct TileDef
+{
+    int id;
+    std::string imagePath;
+};
+
+struct TiledLayer
+{
+    std::vector<int> data;
+    int width{};
+    int height{};
+};
+
+struct TiledMap
+{
+    int width{};
+    int height{};
+    int tilewidth{};
+    int tileheight{};
+    std::vector<TiledLayer> layers;
+};
+
 class World {
 public:
     struct Tile {
@@ -24,6 +46,9 @@ public:
     // Build world from a simple grid layout
     void loadFromGrid(const std::vector<std::vector<int>>& grid);
 	void loadFromJson(const std::string& filename);
+	void loadFromTMJ(const std::string& file);
+
+	void loadTileset();
 
 	// Just a helper for retrieving tile at a specific world coordinate
 	const std::optional<const Tile*> getTileAtCoordinate(const sf::Vector2f& worldPos) const;
@@ -37,6 +62,7 @@ public:
 
 private:
     std::vector<std::vector<Tile>> tiles;
+    std::unordered_map<int, sf::Texture> tileTextures;
 
     static float getRectLeft(const sf::FloatRect& rect) {
         return rect.position.x;

@@ -2,6 +2,7 @@
 	"dependencies": [
 		"fmt",
 		"sfml",
-		"nlohmann-json"
+		"nlohmann-json",
+		"tinyxml2"
 	]
 }

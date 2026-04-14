@@ -112,7 +112,7 @@ class Player {
 		return (leftTile.value()->isSolid || rightTile.value()->isSolid);
 	}
 
-	void handleHorizontalMovement(const World& world, float deltaTime)
+	float handleHorizontalMovement(const World& world, float deltaTime)
 	{
 		float dx = velocity.x * deltaTime;
 		float futureX = sprite.getPosition().x + dx;
@@ -135,7 +135,7 @@ class Player {
 			if (tile.has_value()){
 				if (dx > 0) {
 					// Clip to right wall
-					futureX = tile.value()->position.x + World::TILE_SIZE - FRAME_SIZE / 2.f;
+					futureX = tile.value()->position.x + World::TILE_SIZE - FRAME_SIZE / 2.f - 1.f;
 				} else if (dx < 0) {
 					// Clip to left wall
 					futureX = tile.value()->position.x + FRAME_SIZE / 2.f;
@@ -143,10 +143,10 @@ class Player {
 			}
 		}
 
-		sprite.setPosition({futureX, sprite.getPosition().y});
+		return futureX;
 	}
 
-	void handleVerticalMovement(const World& world, float deltaTime)
+	float handleVerticalMovement(const World& world, float deltaTime)
 	{
 
 		float dy = velocity.y * deltaTime;
@@ -181,7 +181,7 @@ class Player {
 				}
 			}
 		}
-		sprite.setPosition({sprite.getPosition().x, futureY});
+		return futureY;
 	}
 
 	void handleMovement(float deltaTime, const World* world = nullptr)
@@ -215,13 +215,14 @@ class Player {
 			velocity.y = -JUMP_SPEED;
 			isOnGround = false;
 		}
-		handleHorizontalMovement(*world, deltaTime);
 		if (!isGroundBelow(*world)) {
 			isOnGround = false;
 			velocity.y += GRAVITY * deltaTime;
 		}
 
-		handleVerticalMovement(*world, deltaTime);
+		float futureX = handleHorizontalMovement(*world, deltaTime);
+		float futureY = handleVerticalMovement(*world, deltaTime);
+		sprite.setPosition({futureX, futureY});
 	}
 
 	void updateAnimation(float deltaTime, bool attackTriggered)

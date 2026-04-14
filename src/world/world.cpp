@@ -2,7 +2,9 @@
 #include <iostream>
 #include <algorithm>
 #include <nlohmann/json.hpp>
+#include <tinyxml2.h>
 
+using namespace tinyxml2;
 using json = nlohmann::json;
 
 struct Level
@@ -26,6 +28,26 @@ std::string readFile(const std::string& path)
 World::World()
 {
     // Constructor - tiles will be populated via loadFromGrid
+}
+
+void World::loadTileset()
+{
+    std::vector<std::string> paths = {
+        "assets/images/tiles/pixil-frame-0.png",
+        "assets/images/tiles/pixil-frame-1.png",
+        "assets/images/tiles/pixil-frame-2.png",
+        "assets/images/tiles/pixil-frame-3.png"
+    };
+
+    for (int i = 0; i < paths.size(); i++)
+    {
+        sf::Texture tex;
+        bool loaded = tex.loadFromFile(paths[i]);
+        if (!loaded) {
+            std::cerr << "Failed to load texture from " << paths[i] << std::endl;
+        }
+        tileTextures[i] = tex;
+    }
 }
 
 void World::loadFromGrid(const std::vector<std::vector<int>>& grid)
@@ -72,6 +94,68 @@ void World::loadFromJson(const std::string& filename)
             tile.position = {x * TILE_SIZE, y * TILE_SIZE};
             tile.size = {TILE_SIZE, TILE_SIZE};
             tile.isSolid = (value > 0);
+            tile.textureId = value;
+        }
+    }
+}
+
+TiledMap loadMap(const std::string& file)
+{
+    std::ifstream f(file);
+    json j;
+    f >> j;
+
+    TiledMap map;
+
+    map.width = j["width"];
+    map.height = j["height"];
+    map.tilewidth = j["tilewidth"];
+    map.tileheight = j["tileheight"];
+
+    for (auto& layer : j["layers"])
+    {
+        if (layer["type"] != "tilelayer") continue;
+
+        TiledLayer l;
+        l.width = layer["width"];
+        l.height = layer["height"];
+        l.data = layer["data"].get<std::vector<int>>();
+
+        map.layers.push_back(std::move(l));
+    }
+
+    return map;
+}
+
+void World::loadFromTMJ(const std::string& file)
+{
+    TiledMap map = loadMap(file);
+
+    const auto& layer = map.layers[0];
+
+    tiles.resize(map.height);
+
+    for (int y = 0; y < map.height; y++)
+    {
+        tiles[y].resize(map.width);
+
+        for (int x = 0; x < map.width; x++)
+        {
+            int value = layer.data[y * map.width + x];
+
+            Tile& tile = tiles[y][x];
+
+            tile.position = {
+                (float) x * map.tilewidth,
+                (float) y * map.tileheight
+            };
+
+            tile.size = {
+                (float)map.tilewidth,
+                (float)map.tileheight
+            };
+
+            tile.isSolid = (value != 0);
             tile.textureId = value;
         }
     }
@@ -151,25 +235,24 @@ void World::draw(sf::RenderWindow& window, const sf::View& view) const
 
 	std::vector<std::vector<const Tile*>> visibleTiles = World::getTilesAtRect(viewRect);
 
-    for (const std::vector<const Tile*> tileRow : visibleTiles)
+    for (auto& row : visibleTiles)
     {
-        for (const Tile* tile : tileRow)
+        for (auto& tile : row)
         {
+            if (tile->textureId == 0) continue;
+
             sf::RectangleShape shape(tile->size);
             shape.setPosition(tile->position);
-			if (tile->isSolid){
-				int ix = static_cast<int>(tile->position.x / TILE_SIZE);
-				int iy = static_cast<int>(tile->position.y / TILE_SIZE);
-				if ((ix + iy) % 2 == 0) {
-					shape.setFillColor(sf::Color(100, 100, 100));
-				} else {
-					shape.setFillColor(sf::Color(150, 150, 150)); // Slightly lighter color for non-aligned tiles (for visual variety)
-				}
-			} else {
-				shape.setFillColor(sf::Color(135, 206, 235)); // Lighter color for non-solid tiles
+
+            auto it = tileTextures.find(std::max(0, tile->textureId - 1));
+            if (it != tileTextures.end())
+            {
+                shape.setTexture(&it->second);
+            } else {
+				shape.setFillColor(sf::Color(255, 0, 255)); // Magenta for missing texture
 			}
 
-			window.draw(shape);
-		}
+            window.draw(shape);
+        }
     }
 }
