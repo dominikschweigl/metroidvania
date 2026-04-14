@@ -22,8 +22,9 @@ public:
     World();
     ~World() = default;
 
-    // Build world from a simple grid layout (later this will accept more complex data, e.g. from a file)
+    // Build world from a simple grid layout
     void loadFromGrid(const std::vector<std::vector<int>>& grid);
+	void loadFromJson(const std::string& filename);
 
 	// Just a helper for retrieving tile at a specific world coordinate
 	const std::optional<const Tile*> getTileAtCoordinate(const sf::Vector2f& worldPos) const;

@@ -21,16 +21,18 @@ int main()
     World world;
 
     // Create a simple platform world
-    std::vector<std::vector<int>> levelGrid = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 0, 0, 0, 0, 1, 1, 1}, // Platforms
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 1, 1, 1, 1, 1, 0, 0, 0}, // Lower platform
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Ground
-    };
-    world.loadFromGrid(levelGrid);
+    // std::vector<std::vector<int>> levelGrid = {
+    //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //     {1, 1, 1, 0, 0, 0, 0, 1, 1, 1}, // Platforms
+    //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //     {0, 0, 1, 1, 1, 1, 1, 0, 0, 0}, // Lower platform
+    //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Ground
+    // };
+    // world.loadFromGrid(levelGrid);
+
+    world.loadFromJson("data/maps/test.json");
 
 	sf::Clock clock;
 

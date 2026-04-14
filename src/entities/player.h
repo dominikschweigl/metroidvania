@@ -172,11 +172,9 @@ class Player {
 					// Moving down
 					futureY = tile.value()->position.y + World::TILE_SIZE;
 					isOnGround = true;
-					if (jumpState != JumpState::None) {
-						jumpState = JumpState::Landing;
-						currentFrame = 0;
-						frameTimer = 0.f;
-					}
+					jumpState = JumpState::Landing;
+					currentFrame = 0;
+					frameTimer = 0.f;
 				} else if (dy < 0) {
 					// Moving up
 					futureY = tile.value()->position.y + World::TILE_SIZE + FRAME_SIZE;

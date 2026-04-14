@@ -1,9 +1,27 @@
 #include "world.h"
 #include <iostream>
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 
+struct Level
+{
+    int width{};
+    int height{};
+    std::vector<int> tiles;
+};
 
+#include <fstream>
+
+std::string readFile(const std::string& path)
+{
+    std::ifstream file(path);
+    return std::string(
+        std::istreambuf_iterator<char>(file),
+        std::istreambuf_iterator<char>()
+    );
+}
 
 World::World()
 {
@@ -25,6 +43,36 @@ void World::loadFromGrid(const std::vector<std::vector<int>>& grid)
 			tile.isSolid = tileType > 0;
 			tile.textureId = tileType;
 			tiles[y].push_back(tile);
+        }
+    }
+}
+
+void World::loadFromJson(const std::string& filename)
+{
+    std::string data = readFile(filename);
+
+    json j = json::parse(data);
+
+    Level level;
+    level.width = j["width"];
+    level.height = j["height"];
+    level.tiles = j["tiles"].get<std::vector<int>>();
+
+    tiles.resize(level.height);
+
+    for (int y = 0; y < level.height; y++)
+    {
+        tiles[y].resize(level.width);
+
+        for (int x = 0; x < level.width; x++)
+        {
+            int value = level.tiles[y * level.width + x];
+
+            Tile& tile = tiles[y][x];
+            tile.position = {x * TILE_SIZE, y * TILE_SIZE};
+            tile.size = {TILE_SIZE, TILE_SIZE};
+            tile.isSolid = (value > 0);
+            tile.textureId = value;
         }
     }
 }
