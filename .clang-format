@@ -10,5 +10,5 @@ AlwaysBreakTemplateDeclarations: true
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterFunction: true
+        AfterFunction: true
 ...
