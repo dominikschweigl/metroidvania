@@ -1,5 +1,6 @@
 #include "world.h"
 #include <iostream>
+#include <algorithm>
 
 
 
@@ -18,145 +19,109 @@ void World::loadFromGrid(const std::vector<std::vector<int>>& grid)
         tiles[y].clear();
         for (size_t x = 0; x < grid[y].size(); ++x) {
             int tileType = grid[y][x];
-            if (tileType > 0) {
-                Tile tile;
-                tile.position = {x * TILE_SIZE, y * TILE_SIZE};
-                tile.size = {TILE_SIZE, TILE_SIZE};
-                tile.isSolid = true;
-                tile.textureId = tileType;
-                tiles[y].push_back(tile);
-            }
+			Tile tile;
+			tile.position = {x * TILE_SIZE, y * TILE_SIZE};
+			tile.size = {TILE_SIZE, TILE_SIZE};
+			tile.isSolid = tileType > 0;
+			tile.textureId = tileType;
+			tiles[y].push_back(tile);
         }
     }
 }
 
-std::optional<float> World::getGroundYAt(const sf::FloatRect& playerBounds) const
+const std::optional<const World::Tile*> World::getTileAtCoordinate(const sf::Vector2f& worldPos) const
 {
-    std::optional<float> groundY;
+    int x = static_cast<int>(worldPos.x / TILE_SIZE);
+    int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
-    for (const auto& row : getTilesInView(sf::View(playerBounds.getCenter(), playerBounds.size * 2.f))) {
-        for (const auto& tile : row) {
-            if (!tile->isSolid) continue;
+    if (y < 0 || y >= (int)tiles.size())
+        return std::nullopt;
 
-			sf::FloatRect tileBounds = tile->getBounds();
+    if (x < 0 || x >= (int)tiles[y].size())
+        return std::nullopt;
 
-			if (getRectRight(playerBounds) > getRectLeft(tileBounds) &&
-				getRectLeft(playerBounds) < getRectRight(tileBounds)) {
+    return &tiles[y][x];
+}
 
-				if (getRectBottom(playerBounds) - UPWARD_CLIP < getRectTop(tileBounds) && getRectBottom(playerBounds) >= getRectTop(tileBounds)) {
+bool World::isSolidAtRect(const sf::FloatRect& rect) const
+{
+	std::vector<std::vector<const World::Tile*>> tilesInRect = World::getTilesAtRect(rect);
 
-					float tileTop = getRectTop(tileBounds);
-					if (!groundY.has_value() || tileTop < groundY.value()) {
-						groundY = tileTop;
-					}
-				}
-			}
+	for (const std::vector<const World::Tile*>& tileRow : tilesInRect)
+	{
+		for (const World::Tile* tile : tileRow)
+		{
+			if (tile->isSolid && tile->getBounds().findIntersection(rect).has_value())
+				return true;
 		}
-    }
-    return groundY;
+	}
+
+	return false;
 }
 
-std::vector<std::vector<const World::Tile*>> World::getTilesInView(const sf::View& view) const
+std::vector<std::vector<const World::Tile*>> World::getTilesAtRect(const sf::FloatRect& rect) const
 {
-    std::vector<std::vector<const Tile*>> visibleTiles;
+    std::vector<std::vector<const Tile*>> result;
 
-    sf::Vector2f center = view.getCenter();
-    sf::Vector2f size = view.getSize();
-    sf::FloatRect viewBounds(
-        {center.x - size.x / 2.f, center.y - size.y / 2.f},
-        {size.x, size.y}
-    );
+    if (tiles.empty() || tiles[0].empty())
+        return result;
 
-    for (const auto& row : tiles) {
-        std::vector<const Tile*> visibleTilesInRow;
-        for (const auto& tile : row) {
-            if (viewBounds.findIntersection(tile.getBounds())) {
-                visibleTilesInRow.push_back(&tile);
-            }
-        }
-        if (!visibleTilesInRow.empty()) {
-            visibleTiles.push_back(visibleTilesInRow);
+    int left   = static_cast<int>(rect.position.x / TILE_SIZE);
+    int right  = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
+    int top    = static_cast<int>(rect.position.y / TILE_SIZE);
+    int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
+
+    int maxY = (int)tiles.size() - 1;
+    int maxX = (int)tiles[0].size() - 1;
+
+    left   = std::clamp(left, 0, maxX);
+    right  = std::clamp(right, 0, maxX);
+    top    = std::clamp(top, 0, maxY);
+    bottom = std::clamp(bottom, 0, maxY);
+
+    for (int y = top; y <= bottom; ++y)
+    {
+        result.push_back(std::vector<const Tile*>());
+        for (int x = left; x <= right; ++x)
+        {
+            result.back().push_back(&tiles[y][x]);
         }
     }
 
-    return visibleTiles;
-}
-
-std::optional<float> World::willCollideWithWall(const sf::FloatRect & playerBounds, const sf::Vector2f & velocity, float deltaTime, const World & world) const
-{
-    if (velocity.x == 0.f)
-        return std::optional<float>();
-
-    float dx = velocity.x * deltaTime;
-    float dy = velocity.y * deltaTime;
-
-    // Check points along the right edge
-    sf::Vector2f topLeft     = {playerBounds.position.x + dx, playerBounds.position.y + dy + 1.f};
-    sf::Vector2f topRight     = {playerBounds.position.x + playerBounds.size.x + dx, playerBounds.position.y + dy + 1.f};
-    sf::Vector2f bottomLeft  = {playerBounds.position.x + dx, playerBounds.position.y + dy + playerBounds.size.y - UPWARD_CLIP};
-    sf::Vector2f bottomRight  = {playerBounds.position.x + playerBounds.size.x + dx, playerBounds.position.y + dy + playerBounds.size.y - UPWARD_CLIP};
-
-    if (world.isPointSolid(topRight) ||
-        world.isPointSolid(topLeft) ||
-        world.isPointSolid(bottomRight) ||
-        world.isPointSolid(bottomLeft)) {
-        return 1.f;
-    }
-
-    return std::nullopt;
+    return result;
 }
 
 void World::draw(sf::RenderWindow& window, const sf::View& view) const
 {
-    auto visibleTiles = getTilesInView(view);
+	sf::Vector2f center = view.getCenter();
+	sf::Vector2f size = view.getSize();
 
-    for (const auto& row : visibleTiles) {
-        for (const auto* tile : row) {
+	sf::FloatRect viewRect(
+		{center.x - size.x * 0.5f, center.y - size.y * 0.5f},
+		{size.x, size.y}
+	);
+
+	std::vector<std::vector<const Tile*>> visibleTiles = World::getTilesAtRect(viewRect);
+
+    for (const std::vector<const Tile*> tileRow : visibleTiles)
+    {
+        for (const Tile* tile : tileRow)
+        {
             sf::RectangleShape shape(tile->size);
             shape.setPosition(tile->position);
-
-			int ix = static_cast<int>(tile->position.x / TILE_SIZE);
-			int iy = static_cast<int>(tile->position.y / TILE_SIZE);
-			if ((ix + iy) % 2 == 0) {
-				shape.setFillColor({100, 100, 100});
+			if (tile->isSolid){
+				int ix = static_cast<int>(tile->position.x / TILE_SIZE);
+				int iy = static_cast<int>(tile->position.y / TILE_SIZE);
+				if ((ix + iy) % 2 == 0) {
+					shape.setFillColor(sf::Color(100, 100, 100));
+				} else {
+					shape.setFillColor(sf::Color(150, 150, 150)); // Slightly lighter color for non-aligned tiles (for visual variety)
+				}
 			} else {
-				shape.setFillColor({120, 120, 120});
+				shape.setFillColor(sf::Color(135, 206, 235)); // Lighter color for non-solid tiles
 			}
-
-			// shape.setOutlineColor({50, 50, 50});
-			// shape.setOutlineThickness(1.f);
 
 			window.draw(shape);
 		}
     }
-}
-
-bool World::isPointSolid(const sf::Vector2f& point) const
-{
-    for (const auto& tileRow : tiles) {
-        for (const auto& tile : tileRow) {
-            if (!tile.isSolid) continue;
-
-			sf::FloatRect bounds = tile.getBounds();
-			if (bounds.contains(point)) {
-				return true;
-			}
-		}
-    }
-    return false;
-}
-
-const World::Tile* World::getTileAt(int gridX, int gridY) const
-{
-    sf::Vector2f worldPos = {gridX * TILE_SIZE, gridY * TILE_SIZE};
-
-    for (const auto& tileRow : tiles) {
-        for (const auto& tile : tileRow) {
-            if (tile.position == worldPos) {
-                return &tile;
-            }
-        }
-    }
-
-    return nullptr;
 }

@@ -36,6 +36,11 @@ class Player {
 	sf::Sprite sprite;
 	sf::Sprite upperSprite;
 
+	bool debugHorizontalMovement = false;
+	sf::RectangleShape debugHorizontalCollisionCheck;
+	bool debugVerticalMovement = false;
+	sf::RectangleShape debugVerticalCollisionCheck;
+
 	bool isOnGround = true;
 	sf::Vector2f velocity;
 
@@ -74,6 +79,8 @@ class Player {
 
 	void draw(sf::RenderWindow &window)
 	{
+		if (debugHorizontalMovement) window.draw(debugHorizontalCollisionCheck);
+		if (debugVerticalMovement) window.draw(debugVerticalCollisionCheck);
 		window.draw(sprite);
 		if (drawUpperSprite)
 			window.draw(upperSprite);
@@ -95,6 +102,89 @@ class Player {
 	float attackFrameTimer = 0.f;
 
 	bool drawUpperSprite = false;
+
+	bool isGroundBelow(const World& world) const
+	{
+		auto leftTile = world.getTileAtCoordinate({getBounds().position.x, getBounds().position.y + getBounds().size.y + 1.f});
+		auto rightTile = world.getTileAtCoordinate({getBounds().position.x + getBounds().size.x, getBounds().position.y + getBounds().size.y + 1.f});
+		if (!leftTile.has_value() || !rightTile.has_value())
+			return false;
+		return (leftTile.value()->isSolid || rightTile.value()->isSolid);
+	}
+
+	void handleHorizontalMovement(const World& world, float deltaTime)
+	{
+		float dx = velocity.x * deltaTime;
+		float futureX = sprite.getPosition().x + dx;
+
+		auto bounds = getBounds();
+		auto futureBounds = sf::FloatRect(
+		    {futureX - FRAME_SIZE / 2.f, bounds.position.y},
+		     {FRAME_SIZE, bounds.size.y}
+		);
+
+		if (debugHorizontalMovement) {
+			debugHorizontalCollisionCheck = sf::RectangleShape(futureBounds.size);
+			debugHorizontalCollisionCheck.setPosition(futureBounds.position);
+			debugHorizontalCollisionCheck.setFillColor(sf::Color(0, 255, 0, 100)); // Green
+		}
+
+		if (world.isSolidAtRect(futureBounds)) {
+			velocity.x = 0.f;
+			std::optional<const World::Tile *> tile = world.getTileAtCoordinate(sprite.getPosition());
+			if (tile.has_value()){
+				if (dx > 0) {
+					// Clip to right wall
+					futureX = tile.value()->position.x + World::TILE_SIZE - FRAME_SIZE / 2.f;
+				} else if (dx < 0) {
+					// Clip to left wall
+					futureX = tile.value()->position.x + FRAME_SIZE / 2.f;
+				}
+			}
+		}
+
+		sprite.setPosition({futureX, sprite.getPosition().y});
+	}
+
+	void handleVerticalMovement(const World& world, float deltaTime)
+	{
+
+		float dy = velocity.y * deltaTime;
+		float futureY = sprite.getPosition().y + dy;
+
+		auto bounds = getBounds();
+		auto futureBounds = sf::FloatRect(
+		    {bounds.position.x, futureY - bounds.size.y},
+		     {FRAME_SIZE, FRAME_SIZE}
+		);
+
+		if (debugVerticalMovement) {
+			debugVerticalCollisionCheck = sf::RectangleShape(futureBounds.size);
+			debugVerticalCollisionCheck.setPosition(futureBounds.position);
+			debugVerticalCollisionCheck.setFillColor(sf::Color(255, 0, 0, 100)); // Red
+		}
+
+		if (world.isSolidAtRect(futureBounds)) {
+			velocity.y = 0.f;
+			auto tile = world.getTileAtCoordinate(futureBounds.position);
+			if (tile.has_value()) {
+				if (dy > 0) {
+					// Moving down
+					futureY = tile.value()->position.y + World::TILE_SIZE;
+					isOnGround = true;
+					if (jumpState != JumpState::None) {
+						jumpState = JumpState::Landing;
+						currentFrame = 0;
+						frameTimer = 0.f;
+					}
+				} else if (dy < 0) {
+					// Moving up
+					futureY = tile.value()->position.y + World::TILE_SIZE + FRAME_SIZE;
+				}
+			}
+		}
+		sprite.setPosition({sprite.getPosition().x, futureY});
+	}
 
 	void handleMovement(float deltaTime, const World* world = nullptr)
 	{
@@ -127,54 +217,13 @@ class Player {
 			velocity.y = -JUMP_SPEED;
 			isOnGround = false;
 		}
-		if (!isOnGround) {
+		handleHorizontalMovement(*world, deltaTime);
+		if (!isGroundBelow(*world)) {
+			isOnGround = false;
 			velocity.y += GRAVITY * deltaTime;
 		}
 
-		if (world) {
-			sf::FloatRect bounds = getBounds();
-			if (world->willCollideWithWall(bounds, velocity, deltaTime, *world)) {
-				velocity.x = 0.f;
-			}
-		}
-
-		sprite.move(velocity * deltaTime);
-
-		if (world) {
-			sf::FloatRect bounds = getBounds();
-			auto groundY = world->getGroundYAt(bounds);
-
-			if (groundY.has_value() && velocity.y > 0.f) {
-				float playerBottom = sprite.getPosition().y;
-				if (playerBottom >= groundY.value()) {
-					sprite.setPosition({sprite.getPosition().x, groundY.value()});
-					velocity.y = 0.f;
-					if (!isOnGround) {
-						isOnGround = true;
-						if (jumpState != JumpState::None) {
-							jumpState = JumpState::Landing;
-							currentFrame = 0;
-							frameTimer = 0.f;
-						}
-					}
-				}
-			} else if (!groundY.has_value() && isOnGround) {
-				isOnGround = false; // Player walked off platform
-			}
-		} else {
-			if (sprite.getPosition().y >= 0.f && velocity.y > 0.f) {
-				sprite.setPosition({sprite.getPosition().x, 0.f});
-				velocity.y = 0.f;
-				if (!isOnGround) {
-					isOnGround = true;
-					if (jumpState != JumpState::None) {
-						jumpState = JumpState::Landing;
-						currentFrame = 0;
-						frameTimer = 0.f;
-					}
-				}
-			}
-		}
+		handleVerticalMovement(*world, deltaTime);
 	}
 
 	void updateAnimation(float deltaTime, bool attackTriggered)

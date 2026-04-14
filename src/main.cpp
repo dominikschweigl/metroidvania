@@ -84,23 +84,6 @@ int main()
 
 		world.draw(window, view);
 
-		// Draw ground (below y=0) if visible
-		// float startX = std::floor(left / 32.f) * 32.f;
-		// for (float y = 0.f; y < bottom; y += 32.f) {
-		// 	int iy = static_cast<int>(y / 32.f);
-		// 	for (float x = startX; x < right; x += 32.f) {
-		// 		int ix = static_cast<int>(std::floor(x / 32.f));
-		// 		sf::RectangleShape tile({32.f, 32.f});
-		// 		if ((ix + iy) % 2 == 0) {
-		// 			tile.setFillColor({100, 100, 100}); // Darker gray
-		// 		} else {
-		// 			tile.setFillColor({120, 120, 120}); // Lighter gray
-		// 		}
-		// 		tile.setPosition({x, y});
-		// 		window.draw(tile);
-		// 	}
-		// }
-
 		player.draw(window);
 		window.display();
 	}

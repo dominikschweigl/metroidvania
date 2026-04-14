@@ -22,26 +22,18 @@ public:
     World();
     ~World() = default;
 
-    // Build world from a simple grid layout
-    // Grid format: 0 = empty, >0 = solid tile with texture ID
+    // Build world from a simple grid layout (later this will accept more complex data, e.g. from a file)
     void loadFromGrid(const std::vector<std::vector<int>>& grid);
 
-    // Check collision with world and return the ground Y position
-    // Returns the Y coordinate of the highest solid surface below the player
-    std::optional<float> getGroundYAt(const sf::FloatRect& playerBounds) const;
-	std::optional<float> willCollideWithWall(const sf::FloatRect& playerBounds, const sf::Vector2f& velocity, float deltaTime, const World& world) const;
-
-    // Get all tiles within view for efficient rendering
-    std::vector<std::vector<const Tile*>> getTilesInView(const sf::View& view) const;
+	// Just a helper for retrieving tile at a specific world coordinate
+	const std::optional<const Tile*> getTileAtCoordinate(const sf::Vector2f& worldPos) const;
+    // Get all tiles within a rectangle (for collision checks)
+	std::vector<std::vector<const Tile*>> getTilesAtRect(const sf::FloatRect& rect) const;
+	// Return true if any solid tile intersects with the given rectangle
+	bool isSolidAtRect(const sf::FloatRect& rect) const;
 
     // Render all visible tiles
     void draw(sf::RenderWindow& window, const sf::View& view) const;
-
-    // Utility: Check if a point is inside a solid tile
-    bool isPointSolid(const sf::Vector2f& point) const;
-
-    // Get tile at grid coordinates (returns nullptr if out of bounds or empty)
-    const Tile* getTileAt(int gridX, int gridY) const;
 
 private:
     std::vector<std::vector<Tile>> tiles;
