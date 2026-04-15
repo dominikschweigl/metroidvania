@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "../world/world.h"
+
 class Player {
   public:
 	enum class Direction { Left, Right };
@@ -17,28 +19,42 @@ class Player {
 	static constexpr float WALK_FRAME_DURATION = 1 / 10.f;
 	static constexpr float PREJUMP_FRAME_DURATION = 0.08f;
 	static constexpr float LAND_FRAME_DURATION = 0.07f;
-	static constexpr float PEAK_THRESHOLD = 250.f; // velocity.y range considered "peak"
+	static constexpr float PEAK_THRESHOLD =
+		250.f; // velocity.y range considered "peak"
 
 	const sf::Texture idle_texture{"./assets/images/player/idle_hat.png"};
-	const sf::Texture idle_lower_texture{"./assets/images/player/idle_lower_body_extended.png"};
+	const sf::Texture idle_lower_texture{
+		"./assets/images/player/idle_lower_body_extended.png"};
 	const sf::Texture walk_texture{"./assets/images/player/walk.png"};
-	const sf::Texture walk_lower_texture{"./assets/images/player/walk_lower_body_extended.png"};
-	const sf::Texture walk_upper_texture{"./assets/images/player/walk_upper_body.png"};
+	const sf::Texture walk_lower_texture{
+		"./assets/images/player/walk_lower_body_extended.png"};
+	const sf::Texture walk_upper_texture{
+		"./assets/images/player/walk_upper_body.png"};
 	const sf::Texture jump_texture{"./assets/images/player/jump.png"};
 	const sf::Texture run_texture{"./assets/images/player/run.png"};
-	const sf::Texture run_lower_texture{"./assets/images/player/run_lower_body_extended.png"};
-	const sf::Texture run_upper_texture{"./assets/images/player/run_upper_body.png"};
-	const sf::Texture attack_swing_upper_texture{"./assets/images/player/attack_swing_upper_body_extended.png"};
-	const sf::Texture attack_overhead_upper_texture{"./assets/images/player/attack_overhead_upper_body_extended.png"};
+	const sf::Texture run_lower_texture{
+		"./assets/images/player/run_lower_body_extended.png"};
+	const sf::Texture run_upper_texture{
+		"./assets/images/player/run_upper_body.png"};
+	const sf::Texture attack_swing_upper_texture{
+		"./assets/images/player/attack_swing_upper_body_extended.png"};
+	const sf::Texture attack_overhead_upper_texture{
+		"./assets/images/player/attack_overhead_upper_body_extended.png"};
 
 	sf::Sprite sprite;
 	sf::Sprite upperSprite;
+
+	bool debugHorizontalMovement = false;
+	sf::RectangleShape debugHorizontalCollisionCheck;
+	bool debugVerticalMovement = false;
+	sf::RectangleShape debugVerticalCollisionCheck;
 
 	bool isOnGround = true;
 	sf::Vector2f velocity;
 
 	// Each entry defines one attack in the combo chain.
-	// To extend to 3 combos: push another AttackDef into comboChain in the constructor.
+	// To extend to 3 combos: push another AttackDef into comboChain in the
+	// constructor.
 	struct AttackDef {
 		const sf::Texture *upperTexture;
 		int frameCount;
@@ -46,25 +62,34 @@ class Player {
 	};
 	std::vector<AttackDef> comboChain;
 
-	Player() : sprite(idle_texture), upperSprite(walk_upper_texture)
-	{
+	Player() : sprite(idle_texture), upperSprite(walk_upper_texture) {
 		sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
-		upperSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
+		upperSprite.setOrigin(
+			{FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 		comboChain = {
-		    {&attack_swing_upper_texture, 8, 0.09f},
-		    {&attack_overhead_upper_texture, 8, 0.09f},
+			{&attack_swing_upper_texture, 8, 0.09f},
+			{&attack_overhead_upper_texture, 8, 0.09f},
 		};
 	}
 	~Player() = default;
 
-	void update(float deltaTime, bool attackTriggered = false)
-	{
-		handleMovement(deltaTime);
+	sf::FloatRect getBounds() const {
+		return sf::Rect<float>({sprite.getPosition().x - FRAME_SIZE / 2.f,
+								sprite.getPosition().y - FRAME_SIZE},
+							   {FRAME_SIZE, FRAME_SIZE});
+	}
+
+	void update(float deltaTime, const World *world = nullptr,
+				bool attackTriggered = false) {
+		handleMovement(deltaTime, world);
 		updateAnimation(deltaTime, attackTriggered);
 	}
 
-	void draw(sf::RenderWindow &window)
-	{
+	void draw(sf::RenderWindow &window) {
+		if (debugHorizontalMovement)
+			window.draw(debugHorizontalCollisionCheck);
+		if (debugVerticalMovement)
+			window.draw(debugVerticalCollisionCheck);
 		window.draw(sprite);
 		if (drawUpperSprite)
 			window.draw(upperSprite);
@@ -73,7 +98,14 @@ class Player {
 	sf::Vector2f getPosition() const { return sprite.getPosition(); }
 
   private:
-	enum class JumpState { None, PreJump, Ascending, Peak, Descending, Landing };
+	enum class JumpState {
+		None,
+		PreJump,
+		Ascending,
+		Peak,
+		Descending,
+		Landing
+	};
 	JumpState jumpState = JumpState::None;
 
 	int currentFrame = 0;
@@ -87,11 +119,97 @@ class Player {
 
 	bool drawUpperSprite = false;
 
-	void handleMovement(float deltaTime)
-	{
+	bool isGroundBelow(const World &world) const {
+		auto leftTile = world.getTileAtCoordinate(
+			{getBounds().position.x,
+			 getBounds().position.y + getBounds().size.y + 1.f});
+		auto rightTile = world.getTileAtCoordinate(
+			{getBounds().position.x + getBounds().size.x,
+			 getBounds().position.y + getBounds().size.y + 1.f});
+		if (!leftTile.has_value() || !rightTile.has_value())
+			return false;
+		return (leftTile.value()->isSolid || rightTile.value()->isSolid);
+	}
+
+	float handleHorizontalMovement(const World &world, float deltaTime) {
+		float dx = velocity.x * deltaTime;
+		float futureX = sprite.getPosition().x + dx;
+
+		auto bounds = getBounds();
+		auto futureBounds =
+			sf::FloatRect({futureX - FRAME_SIZE / 2.f, bounds.position.y},
+						  {FRAME_SIZE, bounds.size.y});
+
+		if (debugHorizontalMovement) {
+			debugHorizontalCollisionCheck =
+				sf::RectangleShape(futureBounds.size);
+			debugHorizontalCollisionCheck.setPosition(futureBounds.position);
+			debugHorizontalCollisionCheck.setFillColor(
+				sf::Color(0, 255, 0, 100)); // Green
+		}
+
+		if (world.isSolidAtRect(futureBounds)) {
+			velocity.x = 0.f;
+			std::optional<const World::Tile *> tile =
+				world.getTileAtCoordinate(sprite.getPosition());
+			if (tile.has_value()) {
+				if (dx > 0) {
+					// Clip to right wall
+					futureX = tile.value()->position.x + World::TILE_SIZE -
+							  FRAME_SIZE / 2.f - 1.f;
+				} else if (dx < 0) {
+					// Clip to left wall
+					futureX = tile.value()->position.x + FRAME_SIZE / 2.f;
+				}
+			}
+		}
+
+		return futureX;
+	}
+
+	float handleVerticalMovement(const World &world, float deltaTime) {
+
+		float dy = velocity.y * deltaTime;
+		float futureY = sprite.getPosition().y + dy;
+
+		auto bounds = getBounds();
+		auto futureBounds =
+			sf::FloatRect({bounds.position.x, futureY - bounds.size.y},
+						  {FRAME_SIZE, FRAME_SIZE});
+
+		if (debugVerticalMovement) {
+			debugVerticalCollisionCheck = sf::RectangleShape(futureBounds.size);
+			debugVerticalCollisionCheck.setPosition(futureBounds.position);
+			debugVerticalCollisionCheck.setFillColor(
+				sf::Color(255, 0, 0, 100)); // Red
+		}
+
+		if (world.isSolidAtRect(futureBounds)) {
+			velocity.y = 0.f;
+			auto tile = world.getTileAtCoordinate(futureBounds.position);
+			if (tile.has_value()) {
+				if (dy > 0) {
+					// Moving down
+					futureY = tile.value()->position.y + World::TILE_SIZE;
+					isOnGround = true;
+					jumpState = JumpState::Landing;
+					currentFrame = 0;
+					frameTimer = 0.f;
+				} else if (dy < 0) {
+					// Moving up
+					futureY = tile.value()->position.y + World::TILE_SIZE +
+							  FRAME_SIZE;
+				}
+			}
+		}
+		return futureY;
+	}
+
+	void handleMovement(float deltaTime, const World *world = nullptr) {
 		velocity.x = 0.f;
-		bool isSprinting = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
-		                   || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
+		bool isSprinting =
+			sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) ||
+			sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
 		float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -118,28 +236,17 @@ class Player {
 			velocity.y = -JUMP_SPEED;
 			isOnGround = false;
 		}
-		if (!isOnGround) {
+		if (!isGroundBelow(*world)) {
+			isOnGround = false;
 			velocity.y += GRAVITY * deltaTime;
 		}
 
-		sprite.move(velocity * deltaTime);
-
-		if (sprite.getPosition().y >= 0.f && velocity.y > 0.f) {
-			sprite.setPosition({sprite.getPosition().x, 0.f});
-			velocity.y = 0.f;
-			if (!isOnGround) {
-				isOnGround = true;
-				if (jumpState != JumpState::None) {
-					jumpState = JumpState::Landing;
-					currentFrame = 0;
-					frameTimer = 0.f;
-				}
-			}
-		}
+		float futureX = handleHorizontalMovement(*world, deltaTime);
+		float futureY = handleVerticalMovement(*world, deltaTime);
+		sprite.setPosition({futureX, futureY});
 	}
 
-	void updateAnimation(float deltaTime, bool attackTriggered)
-	{
+	void updateAnimation(float deltaTime, bool attackTriggered) {
 		if (attackTriggered) {
 			if (attackComboIndex == -1) {
 				// Start first attack in chain
@@ -147,7 +254,8 @@ class Player {
 				attackFrame = 0;
 				attackFrameTimer = 0.f;
 				comboQueued = false;
-			} else if (attackComboIndex < static_cast<int>(comboChain.size()) - 1) {
+			} else if (attackComboIndex <
+					   static_cast<int>(comboChain.size()) - 1) {
 				// Queue next attack in chain
 				comboQueued = true;
 			}
@@ -161,7 +269,9 @@ class Player {
 				attackFrameTimer -= attack.frameDuration;
 				attackFrame++;
 				if (attackFrame >= attack.frameCount) {
-					if (comboQueued && attackComboIndex < static_cast<int>(comboChain.size()) - 1) {
+					if (comboQueued &&
+						attackComboIndex <
+							static_cast<int>(comboChain.size()) - 1) {
 						comboQueued = false;
 						attackComboIndex++;
 						attackFrame = 0;
@@ -175,9 +285,10 @@ class Player {
 		}
 
 		bool isWalking = velocity.x != 0.f;
-		bool isSprinting = isWalking
-		                   && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
-		                       || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift));
+		bool isSprinting =
+			isWalking &&
+			(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) ||
+			 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift));
 		bool isJumping = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
 		// Interrupt landing with jump input
@@ -187,7 +298,8 @@ class Player {
 		}
 
 		// --- Walking/running while attacking: layered sprites ---
-		if (attackComboIndex >= 0 && isWalking && jumpState == JumpState::None) {
+		if (attackComboIndex >= 0 && isWalking &&
+			jumpState == JumpState::None) {
 			const AttackDef &attack = comboChain[attackComboIndex];
 			sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
 
@@ -196,7 +308,9 @@ class Player {
 				sprite.setTexture(run_lower_texture);
 				frameTimer += deltaTime;
 				if (frameTimer >= WALK_FRAME_DURATION) {
-					frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;
+					frameTimer -=
+						static_cast<int>(frameTimer / WALK_FRAME_DURATION) *
+						WALK_FRAME_DURATION;
 					currentFrame = (currentFrame + 1) % 8;
 				}
 			} else {
@@ -207,12 +321,14 @@ class Player {
 					currentFrame = (currentFrame + 1) % 16;
 				}
 			}
-			sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0},
+											  {FRAME_SIZE, FRAME_SIZE}));
 			sprite.setScale(scale);
 
 			// Upper body: attack upper-body sprite
 			upperSprite.setTexture(*attack.upperTexture);
-			upperSprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			upperSprite.setTextureRect(sf::IntRect(
+				{attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			upperSprite.setPosition(sprite.getPosition());
 			upperSprite.setScale(scale);
 			drawUpperSprite = true;
@@ -225,11 +341,13 @@ class Player {
 			sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
 
 			sprite.setTexture(idle_lower_texture);
-			sprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(
+				sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			sprite.setScale(scale);
 
 			upperSprite.setTexture(*attack.upperTexture);
-			upperSprite.setTextureRect(sf::IntRect({attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			upperSprite.setTextureRect(sf::IntRect(
+				{attackFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			upperSprite.setPosition(sprite.getPosition());
 			upperSprite.setScale(scale);
 			drawUpperSprite = true;
@@ -245,10 +363,13 @@ class Player {
 				sprite.setTexture(run_texture);
 				frameTimer += deltaTime;
 				if (frameTimer >= WALK_FRAME_DURATION) {
-					frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;
+					frameTimer -=
+						static_cast<int>(frameTimer / WALK_FRAME_DURATION) *
+						WALK_FRAME_DURATION;
 					currentFrame = (currentFrame + 1) % 8;
 				}
-				sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+				sprite.setTextureRect(sf::IntRect(
+					{currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			} else if (isWalking) {
 				sprite.setTexture(walk_texture);
 				frameTimer += deltaTime;
@@ -256,10 +377,12 @@ class Player {
 					frameTimer -= WALK_FRAME_DURATION;
 					currentFrame = (currentFrame + 1) % 16;
 				}
-				sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+				sprite.setTextureRect(sf::IntRect(
+					{currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			} else {
 				sprite.setTexture(idle_texture);
-				sprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
+				sprite.setTextureRect(
+					sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
 				currentFrame = 0;
 				frameTimer = 0.f;
 			}
@@ -267,7 +390,8 @@ class Player {
 
 		case JumpState::PreJump:
 			sprite.setTexture(jump_texture);
-			sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(sf::IntRect({currentFrame * FRAME_SIZE, 0},
+											  {FRAME_SIZE, FRAME_SIZE}));
 			frameTimer += deltaTime;
 			if (frameTimer >= PREJUMP_FRAME_DURATION) {
 				frameTimer -= PREJUMP_FRAME_DURATION;
@@ -281,27 +405,31 @@ class Player {
 
 		case JumpState::Ascending:
 			sprite.setTexture(jump_texture);
-			sprite.setTextureRect(sf::IntRect({2 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(
+				sf::IntRect({2 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			if (velocity.y >= -PEAK_THRESHOLD)
 				jumpState = JumpState::Peak;
 			break;
 
 		case JumpState::Peak:
 			sprite.setTexture(jump_texture);
-			sprite.setTextureRect(sf::IntRect({3 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(
+				sf::IntRect({3 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			if (velocity.y > PEAK_THRESHOLD)
 				jumpState = JumpState::Descending;
 			break;
 
 		case JumpState::Descending:
 			sprite.setTexture(jump_texture);
-			sprite.setTextureRect(sf::IntRect({4 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(
+				sf::IntRect({4 * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 			break;
 
 		case JumpState::Landing: {
 			int landingFrame = 5 + currentFrame;
 			sprite.setTexture(jump_texture);
-			sprite.setTextureRect(sf::IntRect({landingFrame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+			sprite.setTextureRect(sf::IntRect({landingFrame * FRAME_SIZE, 0},
+											  {FRAME_SIZE, FRAME_SIZE}));
 			frameTimer += deltaTime;
 			if (frameTimer >= LAND_FRAME_DURATION) {
 				frameTimer -= LAND_FRAME_DURATION;

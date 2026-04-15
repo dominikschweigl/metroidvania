@@ -1,4 +1,5 @@
 #include "entities/player.h"
+#include "world/world.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
@@ -17,6 +18,11 @@ int main()
 	view.setCenter(view.getSize() / 2.f);
 
 	Player player;
+	World world;
+
+	// world.loadFromJson("data/maps/test.json");
+	world.loadFromTMJ("data/maps/test.tmj");
+	world.loadTileset();
 
 	sf::Clock clock;
 
@@ -53,7 +59,7 @@ int main()
 			}
 		}
 
-		player.update(deltaTime, attackTriggered);
+		player.update(deltaTime, &world, attackTriggered);
 		view.setCenter(player.getPosition());
 
 		window.setView(view);
@@ -68,22 +74,7 @@ int main()
 		float right = viewCenter.x + viewSize.x / 2.f;
 		float bottom = viewCenter.y + viewSize.y / 2.f;
 
-		// Draw ground (below y=0) if visible
-		float startX = std::floor(left / 32.f) * 32.f;
-		for (float y = 0.f; y < bottom; y += 32.f) {
-			int iy = static_cast<int>(y / 32.f);
-			for (float x = startX; x < right; x += 32.f) {
-				int ix = static_cast<int>(std::floor(x / 32.f));
-				sf::RectangleShape tile({32.f, 32.f});
-				if ((ix + iy) % 2 == 0) {
-					tile.setFillColor({100, 100, 100}); // Darker gray
-				} else {
-					tile.setFillColor({120, 120, 120}); // Lighter gray
-				}
-				tile.setPosition({x, y});
-				window.draw(tile);
-			}
-		}
+		world.draw(window, view);
 
 		player.draw(window);
 		window.display();
