@@ -1,4 +1,5 @@
 #include "entities/player/player.h"
+#include "entities/race_condition_enemy.h"
 #include "world/world.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>
@@ -19,6 +20,8 @@ int main()
 
 	Player player;
 	World world;
+	RaceConditionEnemy race_condition_enemy_1({5 * 32.f, 15 * 32.f});
+	RaceConditionEnemy race_condition_enemy_2({11 * 32.f, 15 * 32.f});
 
 	// world.loadFromJson("data/maps/test.json");
 	world.loadFromTMJ("data/maps/test.tmj");
@@ -60,6 +63,8 @@ int main()
 		}
 
 		player.update(deltaTime, &world, attackTriggered);
+		race_condition_enemy_1.update(deltaTime, world, player.getPosition());
+		race_condition_enemy_2.update(deltaTime, world, player.getPosition());
 		view.setCenter(player.getPosition());
 
 		window.setView(view);
@@ -70,6 +75,8 @@ int main()
 		world.draw(window, view);
 
 		player.draw(window);
+		race_condition_enemy_1.draw(window);
+		race_condition_enemy_2.draw(window);
 		window.display();
 	}
 }
