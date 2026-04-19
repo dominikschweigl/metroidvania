@@ -3,6 +3,7 @@
 		"fmt",
 		"sfml",
 		"nlohmann-json",
-		"tinyxml2"
+		"tinyxml2",
+		"catch2"
 	]
 }

@@ -32,6 +32,10 @@ TODO:
 - coyote jump
 - faster down gravity during jump
 
+Project Setup with vcpkg, clang-format, editorconfig, git, Cmake.
+
+Catch2 Setup.
+
 ## Lukas Schmölz
 
 (2) enemies

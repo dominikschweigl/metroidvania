@@ -1,4 +1,4 @@
-#include "entities/player.h"
+#include "entities/player/player.h"
 #include "world/world.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>
@@ -66,13 +66,6 @@ int main()
 
 		// Draw background: sky (above y=0) and ground (below y=0)
 		window.clear({135, 206, 235}); // Light blue sky
-
-		// Calculate visible area bounds
-		sf::Vector2f viewCenter = view.getCenter();
-		sf::Vector2f viewSize = view.getSize();
-		float left = viewCenter.x - viewSize.x / 2.f;
-		float right = viewCenter.x + viewSize.x / 2.f;
-		float bottom = viewCenter.y + viewSize.y / 2.f;
 
 		world.draw(window, view);
 

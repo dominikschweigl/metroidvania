@@ -184,3 +184,31 @@ Run with whatever preset names exist locally, for example:
 cmake --preset default-debug
 cmake --build --preset default-debug
 ```
+
+## Running Tests
+
+### First-time setup
+
+If `catch2` was recently added to `vcpkg.json`, reconfigure to install it:
+
+```powershell
+cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+```
+
+### Build and run
+
+```powershell
+# Build only the test executable
+cmake --build ./build/release --target metroidvania_tests
+
+# Run via CTest
+ctest --test-dir ./build/release
+
+# Or run directly
+./build/release/metroidvania_tests.exe
+```
+
+### Notes on the test setup
+
+- **`PLAYER_SOURCES`** — extracted in `CMakeLists.txt` so both the game and test executables share the same source list without duplicating it.
+- **`WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"`** — required because state constructors load textures from relative paths like `"./assets/images/player/..."` at construction time. Without this, the working directory would be the build folder and texture loads would silently fail.
