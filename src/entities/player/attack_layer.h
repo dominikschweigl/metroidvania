@@ -4,8 +4,8 @@
 
 struct AttackDef {
 	const sf::Texture *upperTexture;
-	int                frameCount;
-	float              frameDuration;
+	int frameCount;
+	float frameDuration;
 };
 
 class AttackLayer {
@@ -19,18 +19,18 @@ class AttackLayer {
 
 	void reset() noexcept
 	{
-		comboIndex  = -1;
-		frame       = 0;
-		frameTimer  = 0.f;
+		comboIndex = -1;
+		frame = 0;
+		frameTimer = 0.f;
 		comboQueued = false;
 	}
 
 	void trigger()
 	{
 		if (comboIndex == -1) {
-			comboIndex  = 0;
-			frame       = 0;
-			frameTimer  = 0.f;
+			comboIndex = 0;
+			frame = 0;
+			frameTimer = 0.f;
 			comboQueued = false;
 		} else if (comboIndex < static_cast<int>(comboChain.size()) - 1) {
 			comboQueued = true;
@@ -50,10 +50,10 @@ class AttackLayer {
 				if (comboQueued && comboIndex < static_cast<int>(comboChain.size()) - 1) {
 					comboQueued = false;
 					++comboIndex;
-					frame      = 0;
+					frame = 0;
 					frameTimer = 0.f;
 				} else {
-					comboIndex  = -1;
+					comboIndex = -1;
 					comboQueued = false;
 				}
 			}
@@ -72,8 +72,8 @@ class AttackLayer {
   private:
 	std::vector<AttackDef> comboChain;
 
-	int   comboIndex  = -1;
-	int   frame       = 0;
-	float frameTimer  = 0.f;
-	bool  comboQueued = false;
+	int comboIndex = -1;
+	int frame = 0;
+	float frameTimer = 0.f;
+	bool comboQueued = false;
 };

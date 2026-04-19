@@ -27,7 +27,8 @@ jobs:
             libxrandr-dev \
             libxcursor-dev \
             libudev-dev \
-            libgl1-mesa-dev
+            libgl1-mesa-dev \
+            xvfb
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -36,7 +37,7 @@ jobs:
       - name: Build Project
         run: cmake --build --preset linux
       - name: Run Tests
-        run: ctest --test-dir build/linux -C Release --output-on-failure
+        run: xvfb-run ctest --test-dir build/linux -C Release --output-on-failure
 
   build-windows-mingw:
     name: Build & Test (Windows MinGW)
