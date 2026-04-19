@@ -1,4 +1,4 @@
-#include "entities/player.h"
+#include "entities/player/player.h"
 #include "world/world.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>
