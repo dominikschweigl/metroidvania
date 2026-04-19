@@ -3,7 +3,8 @@
 
 PlayerState *PreJumpState::update(float dt, Player &p)
 {
-	// Frame advancement and transition to Ascending happen in applyAnimation
+	if (readyToAscend)
+		return &p.states.ascending;
 	return this;
 }
 
@@ -18,7 +19,7 @@ void PreJumpState::applyAnimation(float dt, Player &p)
 		currentFrame++;
 		if (currentFrame >= 2) {
 			currentFrame = 2;
-			p.transitionTo(p.states.ascending);
+			readyToAscend = true;
 		}
 	}
 }
@@ -28,4 +29,5 @@ void PreJumpState::onEnter(Player &p)
 	p.velocity.y = 0.f;
 	currentFrame = 0;
 	frameTimer = 0.f;
+	readyToAscend = false;
 }

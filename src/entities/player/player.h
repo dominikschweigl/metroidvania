@@ -17,6 +17,19 @@ class Player {
 	enum class Direction { Left, Right };
 	Direction direction = Direction::Left;
 
+	// State pool — stored by value, transitions are pointer swaps (no allocation).
+	// Must be declared before sprite/upperSprite so textures are ready for the constructor initializer.
+	struct States {
+		IdleState idle;
+		WalkingState walking;
+		RunningState running;
+		PreJumpState preJump;
+		AscendingState ascending;
+		PeakState peak;
+		DescendingState descending;
+		LandingState landing;
+	};
+
 	static constexpr float GRAVITY = 1200.f;
 	static constexpr float WALKING_SPEED = 200.f;
 	static constexpr float RUNNING_SPEED = 350.f;
@@ -48,22 +61,12 @@ class Player {
   private:
 	bool isOnGround = true;
 	bool inputJump = false;
+	bool isSprinting = false;
 	sf::Vector2f velocity;
 
 	AttackLayer attackLayer;
 
-	// State pool — stored by value, transitions are pointer swaps (no allocation).
-	// Must be declared before sprite/upperSprite so textures are ready for the constructor initializer.
-	struct States {
-		IdleState idle;
-		WalkingState walking;
-		RunningState running;
-		PreJumpState preJump;
-		AscendingState ascending;
-		PeakState peak;
-		DescendingState descending;
-		LandingState landing;
-	} states;
+	States states;
 
 	sf::Sprite sprite;
 	sf::Sprite upperSprite;
@@ -160,4 +163,6 @@ class Player {
 	friend class PeakState;
 	friend class DescendingState;
 	friend class LandingState;
+
+	friend struct PlayerTestAccess;
 };

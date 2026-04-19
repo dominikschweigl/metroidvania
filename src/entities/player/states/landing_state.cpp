@@ -5,6 +5,8 @@ PlayerState *LandingState::update(float dt, Player &p)
 {
 	if (p.inputJump)
 		return &p.states.preJump;
+	if (animationComplete)
+		return &p.states.idle;
 	return this;
 }
 
@@ -21,7 +23,7 @@ void LandingState::applyAnimation(float dt, Player &p)
 		if (currentFrame >= 4) {
 			currentFrame = 0;
 			frameTimer = 0.f;
-			p.transitionTo(p.states.idle);
+			animationComplete = true;
 		}
 	}
 }
@@ -30,4 +32,5 @@ void LandingState::onEnter(Player &p)
 {
 	currentFrame = 0;
 	frameTimer = 0.f;
+	animationComplete = false;
 }

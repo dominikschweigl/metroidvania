@@ -8,10 +8,8 @@ PlayerState *IdleState::update(float dt, Player &p)
 	if (p.inputJump)
 		return &p.states.preJump;
 	if (p.velocity.x != 0.f) {
-		bool sprinting = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift)
-		                 || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
-		return sprinting ? static_cast<PlayerState *>(&p.states.running)
-		                 : static_cast<PlayerState *>(&p.states.walking);
+		return p.isSprinting ? static_cast<PlayerState *>(&p.states.running)
+		                     : static_cast<PlayerState *>(&p.states.walking);
 	}
 	return this;
 }

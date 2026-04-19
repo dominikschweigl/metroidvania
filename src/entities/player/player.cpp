@@ -38,7 +38,7 @@ void Player::handleMovement(float deltaTime, const World *world)
 	inputJump = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
 	velocity.x = 0.f;
-	bool isSprinting =
+	isSprinting =
 	    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
 	float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
@@ -50,6 +50,9 @@ void Player::handleMovement(float deltaTime, const World *world)
 		velocity.x = speed;
 		direction = Direction::Right;
 	}
+
+	if (world == nullptr)
+		return;
 
 	if (!isGroundBelow(*world)) {
 		isOnGround = false;

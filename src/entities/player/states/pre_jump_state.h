@@ -13,4 +13,7 @@ class PreJumpState : public PlayerState {
 	PlayerState *update(float dt, Player &p) override;
 	void applyAnimation(float dt, Player &p) override;
 	void onEnter(Player &p) override;
+
+  private:
+	bool readyToAscend = false;
 };
