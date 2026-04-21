@@ -1,5 +1,5 @@
 #include "entities/player/player.h"
-#include "entities/race_condition_slime.h"
+#include "entities/race_condition_slime/race_condition_slime.h"
 #include "world/world.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>

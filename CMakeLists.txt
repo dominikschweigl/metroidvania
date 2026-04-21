@@ -13,6 +13,7 @@ include(Catch)
 
 set(GAME_SOURCES
     src/world/world.cpp
+    src/entities/base/base_enemy.cpp
     src/entities/player/player.cpp
     src/entities/player/states/idle_state.cpp
     src/entities/player/states/walking_state.cpp
@@ -22,6 +23,12 @@ set(GAME_SOURCES
     src/entities/player/states/peak_state.cpp
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
+    src/entities/race_condition_slime/race_condition_slime.cpp
+    src/entities/race_condition_slime/states/idle_state.cpp
+    src/entities/race_condition_slime/states/chase_state.cpp
+    src/entities/race_condition_slime/states/windup_state.cpp
+    src/entities/race_condition_slime/states/attack_state.cpp
+    src/entities/race_condition_slime/states/recover_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
