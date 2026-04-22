@@ -34,7 +34,11 @@ set(GAME_SOURCES
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
 target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System)
 
-add_executable(metroidvania_tests tests/unit/player_state_tests.cpp ${GAME_SOURCES})
+add_executable(metroidvania_tests
+    tests/unit/player_state_tests.cpp
+    tests/unit/base_enemy_tests.cpp
+    tests/unit/race_condition_slime_tests.cpp
+    ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System)
 catch_discover_tests(metroidvania_tests WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

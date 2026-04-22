@@ -59,4 +59,6 @@ class BaseEnemy {
 	EnemyState *currentState = nullptr;
 
 	static constexpr float GRAVITY = 1200.f;
+
+	friend struct EnemyTestAccess;
 };

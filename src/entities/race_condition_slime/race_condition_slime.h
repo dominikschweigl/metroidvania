@@ -85,6 +85,8 @@ class RaceConditionSlime : public BaseEnemy {
 	friend class rc_slime::AttackState;
 	friend class rc_slime::RecoverState;
 
+	friend struct SlimeTestAccess;
+
 	float uniformFloat(float lo, float hi) { return std::uniform_real_distribution<float>(lo, hi)(rng); }
 	void resetTeleportTimer();
 	void glitchTeleport(const World &world, sf::Vector2f playerPos);
