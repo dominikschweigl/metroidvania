@@ -1,5 +1,5 @@
-#include "../race_condition_slime.h"
 #include "chase_state.h"
+#include "../race_condition_slime.h"
 #include <cmath>
 
 namespace rc_slime {
@@ -50,9 +50,7 @@ void ChaseState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 		currentFrame = (currentFrame + 1) % FRAME_COUNT;
 	}
 
-	slime.sprite.setTexture(slime.movingTexture);
-	slime.sprite.setTextureRect(sf::IntRect({currentFrame * RaceConditionSlime::FRAME_SIZE, 0},
-	                                        {RaceConditionSlime::FRAME_SIZE, RaceConditionSlime::FRAME_SIZE}));
+	slime.setAnimation(RaceConditionSlime::SlimeAnimation::Moving, currentFrame);
 }
 
 void ChaseState::onEnter(BaseEnemy & /*enemy*/)

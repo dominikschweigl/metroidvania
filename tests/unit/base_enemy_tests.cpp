@@ -1,6 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "enemy_test_access.h"
+#include "../../src/entities/base/base_enemy.h"
+#include "../../src/entities/base/enemy_physics.h"
+#include "../../src/entities/base/enemy_state.h"
+#include "../../src/world/world.h"
+#include <SFML/Graphics.hpp>
 
 namespace {
 
@@ -100,47 +104,126 @@ TEST_CASE("isGroundBelow reports true when enemy stands on a solid tile")
 {
 	World w = makeWalledWorld();
 	// Tile floor is row y=4, so top of floor is at y = 4*TILE = 128.
-	TestEnemy e({5.f * TILE, 4.f * TILE}, 28.f, 28.f);
-	REQUIRE(EnemyTestAccess::isGroundBelow(e, w));
+	sf::FloatRect bounds{{5.f * TILE - 14.f, 4.f * TILE - 28.f}, {28.f, 28.f}};
+	REQUIRE(EnemyPhysics::isGroundBelow(bounds, w));
 }
 
 TEST_CASE("isGroundBelow reports false when enemy is floating mid-air")
 {
 	World w = makeEmptyWorld();
-	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
-	REQUIRE_FALSE(EnemyTestAccess::isGroundBelow(e, w));
+	sf::FloatRect bounds{{5.f * TILE - 14.f, 2.f * TILE - 28.f}, {28.f, 28.f}};
+	REQUIRE_FALSE(EnemyPhysics::isGroundBelow(bounds, w));
 }
 
 TEST_CASE("applyGravity accelerates downward when not grounded")
 {
 	World w = makeEmptyWorld();
-	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setOnGround(e, false);
+	sf::FloatRect bounds{{5.f * TILE - 14.f, 2.f * TILE - 28.f}, {28.f, 28.f}};
+	float velY = 0.f;
+	bool onGround = false;
 
-	float vyAfter = EnemyTestAccess::applyGravity(e, 0.1f, w);
+	EnemyPhysics::applyGravity(velY, onGround, 0.1f, 1200.f, bounds, w);
 
 	// GRAVITY=1200, dt=0.1 → vy should be 120
-	REQUIRE(vyAfter == 120.f);
-	REQUIRE_FALSE(e.isOnGroundFlag());
+	REQUIRE(velY == 120.f);
+	REQUIRE_FALSE(onGround);
 }
 
 TEST_CASE("applyGravity does not accelerate when ground is below")
 {
 	World w = makeWalledWorld();
-	TestEnemy e({5.f * TILE, 4.f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setOnGround(e, true);
+	sf::FloatRect bounds{{5.f * TILE - 14.f, 4.f * TILE - 28.f}, {28.f, 28.f}};
+	float velY = 0.f;
+	bool onGround = true;
 
-	float vyAfter = EnemyTestAccess::applyGravity(e, 0.1f, w);
-	REQUIRE(vyAfter == 0.f);
+	EnemyPhysics::applyGravity(velY, onGround, 0.1f, 1200.f, bounds, w);
+	REQUIRE(velY == 0.f);
+}
+
+TEST_CASE("applyGravity with custom gravity values")
+{
+	World w = makeEmptyWorld();
+	sf::FloatRect bounds{{5.f * TILE - 14.f, 2.f * TILE - 28.f}, {28.f, 28.f}};
+
+	SECTION("Higher gravity accelerates faster")
+	{
+		float velY = 0.f;
+		bool onGround = false;
+		float customGravity = 2000.f; // 2x the default
+
+		EnemyPhysics::applyGravity(velY, onGround, 0.1f, customGravity, bounds, w);
+
+		// With gravity=2000, dt=0.1 → vy should be 200
+		REQUIRE(velY == 200.f);
+	}
+
+	SECTION("Lower gravity accelerates slower")
+	{
+		float velY = 0.f;
+		bool onGround = false;
+		float customGravity = 600.f; // 0.5x the default
+
+		EnemyPhysics::applyGravity(velY, onGround, 0.1f, customGravity, bounds, w);
+
+		// With gravity=600, dt=0.1 → vy should be 60
+		REQUIRE(velY == 60.f);
+	}
+
+	SECTION("Zero gravity produces no acceleration")
+	{
+		float velY = 0.f;
+		bool onGround = false;
+		float customGravity = 0.f;
+
+		EnemyPhysics::applyGravity(velY, onGround, 0.1f, customGravity, bounds, w);
+
+		// With gravity=0, no acceleration
+		REQUIRE(velY == 0.f);
+	}
+}
+
+TEST_CASE("BaseEnemy respects custom gravity field")
+{
+	World w = makeEmptyWorld();
+	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
+
+	SECTION("Default gravity is 1200")
+	{
+		REQUIRE(e.gravity == 1200.f);
+	}
+
+	SECTION("Custom gravity affects falling")
+	{
+		e.gravity = 2000.f; // Heavier enemy
+		e.setOnGround(false);
+
+		e.update(0.1f, w, {0.f, 0.f});
+
+		// With gravity=2000, dt=0.1, enemy should have fallen more
+		// Expected vel.y = 200.f
+		REQUIRE(e.getVelocity().y == 200.f);
+	}
+
+	SECTION("Low gravity affects falling")
+	{
+		e.gravity = 600.f; // Lighter enemy
+		e.setOnGround(false);
+
+		e.update(0.1f, w, {0.f, 0.f});
+
+		// With gravity=600, dt=0.1, enemy should have fallen less
+		// Expected vel.y = 60.f
+		REQUIRE(e.getVelocity().y == 60.f);
+	}
 }
 
 TEST_CASE("resolveHorizontal moves freely through empty space")
 {
 	World w = makeEmptyWorld();
-	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setVel(e, {120.f, 0.f});
+	sf::Vector2f pos{5.f * TILE, 2.f * TILE};
+	float velX = 120.f;
 
-	float x = EnemyTestAccess::resolveHorizontal(e, 0.1f, w);
+	float x = EnemyPhysics::resolveHorizontal(pos, velX, 28.f, 28.f, 0.1f, w);
 	REQUIRE(x == 5.f * TILE + 12.f); // 120 * 0.1 = 12
 }
 
@@ -149,15 +232,15 @@ TEST_CASE("resolveHorizontal stops at wall and zeros horizontal velocity")
 	World w = makeWalledWorld();
 	// Place enemy so one step at moderate speed overlaps the right wall tile.
 	// Wall tile column 9 spans x=[288, 320]; enemy right edge starts ~5px from it.
-	TestEnemy e({9.f * TILE - 14.f - 5.f, 2.f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setVel(e, {200.f, 0.f});
+	sf::Vector2f pos{9.f * TILE - 14.f - 5.f, 2.f * TILE};
+	float velX = 200.f;
 
-	float x = EnemyTestAccess::resolveHorizontal(e, 0.1f, w);
+	float x = EnemyPhysics::resolveHorizontal(pos, velX, 28.f, 28.f, 0.1f, w);
 
 	// Formula: adjacent-tile.x + TILE - width/2 - 1.
 	// Current tile (8, 2) has x=256 → expected = 256 + 32 - 14 - 1 = 273.
 	REQUIRE(x == 273.f);
-	REQUIRE(e.getVelocity().x == 0.f);
+	REQUIRE(velX == 0.f);
 }
 
 TEST_CASE("resolveVertical plants enemy on floor and sets isOnGround")
@@ -166,15 +249,16 @@ TEST_CASE("resolveVertical plants enemy on floor and sets isOnGround")
 	// Start 16 px above the floor. With vel=300 and dt=0.1, enemy falls 30 px —
 	// enough for the destination rect to overlap the floor tile without the head
 	// tunneling past the floor's top in a single step.
-	TestEnemy e({5.f * TILE, 3.5f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setVel(e, {0.f, 300.f});
+	sf::Vector2f pos{5.f * TILE, 3.5f * TILE};
+	float velY = 300.f;
+	bool onGround = false;
 
-	float y = EnemyTestAccess::resolveVertical(e, 0.1f, w);
+	float y = EnemyPhysics::resolveVertical(pos, velY, onGround, 28.f, 28.f, 0.1f, w);
 
 	// Foot position should snap to top of floor (y = 4*TILE).
 	REQUIRE(y == 4.f * TILE);
-	REQUIRE(e.isOnGroundFlag());
-	REQUIRE(e.getVelocity().y == 0.f);
+	REQUIRE(onGround);
+	REQUIRE(velY == 0.f);
 }
 
 TEST_CASE("resolveVertical bumps head on ceiling and zeros velocity")
@@ -182,14 +266,15 @@ TEST_CASE("resolveVertical bumps head on ceiling and zeros velocity")
 	World w = makeWalledWorld();
 	// Head just below ceiling; rise at a speed slow enough that the destination
 	// rect still overlaps the ceiling tile rather than tunneling over it.
-	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
-	EnemyTestAccess::setVel(e, {0.f, -200.f});
+	sf::Vector2f pos{5.f * TILE, 2.f * TILE};
+	float velY = -200.f;
+	bool onGround = false;
 
-	float y = EnemyTestAccess::resolveVertical(e, 0.1f, w);
+	float y = EnemyPhysics::resolveVertical(pos, velY, onGround, 28.f, 28.f, 0.1f, w);
 
 	// Ceiling tile spans y=[0,32]. Formula: tile.y + TILE + height = 0 + 32 + 28 = 60.
 	REQUIRE(y == 60.f);
-	REQUIRE(e.getVelocity().y == 0.f);
+	REQUIRE(velY == 0.f);
 }
 
 TEST_CASE("BaseEnemy::update runs the current state and its animation")
@@ -197,7 +282,7 @@ TEST_CASE("BaseEnemy::update runs the current state and its animation")
 	World w = makeEmptyWorld();
 	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
 	TestState s;
-	EnemyTestAccess::setCurrentState(e, &s);
+	e.setState(&s);
 
 	e.update(0.016f, w, {0.f, 0.f});
 
@@ -211,13 +296,13 @@ TEST_CASE("BaseEnemy::update calls onExit/onEnter on state transition")
 	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
 	TestState from, to;
 	from.nextState = &to;
-	EnemyTestAccess::setCurrentState(e, &from);
+	e.setState(&from);
 
 	e.update(0.016f, w, {0.f, 0.f});
 
 	REQUIRE(from.exitCalls == 1);
 	REQUIRE(to.enterCalls == 1);
-	REQUIRE(EnemyTestAccess::getCurrentState(e) == &to);
+	REQUIRE(e.getState() == &to);
 }
 
 TEST_CASE("BaseEnemy::update runs updateAnimation on the *new* state after transition")
@@ -227,7 +312,7 @@ TEST_CASE("BaseEnemy::update runs updateAnimation on the *new* state after trans
 	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
 	TestState from, to;
 	from.nextState = &to;
-	EnemyTestAccess::setCurrentState(e, &from);
+	e.setState(&from);
 
 	e.update(0.016f, w, {0.f, 0.f});
 
@@ -240,18 +325,18 @@ TEST_CASE("BaseEnemy::update updates facing from player position")
 	World w = makeEmptyWorld();
 	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
 	TestState s;
-	EnemyTestAccess::setCurrentState(e, &s);
+	e.setState(&s);
 
 	SECTION("player to the right → face right")
 	{
-		EnemyTestAccess::setFacing(e, BaseEnemy::Direction::Left);
+		e.setFacing(BaseEnemy::Direction::Left);
 		e.update(0.016f, w, {e.getPosition().x + 100.f, e.getPosition().y});
 		REQUIRE(e.getFacing() == BaseEnemy::Direction::Right);
 	}
 
 	SECTION("player to the left → face left")
 	{
-		EnemyTestAccess::setFacing(e, BaseEnemy::Direction::Right);
+		e.setFacing(BaseEnemy::Direction::Right);
 		e.update(0.016f, w, {e.getPosition().x - 100.f, e.getPosition().y});
 		REQUIRE(e.getFacing() == BaseEnemy::Direction::Left);
 	}
@@ -262,7 +347,7 @@ TEST_CASE("BaseEnemy::update invokes onPreUpdate once per tick with dt")
 	World w = makeEmptyWorld();
 	TestEnemy e({5.f * TILE, 2.f * TILE}, 28.f, 28.f);
 	TestState s;
-	EnemyTestAccess::setCurrentState(e, &s);
+	e.setState(&s);
 
 	e.update(0.033f, w, {0.f, 0.f});
 

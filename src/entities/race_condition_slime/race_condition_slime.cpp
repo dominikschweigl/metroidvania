@@ -31,7 +31,7 @@ void RaceConditionSlime::tryJumpTowards(float heightDiff)
 		return;
 	}
 	// Jump velocity: v = sqrt(2 * g * h), capped at MAX_JUMP_SPEED.
-	float necessaryVelocity = std::sqrt(2.f * GRAVITY * (heightDiff + ENTITY_HEIGHT));
+	float necessaryVelocity = std::sqrt(2.f * gravity * (heightDiff + ENTITY_HEIGHT));
 	vel.y = -std::min(necessaryVelocity, MAX_JUMP_SPEED);
 	isOnGround = false;
 	jumpCooldown = JUMP_COOLDOWN;
@@ -42,6 +42,30 @@ void RaceConditionSlime::maybeTeleport(const World &world, sf::Vector2f playerPo
 	if (teleportTimer <= 0.f) {
 		glitchTeleport(world, playerPos);
 	}
+}
+
+void RaceConditionSlime::setAnimation(SlimeAnimation anim, int frame)
+{
+	const sf::Texture *tex = nullptr;
+	switch (anim) {
+	case SlimeAnimation::Idle:
+		tex = &idleTexture;
+		break;
+	case SlimeAnimation::Moving:
+		tex = &movingTexture;
+		break;
+	case SlimeAnimation::WindUp:
+		tex = &windupTexture;
+		break;
+	case SlimeAnimation::Attack:
+		tex = &attackTexture;
+		break;
+	case SlimeAnimation::Recover:
+		tex = &recoverTexture;
+		break;
+	}
+	sprite.setTexture(*tex);
+	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 }
 
 void RaceConditionSlime::resetTeleportTimer()
@@ -90,7 +114,9 @@ bool RaceConditionSlime::isValidTeleportDest(const World &world, float newX, flo
 	}
 
 	constexpr float MAX_FALL = 5.f * World::TILE_SIZE; // stays within jump reach
-	for (float delta = 1.f; delta <= MAX_FALL; delta += World::TILE_SIZE / 2.f) {
+	constexpr float STEP = World::TILE_SIZE / 2.f;
+	for (int i = 1; i * STEP <= MAX_FALL; ++i) {
+		float delta = i * STEP;
 		float y = newY + delta;
 		auto lhs = world.getTileAtCoordinate({newX - ENTITY_WIDTH / 2.f, y});
 		auto rhs = world.getTileAtCoordinate({newX + ENTITY_WIDTH / 2.f, y});

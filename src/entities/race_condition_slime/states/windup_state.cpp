@@ -1,5 +1,5 @@
-#include "../race_condition_slime.h"
 #include "windup_state.h"
+#include "../race_condition_slime.h"
 
 namespace rc_slime {
 
@@ -28,9 +28,7 @@ void WindUpState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 		currentFrame = (currentFrame + 1) % FRAME_COUNT;
 	}
 
-	slime.sprite.setTexture(slime.windupTexture);
-	slime.sprite.setTextureRect(sf::IntRect({currentFrame * RaceConditionSlime::FRAME_SIZE, 0},
-	                                        {RaceConditionSlime::FRAME_SIZE, RaceConditionSlime::FRAME_SIZE}));
+	slime.setAnimation(RaceConditionSlime::SlimeAnimation::WindUp, currentFrame);
 }
 
 void WindUpState::onEnter(BaseEnemy &enemy)

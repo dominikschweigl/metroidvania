@@ -33,6 +33,12 @@ class BaseEnemy {
 	void setFacing(Direction d) { facing = d; }
 	bool isOnGroundFlag() const { return isOnGround; }
 	void setOnGround(bool onGround) { isOnGround = onGround; }
+	void setPosition(sf::Vector2f p) { pos = p; }
+	EnemyState* getState() const { return currentState; }
+	void setState(EnemyState* s) { currentState = s; }
+
+	// Gravity acceleration; configurable per instance/subclass. Default 1200 u/s².
+	float gravity = 1200.f;
 
   protected:
 	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight)
@@ -57,8 +63,4 @@ class BaseEnemy {
 
 	// State machine pointer. Derived class must assign an initial state
 	EnemyState *currentState = nullptr;
-
-	static constexpr float GRAVITY = 1200.f;
-
-	friend struct EnemyTestAccess;
 };

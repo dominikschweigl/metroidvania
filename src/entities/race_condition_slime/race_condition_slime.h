@@ -11,6 +11,8 @@
 // Race-condition themed enemy. State flow: Idle -> Chase -> WindUp -> Attack -> Recover.
 class RaceConditionSlime : public BaseEnemy {
   public:
+	enum class SlimeAnimation { Idle, Moving, WindUp, Attack, Recover };
+
 	// Motion
 	static constexpr float MOVE_SPEED = 150.f;
 	static constexpr float MAX_JUMP_SPEED = 700.f;
@@ -54,6 +56,13 @@ class RaceConditionSlime : public BaseEnemy {
 
 	float getAttackCooldown() const { return attackCooldown; }
 	void setAttackCooldown(float t) { attackCooldown = t; }
+	float getJumpCooldown() const { return jumpCooldown; }
+	void setJumpCooldown(float v) { jumpCooldown = v; }
+	float getTeleportTimer() const { return teleportTimer; }
+	void setTeleportTimer(float v) { teleportTimer = v; }
+
+	// Set current animation state. Manages sprite and texture updates.
+	void setAnimation(SlimeAnimation anim, int frame);
 
 	// Slime abilities exposed to ChaseState. Kept on the slime (not the state)
 	// because they rely on slime-owned data (rng, timers).
@@ -77,15 +86,6 @@ class RaceConditionSlime : public BaseEnemy {
 	sf::Sprite sprite{idleTexture};
 
 	std::mt19937 rng;
-
-	// Textures and sprite are private; states access them via friend.
-	friend class rc_slime::IdleState;
-	friend class rc_slime::ChaseState;
-	friend class rc_slime::WindUpState;
-	friend class rc_slime::AttackState;
-	friend class rc_slime::RecoverState;
-
-	friend struct SlimeTestAccess;
 
 	float uniformFloat(float lo, float hi) { return std::uniform_real_distribution<float>(lo, hi)(rng); }
 	void resetTeleportTimer();

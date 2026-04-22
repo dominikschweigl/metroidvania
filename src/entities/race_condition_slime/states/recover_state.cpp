@@ -1,5 +1,5 @@
-#include "../race_condition_slime.h"
 #include "recover_state.h"
+#include "../race_condition_slime.h"
 #include <cmath>
 
 namespace rc_slime {
@@ -31,9 +31,7 @@ void RecoverState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 		currentFrame = (currentFrame + 1) % FRAME_COUNT;
 	}
 
-	slime.sprite.setTexture(slime.recoverTexture);
-	slime.sprite.setTextureRect(sf::IntRect({currentFrame * RaceConditionSlime::FRAME_SIZE, 0},
-	                                        {RaceConditionSlime::FRAME_SIZE, RaceConditionSlime::FRAME_SIZE}));
+	slime.setAnimation(RaceConditionSlime::SlimeAnimation::Recover, currentFrame);
 }
 
 void RecoverState::onEnter(BaseEnemy & /*enemy*/)

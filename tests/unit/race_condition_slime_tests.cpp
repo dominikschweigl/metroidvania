@@ -1,7 +1,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "enemy_test_access.h"
+#include "entities/base/base_enemy.h"
+#include "entities/race_condition_slime/race_condition_slime.h"
+#include "world/world.h"
 
 #include "entities/race_condition_slime/states/attack_state.h"
 #include "entities/race_condition_slime/states/chase_state.h"
@@ -37,7 +39,7 @@ sf::Vector2f groundSpawn()
 TEST_CASE("RaceConditionSlime starts in Idle state at spawn position")
 {
 	RaceConditionSlime s(groundSpawn());
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &s.states.idle);
+	REQUIRE(s.getState() == &s.states.idle);
 	REQUIRE(s.getPosition() == groundSpawn());
 	REQUIRE(s.getVelocity() == sf::Vector2f{0.f, 0.f});
 	REQUIRE(s.getAttackCooldown() == 0.f);
@@ -49,13 +51,13 @@ TEST_CASE("RaceConditionSlime::isAttacking only true during AttackState")
 
 	REQUIRE_FALSE(s.isAttacking());
 
-	EnemyTestAccess::setCurrentState(s, &s.states.windup);
+	s.setState(&s.states.windup);
 	REQUIRE_FALSE(s.isAttacking());
 
-	EnemyTestAccess::setCurrentState(s, &s.states.attack);
+	s.setState(&s.states.attack);
 	REQUIRE(s.isAttacking());
 
-	EnemyTestAccess::setCurrentState(s, &s.states.recover);
+	s.setState(&s.states.recover);
 	REQUIRE_FALSE(s.isAttacking());
 }
 
@@ -65,15 +67,15 @@ TEST_CASE("onPreUpdate decrements per-frame cooldown timers (via BaseEnemy::upda
 	RaceConditionSlime s(groundSpawn());
 
 	s.setAttackCooldown(1.0f);
-	SlimeTestAccess::setJumpCooldown(s, 0.8f);
-	float telInit = SlimeTestAccess::getTeleportTimer(s);
+	s.setJumpCooldown(0.8f);
+	float telInit = s.getTeleportTimer();
 
 	// One physics tick. Player placed far away so state stays idle.
 	s.update(0.1f, w, {0.f, 0.f});
 
 	REQUIRE(s.getAttackCooldown() == 0.9f);
-	REQUIRE(SlimeTestAccess::getJumpCooldown(s) == Catch::Approx(0.7f));
-	REQUIRE(SlimeTestAccess::getTeleportTimer(s) == Catch::Approx(telInit - 0.1f));
+	REQUIRE(s.getJumpCooldown() == Catch::Approx(0.7f));
+	REQUIRE(s.getTeleportTimer() == Catch::Approx(telInit - 0.1f));
 }
 
 TEST_CASE("cooldown timers clamp at zero, do not go negative")
@@ -82,18 +84,18 @@ TEST_CASE("cooldown timers clamp at zero, do not go negative")
 	RaceConditionSlime s(groundSpawn());
 
 	s.setAttackCooldown(0.05f);
-	SlimeTestAccess::setJumpCooldown(s, 0.05f);
+	s.setJumpCooldown(0.05f);
 
 	s.update(0.5f, w, {0.f, 0.f});
 
 	REQUIRE(s.getAttackCooldown() == 0.f);
-	REQUIRE(SlimeTestAccess::getJumpCooldown(s) == 0.f);
+	REQUIRE(s.getJumpCooldown() == 0.f);
 }
 
 TEST_CASE("tryJumpTowards no-ops when airborne")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setOnGround(s, false);
+	s.setOnGround(false);
 
 	s.tryJumpTowards(200.f);
 	REQUIRE(s.getVelocity().y == 0.f);
@@ -102,7 +104,7 @@ TEST_CASE("tryJumpTowards no-ops when airborne")
 TEST_CASE("tryJumpTowards no-ops when height difference is below threshold")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setOnGround(s, true);
+	s.setOnGround(true);
 
 	s.tryJumpTowards(RaceConditionSlime::JUMP_THRESHOLD - 1.f);
 	REQUIRE(s.getVelocity().y == 0.f);
@@ -111,8 +113,8 @@ TEST_CASE("tryJumpTowards no-ops when height difference is below threshold")
 TEST_CASE("tryJumpTowards no-ops while jump cooldown is active")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setOnGround(s, true);
-	SlimeTestAccess::setJumpCooldown(s, 0.5f);
+	s.setOnGround(true);
+	s.setJumpCooldown(0.5f);
 
 	s.tryJumpTowards(RaceConditionSlime::JUMP_THRESHOLD + 100.f);
 	REQUIRE(s.getVelocity().y == 0.f);
@@ -121,20 +123,20 @@ TEST_CASE("tryJumpTowards no-ops while jump cooldown is active")
 TEST_CASE("tryJumpTowards jumps when all preconditions met and sets cooldown")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setOnGround(s, true);
-	SlimeTestAccess::setJumpCooldown(s, 0.f);
+	s.setOnGround(true);
+	s.setJumpCooldown(0.f);
 
 	s.tryJumpTowards(RaceConditionSlime::JUMP_THRESHOLD + 100.f);
 
 	REQUIRE(s.getVelocity().y < 0.f);
 	REQUIRE_FALSE(s.isOnGroundFlag());
-	REQUIRE(SlimeTestAccess::getJumpCooldown(s) == RaceConditionSlime::JUMP_COOLDOWN);
+	REQUIRE(s.getJumpCooldown() == RaceConditionSlime::JUMP_COOLDOWN);
 }
 
 TEST_CASE("tryJumpTowards caps jump speed at MAX_JUMP_SPEED for very tall targets")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setOnGround(s, true);
+	s.setOnGround(true);
 
 	// Huge height difference would otherwise yield sqrt(2*g*h) >> MAX_JUMP_SPEED.
 	s.tryJumpTowards(10000.f);
@@ -177,7 +179,7 @@ TEST_CASE("Slime IdleState transitions")
 
 	SECTION("zeroes horizontal velocity")
 	{
-		EnemyTestAccess::setVel(s, {200.f, 0.f});
+		s.setVelocity({200.f, 0.f});
 		(void)s.states.idle.update(0.016f, s, w, s.getPosition());
 		REQUIRE(s.getVelocity().x == 0.f);
 	}
@@ -192,7 +194,7 @@ TEST_CASE("Slime ChaseState transitions")
 	s.states.chase.onEnter(s);
 
 	// Prevent slime.maybeTeleport from firing incidentally.
-	SlimeTestAccess::setTeleportTimer(s, 10.f);
+	s.setTeleportTimer(10.f);
 
 	SECTION("transitions to windup when in attack range with no cooldown")
 	{
@@ -226,20 +228,20 @@ TEST_CASE("Slime ChaseState sets velocity in the facing direction when pursuing"
 	World w = makeOpenWorld();
 	RaceConditionSlime s(groundSpawn());
 	s.states.chase.onEnter(s);
-	SlimeTestAccess::setTeleportTimer(s, 10.f);
+	s.setTeleportTimer(10.f);
 
 	sf::Vector2f midRange = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE + 100.f, 0.f};
 
 	SECTION("facing right → positive x velocity")
 	{
-		EnemyTestAccess::setFacing(s, BaseEnemy::Direction::Right);
+		s.setFacing(BaseEnemy::Direction::Right);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == RaceConditionSlime::MOVE_SPEED);
 	}
 
 	SECTION("facing left → negative x velocity")
 	{
-		EnemyTestAccess::setFacing(s, BaseEnemy::Direction::Left);
+		s.setFacing(BaseEnemy::Direction::Left);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == -RaceConditionSlime::MOVE_SPEED);
 	}
@@ -250,12 +252,12 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 	World w = makeOpenWorld();
 	RaceConditionSlime s(groundSpawn());
 	s.states.chase.onEnter(s);
-	SlimeTestAccess::setTeleportTimer(s, 10.f);
+	s.setTeleportTimer(10.f);
 
 	SECTION("melee range with cooldown → velocity zero")
 	{
 		s.setAttackCooldown(1.f);
-		EnemyTestAccess::setVel(s, {RaceConditionSlime::MOVE_SPEED, 0.f});
+		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
 		sf::Vector2f melee = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE - 5.f, 0.f};
 		(void)s.states.chase.update(0.016f, s, w, melee);
 		REQUIRE(s.getVelocity().x == 0.f);
@@ -263,7 +265,7 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 
 	SECTION("beyond lose range → velocity zero")
 	{
-		EnemyTestAccess::setVel(s, {RaceConditionSlime::MOVE_SPEED, 0.f});
+		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
 		sf::Vector2f far = s.getPosition() + sf::Vector2f{RaceConditionSlime::LOSE_RANGE + 50.f, 0.f};
 		(void)s.states.chase.update(0.016f, s, w, far);
 		REQUIRE(s.getVelocity().x == 0.f);
@@ -279,12 +281,12 @@ TEST_CASE("Slime ChaseState triggers glitch teleport when teleport timer expires
 	// Force the teleport gate open. glitchTeleport always calls resetTeleportTimer
 	// first, so the timer being positive afterwards is a reliable effect signal
 	// regardless of which RNG branch fires.
-	SlimeTestAccess::setTeleportTimer(s, 0.f);
+	s.setTeleportTimer(0.f);
 	sf::Vector2f midRange = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE + 100.f, 0.f};
 
 	(void)s.states.chase.update(0.016f, s, w, midRange);
 
-	REQUIRE(SlimeTestAccess::getTeleportTimer(s) > 0.f);
+	REQUIRE(s.getTeleportTimer() > 0.f);
 }
 
 TEST_CASE("Slime ChaseState initiates a jump when the player is above and preconditions are met")
@@ -294,9 +296,9 @@ TEST_CASE("Slime ChaseState initiates a jump when the player is above and precon
 	s.states.chase.onEnter(s);
 
 	// Defuse teleport, arm jump prerequisites.
-	SlimeTestAccess::setTeleportTimer(s, 10.f);
-	SlimeTestAccess::setJumpCooldown(s, 0.f);
-	EnemyTestAccess::setOnGround(s, true);
+	s.setTeleportTimer(10.f);
+	s.setJumpCooldown(0.f);
+	s.setOnGround(true);
 
 	// Player above and horizontally in pursuit range (not melee, not lost).
 	// chase.update computes heightDiff = slime.y - player.y, so player.y = slime.y - 200 → heightDiff = 200.
@@ -304,7 +306,7 @@ TEST_CASE("Slime ChaseState initiates a jump when the player is above and precon
 	REQUIRE(s.states.chase.update(0.016f, s, w, aboveAndAhead) == &s.states.chase);
 
 	REQUIRE(s.getVelocity().y < 0.f);
-	REQUIRE(SlimeTestAccess::getJumpCooldown(s) == RaceConditionSlime::JUMP_COOLDOWN);
+	REQUIRE(s.getJumpCooldown() == RaceConditionSlime::JUMP_COOLDOWN);
 }
 
 // WindUpState
@@ -331,7 +333,7 @@ TEST_CASE("Slime WindUpState transitions")
 TEST_CASE("Slime WindUpState::onEnter arms the attack cooldown and zeros velocity")
 {
 	RaceConditionSlime s(groundSpawn());
-	EnemyTestAccess::setVel(s, {150.f, 0.f});
+	s.setVelocity({150.f, 0.f});
 	s.setAttackCooldown(0.f);
 
 	s.states.windup.onEnter(s);
@@ -375,7 +377,7 @@ TEST_CASE("Slime AttackState transitions")
 
 	SECTION("zeroes velocity each tick")
 	{
-		EnemyTestAccess::setVel(s, {200.f, 0.f});
+		s.setVelocity({200.f, 0.f});
 		(void)s.states.attack.update(0.016f, s, w, s.getPosition());
 		REQUIRE(s.getVelocity().x == 0.f);
 	}
@@ -409,7 +411,7 @@ TEST_CASE("Slime RecoverState transitions")
 
 	SECTION("zeroes velocity while recovering")
 	{
-		EnemyTestAccess::setVel(s, {200.f, 0.f});
+		s.setVelocity({200.f, 0.f});
 		(void)s.states.recover.update(0.016f, s, w, s.getPosition());
 		REQUIRE(s.getVelocity().x == 0.f);
 	}
@@ -422,43 +424,142 @@ TEST_CASE("Full combat flow: idle -> chase -> windup -> attack -> recover")
 	World w = makeOpenWorld();
 	RaceConditionSlime s(groundSpawn());
 	// Pin teleport timer high so teleports can't influence the test.
-	SlimeTestAccess::setTeleportTimer(s, 100.f);
+	s.setTeleportTimer(100.f);
 
 	auto &states = s.states;
 
 	// 1. Idle: Chase when the player appears in detect range.
 	sf::Vector2f nearby = s.getPosition() + sf::Vector2f{RaceConditionSlime::DETECT_RANGE - 10.f, 0.f};
 	s.update(0.016f, w, nearby);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &states.chase);
+	REQUIRE(s.getState() == &states.chase);
 
 	// 2. Chase: WindUp when player closes to melee range and cooldown is clear.
 	sf::Vector2f melee = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE - 5.f, 0.f};
 	s.update(0.016f, w, melee);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &states.windup);
+	REQUIRE(s.getState() == &states.windup);
 
 	// 3. WindUp: Attack after WINDUP_DUR.
 	s.update(RaceConditionSlime::WINDUP_DUR + 0.01f, w, melee);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &states.attack);
+	REQUIRE(s.getState() == &states.attack);
 
 	// 4. Attack: Recover after ATTACK_DUR.
 	s.update(RaceConditionSlime::ATTACK_DUR + 0.01f, w, melee);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &states.recover);
+	REQUIRE(s.getState() == &states.recover);
 
 	// 5. Recover: Chase if player is still close.
 	s.update(RaceConditionSlime::RECOVER_DUR + 0.01f, w, melee);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &states.chase);
+	REQUIRE(s.getState() == &states.chase);
 }
 
 TEST_CASE("After the attack flow completes and the player flees, slime returns to idle")
 {
 	World w = makeOpenWorld();
 	RaceConditionSlime s(groundSpawn());
-	SlimeTestAccess::setTeleportTimer(s, 100.f);
-	EnemyTestAccess::setCurrentState(s, &s.states.recover);
+	s.setTeleportTimer(100.f);
+	s.setState(&s.states.recover);
 	s.states.recover.onEnter(s);
 
 	// Player disappears to the far edge before recover ends.
 	sf::Vector2f far = s.getPosition() + sf::Vector2f{RaceConditionSlime::DETECT_RANGE + 100.f, 0.f};
 	s.update(RaceConditionSlime::RECOVER_DUR + 0.01f, w, far);
-	REQUIRE(EnemyTestAccess::getCurrentState(s) == &s.states.idle);
+	REQUIRE(s.getState() == &s.states.idle);
+}
+
+TEST_CASE("RaceConditionSlime jump height respects custom gravity")
+{
+	World w = makeOpenWorld();
+
+	SECTION("Higher gravity produces lower jumps")
+	{
+		RaceConditionSlime heavy(groundSpawn());
+		heavy.gravity = 1800.f; // 1.5x the default
+		heavy.setOnGround(true);
+
+		// Height difference must exceed JUMP_THRESHOLD (40) to trigger jump
+		// v = sqrt(2 * g * (h + ENTITY_HEIGHT)) = sqrt(2 * 1800 * 78) ≈ 529.91
+		float heightDiff = 50.f;
+		heavy.tryJumpTowards(heightDiff);
+
+		float heavyJumpSpeed = std::abs(heavy.getVelocity().y);
+		REQUIRE(heavyJumpSpeed == Catch::Approx(529.91f).margin(1.f));
+	}
+
+	SECTION("Lower gravity produces lower jumps")
+	{
+		RaceConditionSlime light(groundSpawn());
+		light.gravity = 600.f; // 0.5x the default
+		light.setOnGround(true);
+
+		// Same height difference as heavy slime for comparison
+		// v = sqrt(2 * g * (h + ENTITY_HEIGHT)) = sqrt(2 * 600 * 78) ≈ 305.94
+		float heightDiff = 50.f;
+		light.tryJumpTowards(heightDiff);
+
+		float lightJumpSpeed = std::abs(light.getVelocity().y);
+		REQUIRE(lightJumpSpeed == Catch::Approx(305.94f).margin(1.f));
+	}
+
+	SECTION("Different gravity values produce proportionally different jumps")
+	{
+		RaceConditionSlime s1(groundSpawn());
+		s1.gravity = 1200.f;
+		s1.setOnGround(true);
+		s1.tryJumpTowards(20.f); // Small height to avoid cap
+		float normalJump = std::abs(s1.getVelocity().y);
+
+		RaceConditionSlime s2({groundSpawn().x + 100.f, groundSpawn().y});
+		s2.gravity = 2400.f; // 2x gravity
+		s2.setOnGround(true);
+		s2.tryJumpTowards(20.f);
+		float doubleGravityJump = std::abs(s2.getVelocity().y);
+
+		// Jump speed should scale with sqrt(gravity)
+		// sqrt(2400/1200) = sqrt(2) ≈ 1.414
+		REQUIRE(doubleGravityJump == Catch::Approx(normalJump * 1.414f).margin(2.f));
+	}
+}
+
+TEST_CASE("Multiple slimes can have different gravity values")
+{
+	World w = makeOpenWorld();
+
+	// Spawn all slimes well above the ground so gravity applies (floor is at row 15)
+	sf::Vector2f airSpawn{20.f * TILE, 5.f * TILE};
+
+	RaceConditionSlime light(airSpawn);
+	light.gravity = 800.f;
+
+	RaceConditionSlime normal({airSpawn.x + 100.f, airSpawn.y});
+	normal.gravity = 1200.f;
+
+	RaceConditionSlime heavy({airSpawn.x + 200.f, airSpawn.y});
+	heavy.gravity = 1800.f;
+
+	// Verify each maintains its own gravity
+	REQUIRE(light.gravity == 800.f);
+	REQUIRE(normal.gravity == 1200.f);
+	REQUIRE(heavy.gravity == 1800.f);
+
+	// Ensure all start airborne (not on ground)
+	light.setOnGround(false);
+	normal.setOnGround(false);
+	heavy.setOnGround(false);
+
+	// Update and verify different falling speeds
+	light.update(0.1f, w, {0.f, 0.f});
+	normal.update(0.1f, w, {0.f, 0.f});
+	heavy.update(0.1f, w, {0.f, 0.f});
+
+	float lightVel = light.getVelocity().y;
+	float normalVel = normal.getVelocity().y;
+	float heavyVel = heavy.getVelocity().y;
+
+	// gravity * dt = vel, so: 800*0.1=80, 1200*0.1=120, 1800*0.1=180
+	REQUIRE(lightVel == Catch::Approx(80.f).margin(0.1f));
+	REQUIRE(normalVel == Catch::Approx(120.f).margin(0.1f));
+	REQUIRE(heavyVel == Catch::Approx(180.f).margin(0.1f));
+
+	// Verify the ratio
+	REQUIRE(heavyVel > normalVel);
+	REQUIRE(normalVel > lightVel);
 }

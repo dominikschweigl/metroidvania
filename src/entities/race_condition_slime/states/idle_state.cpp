@@ -1,5 +1,5 @@
-#include "../race_condition_slime.h"
 #include "idle_state.h"
+#include "../race_condition_slime.h"
 #include <cmath>
 
 namespace rc_slime {
@@ -35,9 +35,7 @@ void IdleState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 		currentFrame = (currentFrame + 1) % FRAME_COUNT;
 	}
 
-	slime.sprite.setTexture(slime.idleTexture);
-	slime.sprite.setTextureRect(sf::IntRect({currentFrame * RaceConditionSlime::FRAME_SIZE, 0},
-	                                        {RaceConditionSlime::FRAME_SIZE, RaceConditionSlime::FRAME_SIZE}));
+	slime.setAnimation(RaceConditionSlime::SlimeAnimation::Idle, currentFrame);
 }
 
 void IdleState::onEnter(BaseEnemy &enemy)
