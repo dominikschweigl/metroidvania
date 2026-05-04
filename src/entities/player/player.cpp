@@ -1,13 +1,14 @@
 #include "player.h"
+#include "../base/entity_physics.h"
 
-Player::Player() : sprite(states.idle.idle_texture), upperSprite(attackLayer.swing_texture), currentState(&states.idle)
-{
+Player::Player()
+	: sprite(states.idle.idle_texture), upperSprite(attackLayer.swing_texture),
+	  currentState(&states.idle) {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	upperSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 }
 
-void Player::update(float deltaTime, const World *world, bool attackTriggered)
-{
+void Player::update(float deltaTime, const World *world, bool attackTriggered) {
 	handleMovement(deltaTime, world);
 
 	PlayerState *next = currentState->update(deltaTime, *this);
@@ -21,8 +22,7 @@ void Player::update(float deltaTime, const World *world, bool attackTriggered)
 	updateAnimation(deltaTime);
 }
 
-void Player::updateAnimation(float dt)
-{
+void Player::updateAnimation(float dt) {
 	sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
 
 	currentState->applyAnimation(dt, *this);
@@ -33,13 +33,12 @@ void Player::updateAnimation(float dt)
 	}
 }
 
-void Player::handleMovement(float deltaTime, const World *world)
-{
+void Player::handleMovement(float deltaTime, const World *world) {
 	inputJump = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
 	velocity.x = 0.f;
-	isSprinting =
-	    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
+	isSprinting = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) ||
+				  sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
 	float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -54,18 +53,16 @@ void Player::handleMovement(float deltaTime, const World *world)
 	if (world == nullptr)
 		return;
 
-	if (!isGroundBelow(*world)) {
-		isOnGround = false;
-		velocity.y += GRAVITY * deltaTime;
-	}
-
-	float futureX = handleHorizontalMovement(*world, deltaTime);
-	float futureY = handleVerticalMovement(*world, deltaTime);
-	sprite.setPosition({futureX, futureY});
+	bool old_isOnGround = isOnGround;
+	sf::Vector2f position = sprite.getPosition();
+	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround,
+									GRAVITY, FRAME_SIZE, FRAME_SIZE, *world);
+	sprite.setPosition(position);
+	if (!old_isOnGround && isOnGround)
+		transitionTo(states.landing);
 }
 
-void Player::draw(sf::RenderWindow &window)
-{
+void Player::draw(sf::RenderWindow &window) {
 	if (debugHorizontalMovement)
 		window.draw(debugHorizontalCollisionCheck);
 	if (debugVerticalMovement)

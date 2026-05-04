@@ -1,13 +1,16 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <optional>
 
 #include "../../world/world.h"
+#include "../base/entity_physics.h"
 #include "attack_layer.h"
 #include "states/ascending_state.h"
 #include "states/descending_state.h"
 #include "states/idle_state.h"
 #include "states/landing_state.h"
 #include "states/peak_state.h"
+#include "states/player_state.h"
 #include "states/pre_jump_state.h"
 #include "states/running_state.h"
 #include "states/walking_state.h"
@@ -17,8 +20,9 @@ class Player {
 	enum class Direction { Left, Right };
 	Direction direction = Direction::Left;
 
-	// State pool — stored by value, transitions are pointer swaps (no allocation).
-	// Must be declared before sprite/upperSprite so textures are ready for the constructor initializer.
+	// State pool — stored by value, transitions are pointer swaps (no
+	// allocation). Must be declared before sprite/upperSprite so textures are
+	// ready for the constructor initializer.
 	struct States {
 		IdleState idle;
 		WalkingState walking;
@@ -46,13 +50,14 @@ class Player {
 	Player();
 	~Player() = default;
 
-	sf::FloatRect getBounds() const
-	{
-		return sf::Rect<float>({sprite.getPosition().x - FRAME_SIZE / 2.f, sprite.getPosition().y - FRAME_SIZE},
-		                       {FRAME_SIZE, FRAME_SIZE});
+	sf::FloatRect getBounds() const {
+		return sf::Rect<float>({sprite.getPosition().x - FRAME_SIZE / 2.f,
+								sprite.getPosition().y - FRAME_SIZE},
+							   {FRAME_SIZE, FRAME_SIZE});
 	}
 
-	void update(float deltaTime, const World *world = nullptr, bool attackTriggered = false);
+	void update(float deltaTime, const World *world = nullptr,
+				bool attackTriggered = false);
 
 	void draw(sf::RenderWindow &window);
 
@@ -73,8 +78,7 @@ class Player {
 
 	PlayerState *currentState;
 
-	void transitionTo(PlayerState &next)
-	{
+	void transitionTo(PlayerState &next) {
 		currentState->onExit(*this);
 		next.onEnter(*this);
 		currentState = &next;
@@ -82,37 +86,43 @@ class Player {
 			attackLayer.reset();
 	}
 
-	bool isGroundBelow(const World &world) const
-	{
-		auto leftTile =
-		    world.getTileAtCoordinate({getBounds().position.x, getBounds().position.y + getBounds().size.y + 1.f});
+	bool isGroundBelow(const World &world) const {
+		auto leftTile = world.getTileAtCoordinate(
+			{getBounds().position.x,
+			 getBounds().position.y + getBounds().size.y + 1.f});
 		auto rightTile = world.getTileAtCoordinate(
-		    {getBounds().position.x + getBounds().size.x, getBounds().position.y + getBounds().size.y + 1.f});
+			{getBounds().position.x + getBounds().size.x,
+			 getBounds().position.y + getBounds().size.y + 1.f});
 		if (!leftTile.has_value() || !rightTile.has_value())
 			return false;
 		return (leftTile.value()->isSolid || rightTile.value()->isSolid);
 	}
 
-	float handleHorizontalMovement(const World &world, float deltaTime)
-	{
+	float handleHorizontalMovement(const World &world, float deltaTime) {
 		float dx = velocity.x * deltaTime;
 		float futureX = sprite.getPosition().x + dx;
 
 		auto bounds = getBounds();
-		auto futureBounds = sf::FloatRect({futureX - FRAME_SIZE / 2.f, bounds.position.y}, {FRAME_SIZE, bounds.size.y});
+		auto futureBounds =
+			sf::FloatRect({futureX - FRAME_SIZE / 2.f, bounds.position.y},
+						  {FRAME_SIZE, bounds.size.y});
 
 		if (debugHorizontalMovement) {
-			debugHorizontalCollisionCheck = sf::RectangleShape(futureBounds.size);
+			debugHorizontalCollisionCheck =
+				sf::RectangleShape(futureBounds.size);
 			debugHorizontalCollisionCheck.setPosition(futureBounds.position);
-			debugHorizontalCollisionCheck.setFillColor(sf::Color(0, 255, 0, 100));
+			debugHorizontalCollisionCheck.setFillColor(
+				sf::Color(0, 255, 0, 100));
 		}
 
 		if (world.isSolidAtRect(futureBounds)) {
 			velocity.x = 0.f;
-			std::optional<const World::Tile *> tile = world.getTileAtCoordinate(sprite.getPosition());
+			std::optional<const World::Tile *> tile =
+				world.getTileAtCoordinate(sprite.getPosition());
 			if (tile.has_value()) {
 				if (dx > 0)
-					futureX = tile.value()->position.x + World::TILE_SIZE - FRAME_SIZE / 2.f - 1.f;
+					futureX = tile.value()->position.x + World::TILE_SIZE -
+							  FRAME_SIZE / 2.f - 1.f;
 				else if (dx < 0)
 					futureX = tile.value()->position.x + FRAME_SIZE / 2.f;
 			}
@@ -121,13 +131,14 @@ class Player {
 		return futureX;
 	}
 
-	float handleVerticalMovement(const World &world, float deltaTime)
-	{
+	float handleVerticalMovement(const World &world, float deltaTime) {
 		float dy = velocity.y * deltaTime;
 		float futureY = sprite.getPosition().y + dy;
 
 		auto bounds = getBounds();
-		auto futureBounds = sf::FloatRect({bounds.position.x, futureY - bounds.size.y}, {FRAME_SIZE, FRAME_SIZE});
+		auto futureBounds =
+			sf::FloatRect({bounds.position.x, futureY - bounds.size.y},
+						  {FRAME_SIZE, FRAME_SIZE});
 
 		if (debugVerticalMovement) {
 			debugVerticalCollisionCheck = sf::RectangleShape(futureBounds.size);
@@ -144,7 +155,8 @@ class Player {
 					isOnGround = true;
 					transitionTo(states.landing);
 				} else if (dy < 0) {
-					futureY = tile.value()->position.y + World::TILE_SIZE + FRAME_SIZE;
+					futureY = tile.value()->position.y + World::TILE_SIZE +
+							  FRAME_SIZE;
 				}
 			}
 		}

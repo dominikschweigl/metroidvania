@@ -14,7 +14,7 @@ include(Catch)
 set(GAME_SOURCES
     src/world/world.cpp
     src/entities/base/base_enemy.cpp
-    src/entities/base/enemy_physics.cpp
+    src/entities/base/entity_physics.cpp
     src/entities/player/player.cpp
     src/entities/player/states/idle_state.cpp
     src/entities/player/states/walking_state.cpp
