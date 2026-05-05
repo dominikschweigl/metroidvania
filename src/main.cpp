@@ -10,7 +10,7 @@ int main()
 {
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktop, "Metroidvania Game", sf::Style::Default);
-	window.setFramerateLimit(20);
+	window.setFramerateLimit(60);
 
 	// View that controls how many world units are visible; scaled by PixelSize
 	sf::View view;

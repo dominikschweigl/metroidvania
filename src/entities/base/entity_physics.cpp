@@ -65,11 +65,10 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &velocity, bool &isOnGround, float gravity,
                       float width, float height, const World &world)
 {
+	applyGravity(velocity.y, isOnGround, deltaTime, gravity,
+	             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
 	static constexpr float step = 0.01f;
 	for (float t = 0.f; t < deltaTime; t += step) {
-		applyGravity(velocity.y, isOnGround, step, gravity,
-		             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
-
 		position.x = resolveHorizontal(position, velocity.x, width, height, step, world);
 		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, step, world);
 	}
