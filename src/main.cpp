@@ -6,8 +6,7 @@
 #include <iostream>
 #include <optional>
 
-int main()
-{
+int main() {
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktop, "Metroidvania Game", sf::Style::Default);
 	window.setFramerateLimit(60);
@@ -15,17 +14,33 @@ int main()
 	// View that controls how many world units are visible; scaled by PixelSize
 	sf::View view;
 	sf::Vector2u windowSize = window.getSize();
-	view.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
+	view.setSize(
+		{static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view.setCenter(view.getSize() / 2.f);
 
 	Player player;
 	World world;
 	RaceConditionSlime race_condition_enemy_1({5 * 32.f, 15 * 32.f});
 	RaceConditionSlime race_condition_enemy_2({11 * 32.f, 15 * 32.f});
+	AssetManager &assets = AssetManager::getInstance();
+
+	if (!assets.loadFromConfig("../assets/manifest.json")) {
+		std::cerr << "Failed to load assets!" << std::endl;
+		return -1;
+	}
 
 	// world.loadFromJson("data/maps/test.json");
-	world.loadFromTMJ("data/maps/test.tmj");
+	// world.loadFromTMJ("data/maps/test.tmj");
+	// world.loadTileset();
+
 	world.loadTileset();
+
+	// Load your Tiled rooms
+	world.loadRoom("start_room", "data/maps/start_room.tmj");
+	world.loadRoom("boss_room", "data/maps/boss_room.tmj");
+
+	// Switch rooms (e.g., when player enters a door)
+	world.setCurrentRoom("start_room");
 
 	sf::Clock clock;
 
@@ -43,20 +58,25 @@ int main()
 		while (const std::optional event = window.pollEvent()) {
 			if (event->is<sf::Event::Closed>()) {
 				window.close();
-			} else if (const auto *resized = event->getIf<sf::Event::Resized>()) {
-				view.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
+			} else if (const auto *resized =
+						   event->getIf<sf::Event::Resized>()) {
+				view.setSize({static_cast<float>(resized->size.x),
+							  static_cast<float>(resized->size.y)});
 				view.setCenter(view.getSize() / 2.f);
 				window.setView(view);
-			} else if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
-				    || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) {
-					if (key->code == sf::Keyboard::Key::Equal) {         // + key
-						view.zoom(0.9f);                                 // Zoom in
-					} else if (key->code == sf::Keyboard::Key::Hyphen) { // - key
-						view.zoom(1.1f);                                 // Zoom out
+			} else if (const auto *key =
+						   event->getIf<sf::Event::KeyPressed>()) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) ||
+					sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) {
+					if (key->code == sf::Keyboard::Key::Equal) { // + key
+						view.zoom(0.9f);						 // Zoom in
+					} else if (key->code ==
+							   sf::Keyboard::Key::Hyphen) { // - key
+						view.zoom(1.1f);					// Zoom out
 					}
 				}
-			} else if (const auto *mouse = event->getIf<sf::Event::MouseButtonPressed>()) {
+			} else if (const auto *mouse =
+						   event->getIf<sf::Event::MouseButtonPressed>()) {
 				if (mouse->button == sf::Mouse::Button::Left)
 					attackTriggered = true;
 			}

@@ -1,0 +1,22 @@
+{
+	"textures": {
+		"tile_top1": "assets/images/tiles/top1.png",
+		"tile_top2": "assets/images/tiles/top2.png",
+		"tile_right_edge": "assets/images/tiles/right_edge.png",
+		"tile_left_edge": "assets/images/tiles/left_edge.png",
+		"structure": "assets/images/tiles/structure.png",
+		"black": "assets/images/tiles/black.png"
+	},
+	"tilesets": {
+		"default": {
+			"tiles": [
+				"tile_top1",
+				"tile_top2",
+				"tile_right_edge",
+				"tile_left_edge",
+				"structure",
+				"black"
+			]
+		}
+	}
+}
