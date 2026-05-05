@@ -23,31 +23,86 @@ std::string readFile(const std::string &path)
 
 World::World()
 {
-	// Constructor - tiles will be populated via loadFromGrid
+	// Constructor - rooms will be populated via loadRoom
 }
 
 void World::loadTileset()
 {
-	std::vector<std::string> paths = {"assets/images/tiles/pixil-frame-0.png", "assets/images/tiles/pixil-frame-1.png",
-	                                  "assets/images/tiles/pixil-frame-2.png", "assets/images/tiles/pixil-frame-3.png"};
+	std::vector<std::string> paths = {"assets/images/tiles/black.png",      "assets/images/tiles/left_edge.png",
+	                                  "assets/images/tiles/right_edge.png", "assets/images/tiles/structure.png",
+	                                  "assets/images/tiles/top1.png",       "assets/images/tiles/top2.png"};
 
-	for (int i = 0; i < paths.size(); i++) {
+	std::vector<int> ids = {19, 20, 21, 22, 23, 24};
+
+	for (int i = 0; i < ids.size(); i++) {
+		int id = ids[i];
 		sf::Texture tex;
 		bool loaded = tex.loadFromFile(paths[i]);
 		if (!loaded) {
 			std::cerr << "Failed to load texture from " << paths[i] << std::endl;
 		}
-		tileTextures[i] = tex;
+		tileTextures[id] = tex;
+	}
+}
+
+void World::loadRoom(const std::string &roomId, const std::string &file)
+{
+	TiledMap map = loadMap(file);
+
+	if (map.layers.empty()) {
+		std::cerr << "No tile layers found in " << file << std::endl;
+		return;
+	}
+
+	const auto &layer = map.layers[0];
+
+	Room room;
+	room.width = map.width;
+	room.height = map.height;
+	room.tiles.resize(map.height);
+
+	for (int y = 0; y < map.height; y++) {
+		room.tiles[y].resize(map.width);
+
+		for (int x = 0; x < map.width; x++) {
+			int value = layer.data[y * map.width + x];
+
+			Tile &tile = room.tiles[y][x];
+
+			tile.position = {(float)x * map.tilewidth, (float)y * map.tileheight};
+			tile.size = {(float)map.tilewidth, (float)map.tileheight};
+			tile.isSolid = (value != 19 && value != 22);
+			tile.textureId = value;
+		}
+	}
+
+	rooms[roomId] = std::move(room);
+
+	// If this is the first room, set it as current
+	if (currentRoomId.empty()) {
+		currentRoomId = roomId;
+	}
+}
+
+void World::setCurrentRoom(const std::string &roomId)
+{
+	if (rooms.find(roomId) != rooms.end()) {
+		currentRoomId = roomId;
+	} else {
+		std::cerr << "Room " << roomId << " not found" << std::endl;
 	}
 }
 
 void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 {
-	tiles.clear();
-	tiles.resize(grid.size());
+	Room room;
+	room.tiles.clear();
+	room.tiles.resize(grid.size());
+	room.width = grid.empty() ? 0 : grid[0].size();
+	room.height = grid.size();
 
 	for (size_t y = 0; y < grid.size(); ++y) {
-		tiles[y].clear();
+		room.tiles[y].clear();
 		for (size_t x = 0; x < grid[y].size(); ++x) {
 			int tileType = grid[y][x];
 			Tile tile;
@@ -55,8 +110,13 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 			tile.size = {TILE_SIZE, TILE_SIZE};
 			tile.isSolid = tileType > 0;
 			tile.textureId = tileType;
-			tiles[y].push_back(tile);
+			room.tiles[y].push_back(tile);
 		}
+	}
+
+	rooms["default"] = std::move(room);
+	if (currentRoomId.empty()) {
+		currentRoomId = "default";
 	}
 }
 
@@ -71,24 +131,32 @@ void World::loadFromJson(const std::string &filename)
 	level.height = j["height"];
 	level.tiles = j["tiles"].get<std::vector<int>>();
 
-	tiles.resize(level.height);
+	Room room;
+	room.width = level.width;
+	room.height = level.height;
+	room.tiles.resize(level.height);
 
 	for (int y = 0; y < level.height; y++) {
-		tiles[y].resize(level.width);
+		room.tiles[y].resize(level.width);
 
 		for (int x = 0; x < level.width; x++) {
 			int value = level.tiles[y * level.width + x];
 
-			Tile &tile = tiles[y][x];
+			Tile &tile = room.tiles[y][x];
 			tile.position = {x * TILE_SIZE, y * TILE_SIZE};
 			tile.size = {TILE_SIZE, TILE_SIZE};
 			tile.isSolid = (value > 0);
 			tile.textureId = value;
 		}
 	}
+
+	rooms["default"] = std::move(room);
+	if (currentRoomId.empty()) {
+		currentRoomId = "default";
+	}
 }
 
-TiledMap loadMap(const std::string &file)
+TiledMap World::loadMap(const std::string &file)
 {
 	std::ifstream f(file);
 	json j;
@@ -118,32 +186,18 @@ TiledMap loadMap(const std::string &file)
 
 void World::loadFromTMJ(const std::string &file)
 {
-	TiledMap map = loadMap(file);
-
-	const auto &layer = map.layers[0];
-
-	tiles.resize(map.height);
-
-	for (int y = 0; y < map.height; y++) {
-		tiles[y].resize(map.width);
-
-		for (int x = 0; x < map.width; x++) {
-			int value = layer.data[y * map.width + x];
-
-			Tile &tile = tiles[y][x];
-
-			tile.position = {(float)x * map.tilewidth, (float)y * map.tileheight};
-
-			tile.size = {(float)map.tilewidth, (float)map.tileheight};
-
-			tile.isSolid = (value != 0);
-			tile.textureId = value;
-		}
-	}
+	loadRoom("default", file);
 }
 
 const std::optional<const World::Tile *> World::getTileAtCoordinate(const sf::Vector2f &worldPos) const
 {
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return std::nullopt;
+	}
+
+	const auto &room = rooms.at(currentRoomId);
+	const auto &tiles = room.tiles;
+
 	int x = static_cast<int>(worldPos.x / TILE_SIZE);
 	int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
@@ -174,6 +228,13 @@ std::vector<std::vector<const World::Tile *>> World::getTilesAtRect(const sf::Fl
 {
 	std::vector<std::vector<const Tile *>> result;
 
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return result;
+	}
+
+	const auto &room = rooms.at(currentRoomId);
+	const auto &tiles = room.tiles;
+
 	if (tiles.empty() || tiles[0].empty())
 		return result;
 
@@ -202,6 +263,13 @@ std::vector<std::vector<const World::Tile *>> World::getTilesAtRect(const sf::Fl
 
 void World::draw(sf::RenderWindow &window, const sf::View &view) const
 {
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return;
+	}
+
+	const auto &room = rooms.at(currentRoomId);
+	const auto &tiles = room.tiles;
+
 	sf::Vector2f center = view.getCenter();
 	sf::Vector2f size = view.getSize();
 
@@ -211,17 +279,14 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 
 	for (auto &row : visibleTiles) {
 		for (auto &tile : row) {
-			if (tile->textureId == 0)
-				continue;
-
 			sf::RectangleShape shape(tile->size);
 			shape.setPosition(tile->position);
 
-			auto it = tileTextures.find(std::max(0, tile->textureId - 1));
+			auto it = tileTextures.find(tile->textureId);
 			if (it != tileTextures.end()) {
 				shape.setTexture(&it->second);
 			} else {
-				shape.setFillColor(sf::Color(255, 0, 255)); // Magenta for missing texture
+				shape.setFillColor(sf::Color(255, 0, 255));
 			}
 
 			window.draw(shape);

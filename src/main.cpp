@@ -23,9 +23,13 @@ int main()
 	RaceConditionSlime race_condition_enemy_1({5 * 32.f, 15 * 32.f});
 	RaceConditionSlime race_condition_enemy_2({11 * 32.f, 15 * 32.f});
 
-	// world.loadFromJson("data/maps/test.json");
-	world.loadFromTMJ("data/maps/test.tmj");
 	world.loadTileset();
+	// world.loadFromTMJ("data/maps/start_room.tmj");
+
+	world.loadRoom("start_room", "data/maps/start_room.tmj");
+	world.loadRoom("boss_room", "data/maps/boss_room.tmj");
+
+	world.setCurrentRoom("start_room");
 
 	sf::Clock clock;
 
@@ -66,6 +70,12 @@ int main()
 		race_condition_enemy_1.update(deltaTime, world, player.getPosition());
 		race_condition_enemy_2.update(deltaTime, world, player.getPosition());
 		view.setCenter(player.getPosition());
+		view.setSize({window.getSize().x * 0.4f, window.getSize().y * 0.4f});
+
+		if (player.getPosition().x > 18 * 32.f && player.getPosition().x <= 19 * 32.f
+		    && player.getPosition().y > 10 * 32.f && player.getPosition().y <= 11 * 32.f) {
+			world.setCurrentRoom("boss_room");
+		}
 
 		window.setView(view);
 
