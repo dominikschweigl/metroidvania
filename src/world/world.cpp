@@ -27,13 +27,13 @@ World::World() {
 
 void World::loadTileset() {
 	std::vector<std::string> paths = {"assets/images/tiles/black.png",
-									  "assets/images/tiles/structure.png",
-									  "assets/images/tiles/right_edge.png",
 									  "assets/images/tiles/left_edge.png",
+									  "assets/images/tiles/right_edge.png",
+									  "assets/images/tiles/structure.png",
 									  "assets/images/tiles/top1.png",
 									  "assets/images/tiles/top2.png"};
 
-	std::vector<int> ids = {1, 12, 11, 10, 9, 8};
+	std::vector<int> ids = {19, 20, 21, 22, 23, 24};
 
 	for (int i = 0; i < ids.size(); i++) {
 		int id = ids[i];
@@ -73,7 +73,7 @@ void World::loadRoom(const std::string &roomId, const std::string &file) {
 			tile.position = {(float)x * map.tilewidth,
 							 (float)y * map.tileheight};
 			tile.size = {(float)map.tilewidth, (float)map.tileheight};
-			tile.isSolid = (value != 1 && value != 12);
+			tile.isSolid = (value != 19 && value != 22);
 			tile.textureId = value;
 		}
 	}

@@ -5,7 +5,7 @@ Player::Player()
 	  currentState(&states.idle) {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	upperSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
-	sprite.setPosition({5 * 32.f, 0.f});
+	sprite.setPosition({15 * 32.f, 0.f});
 }
 
 void Player::update(float deltaTime, const World *world, bool attackTriggered) {
