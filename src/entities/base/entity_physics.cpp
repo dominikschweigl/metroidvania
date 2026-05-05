@@ -68,9 +68,11 @@ void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &vel
 	applyGravity(velocity.y, isOnGround, deltaTime, gravity,
 	             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
 	static constexpr float step = 0.01f;
-	for (float counter = 0.f; counter < deltaTime; counter += step) {
+	float counter = 0.f;
+	while (counter < deltaTime) {
 		position.x = resolveHorizontal(position, velocity.x, width, height, step, world);
 		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, step, world);
+		counter += step;
 	}
 }
 } // namespace EntityPhysics
