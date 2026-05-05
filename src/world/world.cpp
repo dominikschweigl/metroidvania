@@ -16,27 +16,15 @@ struct Level {
 #include <fstream>
 
 std::string readFile(const std::string &path) {
-std::string readFile(const std::string &path) {
 	std::ifstream file(path);
 	return std::string(std::istreambuf_iterator<char>(file),
 					   std::istreambuf_iterator<char>());
-	return std::string(std::istreambuf_iterator<char>(file),
-					   std::istreambuf_iterator<char>());
 }
 
 World::World() {
 	// Constructor - rooms will be populated via loadRoom
-World::World() {
-	// Constructor - rooms will be populated via loadRoom
 }
 
-void World::loadTileset() {
-	std::vector<std::string> paths = {"assets/images/tiles/pixil-frame-0.png",
-									  "assets/images/tiles/pixil-frame-1.png",
-									  "assets/images/tiles/pixil-frame-2.png",
-									  "assets/images/tiles/pixil-frame-3.png"};
-
-	for (int i = 0; i < paths.size(); i++) {
 void World::loadTileset() {
 	std::vector<std::string> paths = {"assets/images/tiles/black.png",
 									  "assets/images/tiles/structure.png",
@@ -52,8 +40,6 @@ void World::loadTileset() {
 		sf::Texture tex;
 		bool loaded = tex.loadFromFile(paths[i]);
 		if (!loaded) {
-			std::cerr << "Failed to load texture from " << paths[i]
-					  << std::endl;
 			std::cerr << "Failed to load texture from " << paths[i]
 					  << std::endl;
 		}
@@ -117,7 +103,6 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid) {
 
 	for (size_t y = 0; y < grid.size(); ++y) {
 		room.tiles[y].clear();
-		room.tiles[y].clear();
 		for (size_t x = 0; x < grid[y].size(); ++x) {
 			int tileType = grid[y][x];
 			Tile tile;
@@ -126,13 +111,7 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid) {
 			tile.isSolid = tileType > 0;
 			tile.textureId = tileType;
 			room.tiles[y].push_back(tile);
-			room.tiles[y].push_back(tile);
 		}
-	}
-
-	rooms["default"] = std::move(room);
-	if (currentRoomId.empty()) {
-		currentRoomId = "default";
 	}
 
 	rooms["default"] = std::move(room);
@@ -141,7 +120,6 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid) {
 	}
 }
 
-void World::loadFromJson(const std::string &filename) {
 void World::loadFromJson(const std::string &filename) {
 	std::string data = readFile(filename);
 
@@ -156,19 +134,13 @@ void World::loadFromJson(const std::string &filename) {
 	room.width = level.width;
 	room.height = level.height;
 	room.tiles.resize(level.height);
-	Room room;
-	room.width = level.width;
-	room.height = level.height;
-	room.tiles.resize(level.height);
 
 	for (int y = 0; y < level.height; y++) {
-		room.tiles[y].resize(level.width);
 		room.tiles[y].resize(level.width);
 
 		for (int x = 0; x < level.width; x++) {
 			int value = level.tiles[y * level.width + x];
 
-			Tile &tile = room.tiles[y][x];
 			Tile &tile = room.tiles[y][x];
 			tile.position = {x * TILE_SIZE, y * TILE_SIZE};
 			tile.size = {TILE_SIZE, TILE_SIZE};
@@ -181,14 +153,8 @@ void World::loadFromJson(const std::string &filename) {
 	if (currentRoomId.empty()) {
 		currentRoomId = "default";
 	}
-
-	rooms["default"] = std::move(room);
-	if (currentRoomId.empty()) {
-		currentRoomId = "default";
-	}
 }
 
-TiledMap World::loadMap(const std::string &file) {
 TiledMap World::loadMap(const std::string &file) {
 	std::ifstream f(file);
 	json j;
@@ -227,17 +193,6 @@ World::getTileAtCoordinate(const sf::Vector2f &worldPos) const {
 	const auto &room = rooms.at(currentRoomId);
 	const auto &tiles = room.tiles;
 
-void World::loadFromTMJ(const std::string &file) { loadRoom("default", file); }
-
-const std::optional<const World::Tile *>
-World::getTileAtCoordinate(const sf::Vector2f &worldPos) const {
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return std::nullopt;
-	}
-
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
-
 	int x = static_cast<int>(worldPos.x / TILE_SIZE);
 	int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
@@ -253,14 +208,9 @@ World::getTileAtCoordinate(const sf::Vector2f &worldPos) const {
 bool World::isSolidAtRect(const sf::FloatRect &rect) const {
 	std::vector<std::vector<const World::Tile *>> tilesInRect =
 		World::getTilesAtRect(rect);
-bool World::isSolidAtRect(const sf::FloatRect &rect) const {
-	std::vector<std::vector<const World::Tile *>> tilesInRect =
-		World::getTilesAtRect(rect);
 
 	for (const std::vector<const World::Tile *> &tileRow : tilesInRect) {
 		for (const World::Tile *tile : tileRow) {
-			if (tile->isSolid &&
-				tile->getBounds().findIntersection(rect).has_value())
 			if (tile->isSolid &&
 				tile->getBounds().findIntersection(rect).has_value())
 				return true;
@@ -272,16 +222,7 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const {
 
 std::vector<std::vector<const World::Tile *>>
 World::getTilesAtRect(const sf::FloatRect &rect) const {
-std::vector<std::vector<const World::Tile *>>
-World::getTilesAtRect(const sf::FloatRect &rect) const {
 	std::vector<std::vector<const Tile *>> result;
-
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return result;
-	}
-
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
 
 	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
 		return result;
@@ -324,24 +265,12 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const {
 	const auto &room = rooms.at(currentRoomId);
 	const auto &tiles = room.tiles;
 
-void World::draw(sf::RenderWindow &window, const sf::View &view) const {
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return;
-	}
-
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
-
 	sf::Vector2f center = view.getCenter();
 	sf::Vector2f size = view.getSize();
 
 	sf::FloatRect viewRect({center.x - size.x * 0.5f, center.y - size.y * 0.5f},
 						   {size.x, size.y});
-	sf::FloatRect viewRect({center.x - size.x * 0.5f, center.y - size.y * 0.5f},
-						   {size.x, size.y});
 
-	std::vector<std::vector<const Tile *>> visibleTiles =
-		World::getTilesAtRect(viewRect);
 	std::vector<std::vector<const Tile *>> visibleTiles =
 		World::getTilesAtRect(viewRect);
 
