@@ -1,4 +1,5 @@
 #pragma once
+#include "../rendering/asset_manager.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <unordered_map>
@@ -29,7 +30,7 @@ class World {
 		sf::Vector2f position;
 		sf::Vector2f size;
 		bool isSolid;
-		int textureId; // For future texture mapping
+		std::string textureId;
 
 		sf::FloatRect getBounds() const {
 			return sf::FloatRect(position, size);

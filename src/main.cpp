@@ -22,9 +22,22 @@ int main() {
 	World world;
 	RaceConditionSlime race_condition_enemy_1({5 * 32.f, 15 * 32.f});
 	RaceConditionSlime race_condition_enemy_2({11 * 32.f, 15 * 32.f});
+	AssetManager &assets = AssetManager::getInstance();
+
+	if (!assets.loadFromConfig("../assets/manifest.json")) {
+		std::cerr << "Failed to load assets!" << std::endl;
+		return -1;
+	}
 
 	world.loadTileset();
 	world.loadFromTMJ("data/maps/start_room.tmj");
+
+	// Load your Tiled rooms
+	world.loadRoom("start_room", "data/maps/start_room.tmj");
+	world.loadRoom("boss_room", "data/maps/boss_room.tmj");
+
+	// Switch rooms (e.g., when player enters a door)
+	world.setCurrentRoom("start_room");
 
 	sf::Clock clock;
 
