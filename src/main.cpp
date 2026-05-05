@@ -20,8 +20,8 @@ int main() {
 
 	Player player;
 	World world;
-	RaceConditionSlime race_condition_enemy_1({5 * 32.f, 15 * 32.f});
-	RaceConditionSlime race_condition_enemy_2({11 * 32.f, 15 * 32.f});
+	RaceConditionSlime race_condition_enemy_1({25 * 32.f, 18 * 32.f});
+	RaceConditionSlime race_condition_enemy_2({30 * 32.f, 18 * 32.f});
 
 	world.loadTileset();
 	// world.loadFromTMJ("data/maps/start_room.tmj");
