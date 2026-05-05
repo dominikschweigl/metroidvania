@@ -1,6 +1,6 @@
-#include "enemy_physics.h"
+#include "entity_physics.h"
 
-namespace EnemyPhysics {
+namespace EntityPhysics {
 
 bool isGroundBelow(sf::FloatRect bounds, const World &world)
 {
@@ -62,4 +62,17 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 	return futureY;
 }
 
-} // namespace EnemyPhysics
+void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &velocity, bool &isOnGround, float gravity,
+                      float width, float height, const World &world)
+{
+	applyGravity(velocity.y, isOnGround, deltaTime, gravity,
+	             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
+	static constexpr float step = 0.01f;
+	float counter = 0.f;
+	while (counter < deltaTime) {
+		position.x = resolveHorizontal(position, velocity.x, width, height, step, world);
+		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, step, world);
+		counter += step;
+	}
+}
+} // namespace EntityPhysics

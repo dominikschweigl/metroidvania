@@ -1,6 +1,6 @@
 #include "base_enemy.h"
-#include "enemy_physics.h"
 #include "enemy_state.h"
+#include "entity_physics.h"
 
 void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerPos)
 {
@@ -20,27 +20,25 @@ void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerP
 		currentState->updateAnimation(deltaTime, *this);
 	}
 
-	applyGravity(deltaTime, world);
-	pos.x = resolveHorizontal(deltaTime, world);
-	pos.y = resolveVertical(deltaTime, world);
+	EntityPhysics::simulateMovement(deltaTime, pos, vel, isOnGround, gravity, width, height, world);
 }
 
 void BaseEnemy::applyGravity(float dt, const World &world)
 {
-	EnemyPhysics::applyGravity(vel.y, isOnGround, dt, gravity, getBounds(), world);
+	EntityPhysics::applyGravity(vel.y, isOnGround, dt, gravity, getBounds(), world);
 }
 
 bool BaseEnemy::isGroundBelow(const World &world) const
 {
-	return EnemyPhysics::isGroundBelow(getBounds(), world);
+	return EntityPhysics::isGroundBelow(getBounds(), world);
 }
 
 float BaseEnemy::resolveHorizontal(float dt, const World &world)
 {
-	return EnemyPhysics::resolveHorizontal(pos, vel.x, width, height, dt, world);
+	return EntityPhysics::resolveHorizontal(pos, vel.x, width, height, dt, world);
 }
 
 float BaseEnemy::resolveVertical(float dt, const World &world)
 {
-	return EnemyPhysics::resolveVertical(pos, vel.y, isOnGround, width, height, dt, world);
+	return EntityPhysics::resolveVertical(pos, vel.y, isOnGround, width, height, dt, world);
 }

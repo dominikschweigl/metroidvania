@@ -1,4 +1,5 @@
 #include "player.h"
+#include "../base/entity_physics.h"
 
 Player::Player() : sprite(states.idle.idle_texture), upperSprite(attackLayer.swing_texture), currentState(&states.idle)
 {
@@ -54,14 +55,12 @@ void Player::handleMovement(float deltaTime, const World *world)
 	if (world == nullptr)
 		return;
 
-	if (!isGroundBelow(*world)) {
-		isOnGround = false;
-		velocity.y += GRAVITY * deltaTime;
-	}
-
-	float futureX = handleHorizontalMovement(*world, deltaTime);
-	float futureY = handleVerticalMovement(*world, deltaTime);
-	sprite.setPosition({futureX, futureY});
+	bool old_isOnGround = isOnGround;
+	sf::Vector2f position = sprite.getPosition();
+	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, GRAVITY, FRAME_SIZE, FRAME_SIZE, *world);
+	sprite.setPosition(position);
+	if (!old_isOnGround && isOnGround)
+		transitionTo(states.landing);
 }
 
 void Player::draw(sf::RenderWindow &window)
