@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 struct TileDef {
@@ -35,15 +36,28 @@ class World {
 		}
 	};
 
+	struct Room {
+		std::vector<std::vector<Tile>> tiles;
+		int width{};
+		int height{};
+	};
+
 	static constexpr float TILE_SIZE = 32.f;
 
 	World();
 	~World() = default;
 
-	// Build world from a simple grid layout
+	// Build world from a simple grid layout (deprecated, use rooms)
 	void loadFromGrid(const std::vector<std::vector<int>> &grid);
 	void loadFromJson(const std::string &filename);
 	void loadFromTMJ(const std::string &file);
+
+	TiledMap loadMap(const std::string &file);
+
+	// New room-based methods
+	void loadRoom(const std::string &roomId, const std::string &tmjFile);
+	void setCurrentRoom(const std::string &roomId);
+	const std::string &getCurrentRoomId() const { return currentRoomId; }
 
 	void loadTileset();
 
@@ -60,7 +74,8 @@ class World {
 	void draw(sf::RenderWindow &window, const sf::View &view) const;
 
   private:
-	std::vector<std::vector<Tile>> tiles;
+	std::unordered_map<std::string, Room> rooms;
+	std::string currentRoomId;
 	std::unordered_map<int, sf::Texture> tileTextures;
 
 	static float getRectLeft(const sf::FloatRect &rect) {
