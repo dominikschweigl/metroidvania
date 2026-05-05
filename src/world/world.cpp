@@ -15,23 +15,22 @@ struct Level {
 
 #include <fstream>
 
-std::string readFile(const std::string &path) {
+std::string readFile(const std::string &path)
+{
 	std::ifstream file(path);
-	return std::string(std::istreambuf_iterator<char>(file),
-					   std::istreambuf_iterator<char>());
+	return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
 }
 
-World::World() {
+World::World()
+{
 	// Constructor - rooms will be populated via loadRoom
 }
 
-void World::loadTileset() {
-	std::vector<std::string> paths = {"assets/images/tiles/black.png",
-									  "assets/images/tiles/left_edge.png",
-									  "assets/images/tiles/right_edge.png",
-									  "assets/images/tiles/structure.png",
-									  "assets/images/tiles/top1.png",
-									  "assets/images/tiles/top2.png"};
+void World::loadTileset()
+{
+	std::vector<std::string> paths = {"assets/images/tiles/black.png",      "assets/images/tiles/left_edge.png",
+	                                  "assets/images/tiles/right_edge.png", "assets/images/tiles/structure.png",
+	                                  "assets/images/tiles/top1.png",       "assets/images/tiles/top2.png"};
 
 	std::vector<int> ids = {19, 20, 21, 22, 23, 24};
 
@@ -40,14 +39,14 @@ void World::loadTileset() {
 		sf::Texture tex;
 		bool loaded = tex.loadFromFile(paths[i]);
 		if (!loaded) {
-			std::cerr << "Failed to load texture from " << paths[i]
-					  << std::endl;
+			std::cerr << "Failed to load texture from " << paths[i] << std::endl;
 		}
 		tileTextures[id] = tex;
 	}
 }
 
-void World::loadRoom(const std::string &roomId, const std::string &file) {
+void World::loadRoom(const std::string &roomId, const std::string &file)
+{
 	TiledMap map = loadMap(file);
 
 	if (map.layers.empty()) {
@@ -70,8 +69,7 @@ void World::loadRoom(const std::string &roomId, const std::string &file) {
 
 			Tile &tile = room.tiles[y][x];
 
-			tile.position = {(float)x * map.tilewidth,
-							 (float)y * map.tileheight};
+			tile.position = {(float)x * map.tilewidth, (float)y * map.tileheight};
 			tile.size = {(float)map.tilewidth, (float)map.tileheight};
 			tile.isSolid = (value != 19 && value != 22);
 			tile.textureId = value;
@@ -86,7 +84,8 @@ void World::loadRoom(const std::string &roomId, const std::string &file) {
 	}
 }
 
-void World::setCurrentRoom(const std::string &roomId) {
+void World::setCurrentRoom(const std::string &roomId)
+{
 	if (rooms.find(roomId) != rooms.end()) {
 		currentRoomId = roomId;
 	} else {
@@ -94,7 +93,8 @@ void World::setCurrentRoom(const std::string &roomId) {
 	}
 }
 
-void World::loadFromGrid(const std::vector<std::vector<int>> &grid) {
+void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
+{
 	Room room;
 	room.tiles.clear();
 	room.tiles.resize(grid.size());
@@ -120,7 +120,8 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid) {
 	}
 }
 
-void World::loadFromJson(const std::string &filename) {
+void World::loadFromJson(const std::string &filename)
+{
 	std::string data = readFile(filename);
 
 	json j = json::parse(data);
@@ -155,7 +156,8 @@ void World::loadFromJson(const std::string &filename) {
 	}
 }
 
-TiledMap World::loadMap(const std::string &file) {
+TiledMap World::loadMap(const std::string &file)
+{
 	std::ifstream f(file);
 	json j;
 	f >> j;
@@ -182,10 +184,13 @@ TiledMap World::loadMap(const std::string &file) {
 	return map;
 }
 
-void World::loadFromTMJ(const std::string &file) { loadRoom("default", file); }
+void World::loadFromTMJ(const std::string &file)
+{
+	loadRoom("default", file);
+}
 
-const std::optional<const World::Tile *>
-World::getTileAtCoordinate(const sf::Vector2f &worldPos) const {
+const std::optional<const World::Tile *> World::getTileAtCoordinate(const sf::Vector2f &worldPos) const
+{
 	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
 		return std::nullopt;
 	}
@@ -205,14 +210,13 @@ World::getTileAtCoordinate(const sf::Vector2f &worldPos) const {
 	return &tiles[y][x];
 }
 
-bool World::isSolidAtRect(const sf::FloatRect &rect) const {
-	std::vector<std::vector<const World::Tile *>> tilesInRect =
-		World::getTilesAtRect(rect);
+bool World::isSolidAtRect(const sf::FloatRect &rect) const
+{
+	std::vector<std::vector<const World::Tile *>> tilesInRect = World::getTilesAtRect(rect);
 
 	for (const std::vector<const World::Tile *> &tileRow : tilesInRect) {
 		for (const World::Tile *tile : tileRow) {
-			if (tile->isSolid &&
-				tile->getBounds().findIntersection(rect).has_value())
+			if (tile->isSolid && tile->getBounds().findIntersection(rect).has_value())
 				return true;
 		}
 	}
@@ -220,8 +224,8 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const {
 	return false;
 }
 
-std::vector<std::vector<const World::Tile *>>
-World::getTilesAtRect(const sf::FloatRect &rect) const {
+std::vector<std::vector<const World::Tile *>> World::getTilesAtRect(const sf::FloatRect &rect) const
+{
 	std::vector<std::vector<const Tile *>> result;
 
 	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
@@ -257,7 +261,8 @@ World::getTilesAtRect(const sf::FloatRect &rect) const {
 	return result;
 }
 
-void World::draw(sf::RenderWindow &window, const sf::View &view) const {
+void World::draw(sf::RenderWindow &window, const sf::View &view) const
+{
 	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
 		return;
 	}
@@ -268,11 +273,9 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const {
 	sf::Vector2f center = view.getCenter();
 	sf::Vector2f size = view.getSize();
 
-	sf::FloatRect viewRect({center.x - size.x * 0.5f, center.y - size.y * 0.5f},
-						   {size.x, size.y});
+	sf::FloatRect viewRect({center.x - size.x * 0.5f, center.y - size.y * 0.5f}, {size.x, size.y});
 
-	std::vector<std::vector<const Tile *>> visibleTiles =
-		World::getTilesAtRect(viewRect);
+	std::vector<std::vector<const Tile *>> visibleTiles = World::getTilesAtRect(viewRect);
 
 	for (auto &row : visibleTiles) {
 		for (auto &tile : row) {
