@@ -6,8 +6,8 @@ class Player;
 
 class IdleState : public PlayerState {
   public:
-	const sf::Texture& idle_texture;
-	const sf::Texture& idle_lower_texture;
+	const sf::Texture &idle_texture;
+	const sf::Texture &idle_lower_texture;
 
 	IdleState();
 	bool canAttack() const noexcept override { return true; }

@@ -38,11 +38,11 @@ class AssetManager {
 	[[nodiscard]] static AssetManager &getInstance();
 
 	// Rule of Five: singleton is non-copyable and non-movable
-	~AssetManager()                              = default;
-	AssetManager(const AssetManager &)           = delete;
+	~AssetManager() = default;
+	AssetManager(const AssetManager &) = delete;
 	AssetManager &operator=(const AssetManager &) = delete;
-	AssetManager(AssetManager &&)                = delete;
-	AssetManager &operator=(AssetManager &&)     = delete;
+	AssetManager(AssetManager &&) = delete;
+	AssetManager &operator=(AssetManager &&) = delete;
 
 	[[nodiscard]] const sf::Texture &getTexture(TextureAsset asset);
 
