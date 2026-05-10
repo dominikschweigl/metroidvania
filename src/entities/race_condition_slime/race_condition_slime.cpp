@@ -3,9 +3,13 @@
 #include <cmath>
 
 RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), rng(std::random_device{}())
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
+      movingTexture(AssetManager::getInstance().getTexture(SLIME_MOVING)),
+      windupTexture(AssetManager::getInstance().getTexture(SLIME_WIND_UP)),
+      attackTexture(AssetManager::getInstance().getTexture(SLIME_ATTACK)),
+      recoverTexture(AssetManager::getInstance().getTexture(SLIME_RECOVER)), sprite(idleTexture),
+      rng(std::random_device{}())
 {
-	loadAssets();
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	resetTeleportTimer();
 	currentState = &states.idle;
@@ -46,25 +50,23 @@ void RaceConditionSlime::maybeTeleport(const World &world, sf::Vector2f playerPo
 
 void RaceConditionSlime::setAnimation(SlimeAnimation anim, int frame)
 {
-	const sf::Texture *tex = nullptr;
 	switch (anim) {
 	case SlimeAnimation::Idle:
-		tex = &idleTexture;
+		sprite.setTexture(idleTexture);
 		break;
 	case SlimeAnimation::Moving:
-		tex = &movingTexture;
+		sprite.setTexture(movingTexture);
 		break;
 	case SlimeAnimation::WindUp:
-		tex = &windupTexture;
+		sprite.setTexture(windupTexture);
 		break;
 	case SlimeAnimation::Attack:
-		tex = &attackTexture;
+		sprite.setTexture(attackTexture);
 		break;
 	case SlimeAnimation::Recover:
-		tex = &recoverTexture;
+		sprite.setTexture(recoverTexture);
 		break;
 	}
-	sprite.setTexture(*tex);
 	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 }
 
@@ -125,17 +127,4 @@ bool RaceConditionSlime::isValidTeleportDest(const World &world, float newX, flo
 		}
 	}
 	return false;
-}
-
-void RaceConditionSlime::loadAssets()
-{
-
-	// ToDo: Extract asset logic for shared sprite cache (Flighweight Pattern?)
-
-	(void)idleTexture.loadFromFile("./assets/images/enemies/race_condition/idle.png");
-	(void)movingTexture.loadFromFile("./assets/images/enemies/race_condition/moving.png");
-	(void)windupTexture.loadFromFile("./assets/images/enemies/race_condition/windup.png");
-	(void)attackTexture.loadFromFile("./assets/images/enemies/race_condition/attack.png");
-	(void)recoverTexture.loadFromFile("./assets/images/enemies/race_condition/recover.png");
-	sprite.setTexture(idleTexture);
 }

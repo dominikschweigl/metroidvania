@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/asset_manager.h"
 #include "../base/base_enemy.h"
 #include "states/attack_state.h"
 #include "states/chase_state.h"
@@ -78,12 +79,12 @@ class RaceConditionSlime : public BaseEnemy {
 	float jumpCooldown = 0.f;
 	float teleportTimer = 0.f;
 
-	sf::Texture idleTexture;
-	sf::Texture movingTexture;
-	sf::Texture windupTexture;
-	sf::Texture attackTexture;
-	sf::Texture recoverTexture;
-	sf::Sprite sprite{idleTexture};
+	const sf::Texture &idleTexture;
+	const sf::Texture &movingTexture;
+	const sf::Texture &windupTexture;
+	const sf::Texture &attackTexture;
+	const sf::Texture &recoverTexture;
+	sf::Sprite sprite;
 
 	std::mt19937 rng;
 
@@ -91,5 +92,4 @@ class RaceConditionSlime : public BaseEnemy {
 	void resetTeleportTimer();
 	void glitchTeleport(const World &world, sf::Vector2f playerPos);
 	bool isValidTeleportDest(const World &world, float newX, float newY) const;
-	void loadAssets();
 };

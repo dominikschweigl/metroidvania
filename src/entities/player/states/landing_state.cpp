@@ -1,6 +1,10 @@
 #include "landing_state.h"
 #include "../player.h"
 
+LandingState::LandingState()
+    : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP))
+{}
+
 PlayerState *LandingState::update(float dt, Player &p)
 {
 	if (p.inputJump)

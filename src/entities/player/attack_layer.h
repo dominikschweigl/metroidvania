@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/asset_manager.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -10,10 +11,15 @@ struct AttackDef {
 
 class AttackLayer {
   public:
-	const sf::Texture swing_texture{"./assets/images/player/attack_swing_upper_body_extended.png"};
-	const sf::Texture overhead_texture{"./assets/images/player/attack_overhead_upper_body_extended.png"};
+	const sf::Texture &swing_texture;
+	const sf::Texture &overhead_texture;
 
-	AttackLayer() : comboChain{{&swing_texture, 8, 0.09f}, {&overhead_texture, 8, 0.09f}} {}
+	AttackLayer()
+	    : swing_texture(AssetManager::getInstance().getTexture(PLAYER_ATTACK_SWING_UPPER_BODY)),
+	      overhead_texture(AssetManager::getInstance().getTexture(PLAYER_ATTACK_OVERHEAD_UPPER_BODY))
+	{
+		comboChain = {{&swing_texture, 8, 0.09f}, {&overhead_texture, 8, 0.09f}};
+	}
 
 	bool isActive() const noexcept { return comboIndex >= 0; }
 

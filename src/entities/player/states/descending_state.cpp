@@ -1,6 +1,8 @@
 #include "descending_state.h"
 #include "../player.h"
 
+DescendingState::DescendingState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+
 void DescendingState::onEnter(Player &p)
 {
 	currentFrame = 0;

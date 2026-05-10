@@ -1,6 +1,12 @@
 #include "idle_state.h"
 #include "../player.h"
 
+IdleState::IdleState()
+    : idle_texture(AssetManager::getInstance().getTexture(PLAYER_IDLE_HAT)),
+      idle_lower_texture(AssetManager::getInstance().getTexture(PLAYER_IDLE_LOWER_BODY))
+{
+}
+
 PlayerState *IdleState::update(float dt, Player &p)
 {
 	if (!p.isOnGround)

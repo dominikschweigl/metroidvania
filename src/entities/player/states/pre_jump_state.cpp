@@ -1,6 +1,8 @@
 #include "pre_jump_state.h"
 #include "../player.h"
 
+PreJumpState::PreJumpState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+
 PlayerState *PreJumpState::update(float dt, Player &p)
 {
 	if (readyToAscend)

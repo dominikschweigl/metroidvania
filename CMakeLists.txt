@@ -12,6 +12,7 @@ include(CTest)
 include(Catch)
 
 set(GAME_SOURCES
+    src/core/asset_manager.cpp
     src/world/world.cpp
     src/entities/base/base_enemy.cpp
     src/entities/base/entity_physics.cpp

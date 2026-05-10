@@ -1,6 +1,13 @@
 #include "running_state.h"
 #include "../player.h"
 
+RunningState::RunningState()
+    : run_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_HAT)),
+      run_lower_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_LOWER_BODY)),
+      run_upper_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_UPPER_BODY))
+{
+}
+
 PlayerState *RunningState::update(float dt, Player &p)
 {
 	if (!p.isOnGround)

@@ -1,6 +1,8 @@
 #include "ascending_state.h"
 #include "../player.h"
 
+AscendingState::AscendingState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+
 void AscendingState::onEnter(Player &p)
 {
 	p.velocity.y = -Player::JUMP_SPEED;

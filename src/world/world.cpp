@@ -28,21 +28,13 @@ World::World()
 
 void World::loadTileset()
 {
-	std::vector<std::string> paths = {"assets/images/tiles/black.png",      "assets/images/tiles/left_edge.png",
-	                                  "assets/images/tiles/right_edge.png", "assets/images/tiles/structure.png",
-	                                  "assets/images/tiles/top1.png",       "assets/images/tiles/top2.png"};
-
-	std::vector<int> ids = {19, 20, 21, 22, 23, 24};
-
-	for (int i = 0; i < ids.size(); i++) {
-		int id = ids[i];
-		sf::Texture tex;
-		bool loaded = tex.loadFromFile(paths[i]);
-		if (!loaded) {
-			std::cerr << "Failed to load texture from " << paths[i] << std::endl;
-		}
-		tileTextures[id] = tex;
-	}
+	AssetManager &am = AssetManager::getInstance();
+	const std::vector<std::pair<int, TextureAsset>> entries = {
+	    {19, TILE_BLACK},     {20, TILE_LEFT_EDGE}, {21, TILE_RIGHT_EDGE},
+	    {22, TILE_STRUCTURE}, {23, TILE_TOP_1},     {24, TILE_TOP_2},
+	};
+	for (const auto &[id, asset] : entries)
+		tileTextures.emplace(id, std::cref(am.getTexture(asset)));
 }
 
 void World::loadRoom(const std::string &roomId, const std::string &file)
@@ -284,7 +276,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 
 			auto it = tileTextures.find(tile->textureId);
 			if (it != tileTextures.end()) {
-				shape.setTexture(&it->second);
+				shape.setTexture(&it->second.get());
 			} else {
 				shape.setFillColor(sf::Color(255, 0, 255));
 			}

@@ -1,6 +1,8 @@
 #include "peak_state.h"
 #include "../player.h"
 
+PeakState::PeakState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+
 void PeakState::onEnter(Player &p)
 {
 	currentFrame = 0;

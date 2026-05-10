@@ -1,5 +1,7 @@
 #pragma once
+#include "../core/asset_manager.h"
 #include <SFML/Graphics.hpp>
+#include <functional>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -31,9 +33,7 @@ class World {
 		bool isSolid;
 		int textureId;
 
-		sf::FloatRect getBounds() const {
-			return sf::FloatRect(position, size);
-		}
+		sf::FloatRect getBounds() const { return sf::FloatRect(position, size); }
 	};
 
 	struct Room {
@@ -62,11 +62,9 @@ class World {
 	void loadTileset();
 
 	// Just a helper for retrieving tile at a specific world coordinate
-	const std::optional<const Tile *>
-	getTileAtCoordinate(const sf::Vector2f &worldPos) const;
+	const std::optional<const Tile *> getTileAtCoordinate(const sf::Vector2f &worldPos) const;
 	// Get all tiles within a rectangle (for collision checks)
-	std::vector<std::vector<const Tile *>>
-	getTilesAtRect(const sf::FloatRect &rect) const;
+	std::vector<std::vector<const Tile *>> getTilesAtRect(const sf::FloatRect &rect) const;
 	// Return true if any solid tile intersects with the given rectangle
 	bool isSolidAtRect(const sf::FloatRect &rect) const;
 
@@ -76,18 +74,10 @@ class World {
   private:
 	std::unordered_map<std::string, Room> rooms;
 	std::string currentRoomId;
-	std::unordered_map<int, sf::Texture> tileTextures;
+	std::unordered_map<int, std::reference_wrapper<const sf::Texture>> tileTextures;
 
-	static float getRectLeft(const sf::FloatRect &rect) {
-		return rect.position.x;
-	}
-	static float getRectTop(const sf::FloatRect &rect) {
-		return rect.position.y;
-	}
-	static float getRectRight(const sf::FloatRect &rect) {
-		return rect.position.x + rect.size.x;
-	}
-	static float getRectBottom(const sf::FloatRect &rect) {
-		return rect.position.y + rect.size.y;
-	}
+	static float getRectLeft(const sf::FloatRect &rect) { return rect.position.x; }
+	static float getRectTop(const sf::FloatRect &rect) { return rect.position.y; }
+	static float getRectRight(const sf::FloatRect &rect) { return rect.position.x + rect.size.x; }
+	static float getRectBottom(const sf::FloatRect &rect) { return rect.position.y + rect.size.y; }
 };

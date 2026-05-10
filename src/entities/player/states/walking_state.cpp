@@ -1,6 +1,13 @@
 #include "walking_state.h"
 #include "../player.h"
 
+WalkingState::WalkingState()
+    : walk_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_HAT)),
+      walk_lower_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_LOWER_BODY)),
+      walk_upper_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_UPPER_BODY))
+{
+}
+
 PlayerState *WalkingState::update(float dt, Player &p)
 {
 	if (!p.isOnGround)
