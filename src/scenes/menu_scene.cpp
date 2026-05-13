@@ -1,13 +1,13 @@
 #include "menu_scene.h"
 #include "../ui/button.h"
 #include "../ui/vertical_list.h"
+#include <algorithm>
 #include <array>
 #include <iostream>
 #include <utility>
 
 namespace {
-const std::array<const char *, 5> kFontCandidates = {
-    "assets/fonts/menu.ttf",
+const std::array<const char *, 4> kFontCandidates = {
     "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
     "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
@@ -16,15 +16,14 @@ const std::array<const char *, 5> kFontCandidates = {
 } // namespace
 
 MenuScene::MenuScene(sf::Vector2u windowSize, Config config)
-    : config_(std::move(config)), windowSize_(windowSize), backgroundSprite_(backgroundTex_)
+    : config_(std::move(config)), windowSize_(windowSize)
 {
 	uiView_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	uiView_.setCenter(uiView_.getSize() / 2.f);
 
 	if (!config_.transparent) {
-		if (config_.backgroundImage && backgroundTex_.loadFromFile(*config_.backgroundImage)) {
-			hasBackground_ = true;
-			backgroundSprite_.setTexture(backgroundTex_, true);
+		if (config_.backgroundTexture) {
+			backgroundSprite_.emplace(*config_.backgroundTexture);
 		} else {
 			backgroundFallback_.setFillColor(config_.backgroundFallback);
 		}
@@ -68,10 +67,15 @@ void MenuScene::layoutForSize(sf::Vector2u size)
 	uiView_.setSize({static_cast<float>(size.x), static_cast<float>(size.y)});
 	uiView_.setCenter(uiView_.getSize() / 2.f);
 
-	if (hasBackground_) {
-		const auto tex = backgroundTex_.getSize();
+	if (backgroundSprite_) {
+		const auto tex = config_.backgroundTexture->getSize();
 		if (tex.x > 0 && tex.y > 0) {
-			backgroundSprite_.setScale({static_cast<float>(size.x) / tex.x, static_cast<float>(size.y) / tex.y});
+			constexpr float fill = 0.85f;
+			const float scale = std::min(static_cast<float>(size.x) / tex.x, static_cast<float>(size.y) / tex.y) * fill;
+			backgroundSprite_->setScale({scale, scale});
+			const float w = tex.x * scale;
+			const float h = tex.y * scale;
+			backgroundSprite_->setPosition({(size.x - w) * 0.5f, (size.y - h) * 0.5f});
 		}
 	} else if (!config_.transparent) {
 		backgroundFallback_.setSize({static_cast<float>(size.x), static_cast<float>(size.y)});
@@ -114,8 +118,8 @@ void MenuScene::draw(sf::RenderWindow &window)
 	window.setView(uiView_);
 	if (!config_.transparent) {
 		window.clear();
-		if (hasBackground_)
-			window.draw(backgroundSprite_);
+		if (backgroundSprite_)
+			window.draw(*backgroundSprite_);
 		else
 			window.draw(backgroundFallback_);
 	}

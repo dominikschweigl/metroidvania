@@ -10,7 +10,6 @@
 #include <vector>
 
 // Generic menu screen.
-// Config defines .
 class MenuScene : public Scene {
   public:
 	struct ButtonSpec {
@@ -26,7 +25,7 @@ class MenuScene : public Scene {
 
 		// When transparent, scenes beneath show through
 		bool transparent = false;
-		std::optional<std::string> backgroundImage;
+		const sf::Texture *backgroundTexture = nullptr;
 		sf::Color backgroundFallback = {30, 34, 60};
 
 		// Optional Escape handler. If empty, Escape is ignored.
@@ -48,9 +47,7 @@ class MenuScene : public Scene {
 	sf::Font font_;
 	std::optional<Theme> theme_;
 
-	sf::Texture backgroundTex_;
-	sf::Sprite backgroundSprite_;
-	bool hasBackground_ = false;
+	std::optional<sf::Sprite> backgroundSprite_;
 	sf::RectangleShape backgroundFallback_;
 
 	std::unique_ptr<Panel> panel_;

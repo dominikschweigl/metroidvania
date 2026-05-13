@@ -9,7 +9,7 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 {
 	MenuScene::Config cfg;
 	cfg.title = "Segfault Slayer";
-	cfg.backgroundImage = "assets/images/menu_background.png";
+	cfg.backgroundTexture = &AssetManager::getInstance().getTexture(MAIN_MENU_BACKGROUND);
 	cfg.buttons = {
 	    {"New Game",
 	     [&stack, &window]() {
