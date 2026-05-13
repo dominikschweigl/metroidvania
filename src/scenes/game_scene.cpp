@@ -1,7 +1,8 @@
 #include "game_scene.h"
+#include "menus/pause_menu.h"
 
-GameScene::GameScene(sf::Vector2u windowSize)
-    : slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
+GameScene::GameScene(SceneStack &sceneStack, sf::Vector2u windowSize)
+    : sceneStack_(sceneStack), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
 {
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
@@ -29,6 +30,8 @@ void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 				view_.zoom(0.9f);
 			else if (key->code == sf::Keyboard::Key::Hyphen)
 				view_.zoom(1.1f);
+		} else if (key->code == sf::Keyboard::Key::Escape) {
+			sceneStack_.push([&stack = sceneStack_, &window]() { return makePauseMenu(stack, window); });
 		}
 	}
 	if (const auto *mouse = event.getIf<sf::Event::MouseButtonPressed>()) {

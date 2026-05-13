@@ -1,6 +1,5 @@
 #include "core/scene_stack.h"
-#include "scenes/game_scene.h"
-#include "scenes/menu_scene.h"
+#include "scenes/menus/main_menu.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 
@@ -9,25 +8,10 @@ int main()
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktop, "Metroidvania Game", sf::Style::Default);
 	window.setFramerateLimit(60);
+	window.setKeyRepeatEnabled(false);
 
 	SceneStack stack;
-	stack.push([&stack, &window]() {
-		MenuScene::Config cfg;
-		cfg.title = "Metroidvania";
-		cfg.backgroundImage = "assets/images/menu_background.png";
-		cfg.buttons = {
-		    {"New Game",
-		     [&stack, &window]() {
-			     stack.replace(
-			         [&window]() -> std::unique_ptr<Scene> { return std::make_unique<GameScene>(window.getSize()); });
-		     }},
-		    {"Load Game", {}, false},
-		    {"Settings", {}, false},
-		    {"Exit", [&window]() { window.close(); }},
-		};
-		cfg.onEscape = [&window]() { window.close(); };
-		return std::make_unique<MenuScene>(window.getSize(), std::move(cfg));
-	});
+	stack.push([&stack, &window]() { return makeMainMenu(stack, window); });
 	stack.applyPending();
 
 	sf::Clock clock;
@@ -40,6 +24,7 @@ int main()
 				break;
 			}
 			stack.handleEvent(*event, window);
+			stack.applyPending();
 		}
 
 		stack.update(deltaTime);
