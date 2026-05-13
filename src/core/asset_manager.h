@@ -31,6 +31,9 @@ enum TextureAsset {
 	TILE_STRUCTURE,
 	TILE_TOP_1,
 	TILE_TOP_2,
+
+	// Menus
+	MAIN_MENU_BACKGROUND,
 };
 
 class AssetManager {

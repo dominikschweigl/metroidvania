@@ -13,6 +13,12 @@ include(Catch)
 
 set(GAME_SOURCES
     src/core/asset_manager.cpp
+    src/core/scene_stack.cpp
+    src/ui/button.cpp
+    src/ui/vertical_list.cpp
+    src/ui/panel.cpp
+    src/scenes/menu_scene.cpp
+    src/scenes/game_scene.cpp
     src/world/world.cpp
     src/entities/base/base_enemy.cpp
     src/entities/base/entity_physics.cpp
