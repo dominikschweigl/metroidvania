@@ -1,13 +1,15 @@
 #include "game_scene.h"
 
 GameScene::GameScene(sf::Vector2u windowSize)
-    : slime1_({5 * 32.f, 15 * 32.f}), slime2_({11 * 32.f, 15 * 32.f})
+    : slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
 {
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadFromTMJ("data/maps/test.tmj");
 	world_.loadTileset();
+	world_.loadRoom("start_room", "data/maps/start_room.tmj");
+	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
+	world_.setCurrentRoom("start_room");
 
 	view_.setCenter(player_.getPosition());
 }
@@ -40,14 +42,22 @@ void GameScene::update(float deltaTime)
 	player_.update(deltaTime, &world_, attackTriggered_);
 	slime1_.update(deltaTime, world_, player_.getPosition());
 	slime2_.update(deltaTime, world_, player_.getPosition());
+
+	if (player_.getPosition().x > 18 * 32.f && player_.getPosition().x <= 19 * 32.f
+	    && player_.getPosition().y > 10 * 32.f && player_.getPosition().y <= 11 * 32.f) {
+		world_.setCurrentRoom("boss_room");
+	}
+
 	view_.setCenter(player_.getPosition());
 	attackTriggered_ = false;
 }
 
 void GameScene::draw(sf::RenderWindow &window)
 {
+	sf::Vector2u windowSize = window.getSize();
+	view_.setSize({windowSize.x * 0.4f, windowSize.y * 0.4f});
 	window.setView(view_);
-	window.clear({135, 206, 235});
+	window.clear({0, 0, 0});
 	world_.draw(window, view_);
 	player_.draw(window);
 	slime1_.draw(window);
