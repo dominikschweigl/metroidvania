@@ -15,8 +15,7 @@ const std::array<const char *, 4> kFontCandidates = {
 };
 } // namespace
 
-MenuScene::MenuScene(sf::Vector2u windowSize, Config config)
-    : config_(std::move(config)), windowSize_(windowSize)
+MenuScene::MenuScene(sf::Vector2u windowSize, Config config) : config_(std::move(config)), windowSize_(windowSize)
 {
 	uiView_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	uiView_.setCenter(uiView_.getSize() / 2.f);
