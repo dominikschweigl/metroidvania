@@ -1,0 +1,64 @@
+#pragma once
+#include "../core/scene.h"
+#include "../ui/panel.h"
+#include "../ui/theme.h"
+#include <SFML/Graphics.hpp>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+// Data-driven menu screen. One class serves as main menu, pause overlay, or settings submenu;
+// per-instance variation lives in Config (title, buttons, background, escape behavior).
+class MenuScene : public Scene {
+  public:
+	struct ButtonSpec {
+		std::string label;
+		std::function<void()> onActivate;
+		bool enabled = true;
+	};
+
+	struct Config {
+		std::string title;
+		std::vector<ButtonSpec> buttons;
+		sf::Vector2f panelSize = {420.f, 380.f};
+
+		// When transparent, scenes beneath show through (no clear, no background drawn).
+		bool transparent = false;
+		std::optional<std::string> backgroundImage;
+		sf::Color backgroundFallback = {30, 34, 60};
+
+		// Optional Escape handler. If empty, Escape is ignored.
+		std::function<void()> onEscape;
+	};
+
+	MenuScene(sf::Vector2u windowSize, Config config);
+
+	void handleEvent(const sf::Event &event, sf::RenderWindow &window) override;
+	void update(float deltaTime) override;
+	void draw(sf::RenderWindow &window) override;
+	bool isTransparent() const override
+	{
+		return config_.transparent;
+	}
+
+  private:
+	Config config_;
+	sf::View uiView_;
+	sf::Vector2u windowSize_;
+
+	sf::Font font_;
+	std::optional<Theme> theme_;
+
+	sf::Texture backgroundTex_;
+	sf::Sprite backgroundSprite_;
+	bool hasBackground_ = false;
+	sf::RectangleShape backgroundFallback_;
+
+	std::unique_ptr<Panel> panel_;
+
+	bool loadFont();
+	void buildPanel();
+	void layoutForSize(sf::Vector2u size);
+};

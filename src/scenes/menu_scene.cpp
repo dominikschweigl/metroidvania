@@ -1,6 +1,6 @@
+#include "menu_scene.h"
 #include "../ui/button.h"
 #include "../ui/vertical_list.h"
-#include "main_menu_scene.h"
 #include <array>
 #include <iostream>
 #include <utility>
@@ -15,22 +15,23 @@ const std::array<const char *, 5> kFontCandidates = {
 };
 } // namespace
 
-MainMenuScene::MainMenuScene(SceneStack &stack, sf::Vector2u windowSize, NewGameFactory newGame, ExitCallback onExit)
-    : stack_(stack), newGame_(std::move(newGame)), onExit_(std::move(onExit)), windowSize_(windowSize),
-      backgroundSprite_(backgroundTex_)
+MenuScene::MenuScene(sf::Vector2u windowSize, Config config)
+    : config_(std::move(config)), windowSize_(windowSize), backgroundSprite_(backgroundTex_)
 {
 	uiView_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	uiView_.setCenter(uiView_.getSize() / 2.f);
 
-	if (backgroundTex_.loadFromFile("assets/images/menu_background.png")) {
-		hasBackground_ = true;
-		backgroundSprite_.setTexture(backgroundTex_, true);
-	} else {
-		backgroundFallback_.setFillColor({30, 34, 60});
+	if (!config_.transparent) {
+		if (config_.backgroundImage && backgroundTex_.loadFromFile(*config_.backgroundImage)) {
+			hasBackground_ = true;
+			backgroundSprite_.setTexture(backgroundTex_, true);
+		} else {
+			backgroundFallback_.setFillColor(config_.backgroundFallback);
+		}
 	}
 
 	if (!loadFont()) {
-		std::cerr << "MainMenuScene: no usable font found; menu will not render text.\n";
+		std::cerr << "MenuScene: no usable font found; menu will not render text.\n";
 		return;
 	}
 	theme_.emplace(Theme{font_});
@@ -38,7 +39,7 @@ MainMenuScene::MainMenuScene(SceneStack &stack, sf::Vector2u windowSize, NewGame
 	layoutForSize(windowSize);
 }
 
-bool MainMenuScene::loadFont()
+bool MenuScene::loadFont()
 {
 	for (const char *path : kFontCandidates) {
 		if (font_.openFromFile(path))
@@ -47,31 +48,21 @@ bool MainMenuScene::loadFont()
 	return false;
 }
 
-void MainMenuScene::buildPanel()
+void MenuScene::buildPanel()
 {
 	if (!theme_)
 		return;
 	auto list = std::make_unique<VerticalList>(*theme_, theme_->itemSpacing);
 
-	list->addItem(std::make_unique<Button>(*theme_, "New Game", [this]() {
-		if (!newGame_)
-			return;
-		// Capture by value so the factory survives this scene being replaced.
-		auto factory = newGame_;
-		stack_.replace([factory = std::move(factory)]() { return factory(); });
-	}));
-	list->addItem(std::make_unique<Button>(*theme_, "Load Game", []() {}, /*enabled=*/false));
-	list->addItem(std::make_unique<Button>(*theme_, "Settings", []() {}, /*enabled=*/false));
-	list->addItem(std::make_unique<Button>(*theme_, "Exit", [this]() {
-		if (onExit_)
-			onExit_();
-	}));
+	for (const auto &spec : config_.buttons) {
+		list->addItem(std::make_unique<Button>(*theme_, spec.label, spec.onActivate, spec.enabled));
+	}
 
-	panel_ = std::make_unique<Panel>(*theme_, sf::Vector2f{420.f, 380.f}, "Metroidvania");
+	panel_ = std::make_unique<Panel>(*theme_, config_.panelSize, config_.title);
 	panel_->setChild(std::move(list));
 }
 
-void MainMenuScene::layoutForSize(sf::Vector2u size)
+void MenuScene::layoutForSize(sf::Vector2u size)
 {
 	windowSize_ = size;
 	uiView_.setSize({static_cast<float>(size.x), static_cast<float>(size.y)});
@@ -82,7 +73,7 @@ void MainMenuScene::layoutForSize(sf::Vector2u size)
 		if (tex.x > 0 && tex.y > 0) {
 			backgroundSprite_.setScale({static_cast<float>(size.x) / tex.x, static_cast<float>(size.y) / tex.y});
 		}
-	} else {
+	} else if (!config_.transparent) {
 		backgroundFallback_.setSize({static_cast<float>(size.x), static_cast<float>(size.y)});
 	}
 
@@ -92,7 +83,7 @@ void MainMenuScene::layoutForSize(sf::Vector2u size)
 	}
 }
 
-void MainMenuScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
+void MenuScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 {
 	if (const auto *resized = event.getIf<sf::Event::Resized>()) {
 		layoutForSize({resized->size.x, resized->size.y});
@@ -103,8 +94,8 @@ void MainMenuScene::handleEvent(const sf::Event &event, sf::RenderWindow &window
 	window.setView(uiView_);
 	if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
 		if (key->code == sf::Keyboard::Key::Escape) {
-			if (onExit_)
-				onExit_();
+			if (config_.onEscape)
+				config_.onEscape();
 			return;
 		}
 	}
@@ -112,20 +103,22 @@ void MainMenuScene::handleEvent(const sf::Event &event, sf::RenderWindow &window
 		panel_->handleEvent(event, window);
 }
 
-void MainMenuScene::update(float deltaTime)
+void MenuScene::update(float deltaTime)
 {
 	if (panel_)
 		panel_->update(deltaTime);
 }
 
-void MainMenuScene::draw(sf::RenderWindow &window)
+void MenuScene::draw(sf::RenderWindow &window)
 {
 	window.setView(uiView_);
-	window.clear();
-	if (hasBackground_)
-		window.draw(backgroundSprite_);
-	else
-		window.draw(backgroundFallback_);
+	if (!config_.transparent) {
+		window.clear();
+		if (hasBackground_)
+			window.draw(backgroundSprite_);
+		else
+			window.draw(backgroundFallback_);
+	}
 	if (panel_)
 		panel_->draw(window);
 }

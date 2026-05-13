@@ -1,6 +1,6 @@
 #include "core/scene_stack.h"
 #include "scenes/game_scene.h"
-#include "scenes/main_menu_scene.h"
+#include "scenes/menu_scene.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 
@@ -12,9 +12,21 @@ int main()
 
 	SceneStack stack;
 	stack.push([&stack, &window]() {
-		auto newGame = [&window]() -> std::unique_ptr<Scene> { return std::make_unique<GameScene>(window.getSize()); };
-		auto onExit = [&window]() { window.close(); };
-		return std::make_unique<MainMenuScene>(stack, window.getSize(), std::move(newGame), std::move(onExit));
+		MenuScene::Config cfg;
+		cfg.title = "Metroidvania";
+		cfg.backgroundImage = "assets/images/menu_background.png";
+		cfg.buttons = {
+		    {"New Game",
+		     [&stack, &window]() {
+			     stack.replace(
+			         [&window]() -> std::unique_ptr<Scene> { return std::make_unique<GameScene>(window.getSize()); });
+		     }},
+		    {"Load Game", {}, false},
+		    {"Settings", {}, false},
+		    {"Exit", [&window]() { window.close(); }},
+		};
+		cfg.onEscape = [&window]() { window.close(); };
+		return std::make_unique<MenuScene>(window.getSize(), std::move(cfg));
 	});
 	stack.applyPending();
 
