@@ -1,19 +1,17 @@
 #pragma once
 #include "scene.h"
-#include <functional>
+#include "scene_actions.h"
 #include <memory>
 #include <vector>
 
 // Owns the current stack of scenes and mediates transitions.
 // Push/pop/replace are queued and applied between frames so scenes can request
 // transitions from inside their own handlers without invalidating iteration.
-class SceneStack {
+class SceneStack : public SceneActions {
   public:
-	using Factory = std::function<std::unique_ptr<Scene>()>;
-
-	void push(Factory factory);
-	void pop();
-	void replace(Factory factory); // pop all + push one (transition to a new top-level scene)
+	void push(Factory factory) override;
+	void pop() override;
+	void replace(Factory factory) override; // pop all + push one (transition to a new top-level scene)
 	void clear();
 
 	bool empty() const
