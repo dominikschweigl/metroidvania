@@ -4,8 +4,8 @@
 #include <functional>
 #include <string>
 
-// A labeled, clickable/activatable button. Visual state (selected/hovered/
-// disabled) is driven externally by its container or by mouse events.
+// A labeled, clickable/activatable button. Visual state
+// is managed externally by its container or by mouse events.
 class Button : public Widget {
   public:
 	using Callback = std::function<void()>;
@@ -16,20 +16,11 @@ class Button : public Widget {
 	void draw(sf::RenderTarget &target) const override;
 
 	void setPosition(sf::Vector2f position) override;
-	sf::Vector2f getPosition() const override
-	{
-		return position_;
-	}
+	sf::Vector2f getPosition() const override { return position_; }
 	sf::Vector2f getSize() const override;
 
-	void setSelected(bool selected)
-	{
-		selected_ = selected;
-	}
-	bool isEnabled() const
-	{
-		return enabled_;
-	}
+	void setSelected(bool selected) { selected_ = selected; }
+	bool isEnabled() const { return enabled_; }
 
 	void activate();
 

@@ -11,9 +11,9 @@ class Scene {
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(sf::RenderWindow &window) = 0;
 
-	// If true, scenes underneath are drawn first (e.g. pause overlay over gameplay).
+	// If true, scenes underneath are drawn first
 	virtual bool isTransparent() const { return false; }
 
-	// If true, scenes underneath keep receiving update() (e.g. animated background under menu).
+	// If true, scenes underneath keep receiving update()
 	virtual bool updateBelow() const { return false; }
 };

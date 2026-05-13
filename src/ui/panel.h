@@ -5,8 +5,7 @@
 #include <string>
 
 // A solid rectangular panel with an optional title and a single child widget
-// (typically a container like VerticalList). Centers its child inside the
-// interior. Reused for main menu, pause menu, confirmation dialogs, etc.
+// Centers its child inside the interior.
 class Panel : public Widget {
   public:
 	Panel(const Theme &theme, sf::Vector2f size, std::string title = "");
@@ -18,14 +17,8 @@ class Panel : public Widget {
 	void draw(sf::RenderTarget &target) const override;
 
 	void setPosition(sf::Vector2f position) override;
-	sf::Vector2f getPosition() const override
-	{
-		return position_;
-	}
-	sf::Vector2f getSize() const override
-	{
-		return size_;
-	}
+	sf::Vector2f getPosition() const override { return position_; }
+	sf::Vector2f getSize() const override { return size_; }
 
   private:
 	const Theme *theme_;

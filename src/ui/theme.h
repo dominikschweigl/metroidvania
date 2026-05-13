@@ -1,8 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// Visual config shared by widgets. Swap a Theme instance to reskin the UI
-// without modifying widget code.
+// Visual config shared by widgets.
 struct Theme {
 	const sf::Font &font;
 

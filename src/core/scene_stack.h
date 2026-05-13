@@ -5,19 +5,14 @@
 #include <vector>
 
 // Owns the current stack of scenes and mediates transitions.
-// Push/pop/replace are queued and applied between frames so scenes can request
-// transitions from inside their own handlers without invalidating iteration.
 class SceneStack : public SceneActions {
   public:
 	void push(Factory factory) override;
 	void pop() override;
-	void replace(Factory factory) override; // pop all + push one (transition to a new top-level scene)
+	void replace(Factory factory) override; // pop all + push one
 	void clear();
 
-	bool empty() const
-	{
-		return scenes_.empty();
-	}
+	bool empty() const { return scenes_.empty(); }
 
 	void handleEvent(const sf::Event &event, sf::RenderWindow &window);
 	void update(float deltaTime);

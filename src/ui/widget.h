@@ -1,17 +1,14 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// Minimal widget interface. Widgets never know about scenes or windows; they
-// receive events and draw to a render target. Containers compose them.
+// Minimal widget interface.
+// Widgets receive events and draw to a render target. Containers compose them.
 class Widget {
   public:
 	virtual ~Widget() = default;
 
 	virtual void handleEvent(const sf::Event &event, const sf::RenderWindow &window) = 0;
-	virtual void update(float deltaTime)
-	{
-		(void)deltaTime;
-	}
+	virtual void update(float deltaTime) { (void)deltaTime; }
 	virtual void draw(sf::RenderTarget &target) const = 0;
 
 	virtual void setPosition(sf::Vector2f position) = 0;

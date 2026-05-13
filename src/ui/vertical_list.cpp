@@ -99,10 +99,10 @@ void VerticalList::handleEvent(const sf::Event &event, const sf::RenderWindow &w
 			break;
 		}
 	}
-	// Mouse events propagate to all children (buttons do hit-testing themselves).
+	// Mouse events propagate to all children
 	for (auto &item : items_)
 		item->handleEvent(event, window);
-	applySelection(); // keep keyboard-selected highlight consistent after mouse hover updates
+	applySelection();
 }
 
 void VerticalList::draw(sf::RenderTarget &target) const

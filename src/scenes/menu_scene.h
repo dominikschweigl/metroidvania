@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-// Data-driven menu screen. One class serves as main menu, pause overlay, or settings submenu;
-// per-instance variation lives in Config (title, buttons, background, escape behavior).
+// Generic menu screen.
+// Config defines .
 class MenuScene : public Scene {
   public:
 	struct ButtonSpec {
@@ -24,7 +24,7 @@ class MenuScene : public Scene {
 		std::vector<ButtonSpec> buttons;
 		sf::Vector2f panelSize = {420.f, 380.f};
 
-		// When transparent, scenes beneath show through (no clear, no background drawn).
+		// When transparent, scenes beneath show through
 		bool transparent = false;
 		std::optional<std::string> backgroundImage;
 		sf::Color backgroundFallback = {30, 34, 60};
@@ -38,10 +38,7 @@ class MenuScene : public Scene {
 	void handleEvent(const sf::Event &event, sf::RenderWindow &window) override;
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow &window) override;
-	bool isTransparent() const override
-	{
-		return config_.transparent;
-	}
+	bool isTransparent() const override { return config_.transparent; }
 
   private:
 	Config config_;

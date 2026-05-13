@@ -4,9 +4,8 @@
 #include <memory>
 #include <vector>
 
-// Vertical stack of buttons with keyboard focus management. Disabled items
-// are skipped by focus traversal. Reusable for any vertical menu (main menu,
-// pause menu, confirmation dialogs).
+// Vertical stack of buttons with keyboard focus.
+// Reusable for any vertical menu.
 class VerticalList : public Widget {
   public:
 	VerticalList(const Theme &theme, float spacing);
@@ -17,10 +16,7 @@ class VerticalList : public Widget {
 	void draw(sf::RenderTarget &target) const override;
 
 	void setPosition(sf::Vector2f position) override;
-	sf::Vector2f getPosition() const override
-	{
-		return position_;
-	}
+	sf::Vector2f getPosition() const override { return position_; }
 	sf::Vector2f getSize() const override;
 
   private:

@@ -17,8 +17,8 @@ void Button::setPosition(sf::Vector2f position)
 {
 	position_ = position;
 	const auto local = text_.getLocalBounds();
-	text_.setPosition({position.x + theme_->itemPaddingX - local.position.x,
-	                   position.y + theme_->itemPaddingY - local.position.y});
+	text_.setPosition(
+	    {position.x + theme_->itemPaddingX - local.position.x, position.y + theme_->itemPaddingY - local.position.y});
 }
 
 sf::FloatRect Button::bounds() const
