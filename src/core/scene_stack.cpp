@@ -32,11 +32,13 @@ void SceneStack::applyPending()
 			if (!scenes_.empty())
 				scenes_.pop_back();
 			break;
-		case Op::Replace:
+		case Op::Replace: {
+			auto next = p.factory ? p.factory() : nullptr;
 			scenes_.clear();
-			if (p.factory)
-				scenes_.push_back(p.factory());
+			if (next)
+				scenes_.push_back(std::move(next));
 			break;
+		}
 		case Op::Clear:
 			scenes_.clear();
 			break;
