@@ -23,4 +23,6 @@ class GameScene : public Scene {
 	RaceConditionSlime slime1_;
 	RaceConditionSlime slime2_;
 	bool attackTriggered_ = false;
+	bool hatThrowTriggered_ = false;
+	float zoomFactor_ = 0.4f;
 };
