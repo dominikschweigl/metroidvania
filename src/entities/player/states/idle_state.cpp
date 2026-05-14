@@ -23,7 +23,7 @@ PlayerState *IdleState::update(float dt, Player &p)
 void IdleState::applyAnimation(float dt, Player &p)
 {
 	// Use extended lower-body texture when attack overlay is active
-	p.sprite.setTexture(p.attackLayer.isActive() ? idle_lower_texture : idle_texture);
+	p.sprite.setTexture(p.isAttackActive() ? idle_lower_texture : idle_texture);
 	p.sprite.setTextureRect(sf::IntRect({0, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
 }
 

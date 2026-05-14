@@ -2,9 +2,11 @@
 #include <SFML/Graphics.hpp>
 #include <optional>
 
+#include "../../core/direction.h"
 #include "../../world/world.h"
 #include "../base/entity_physics.h"
-#include "attack_layer.h"
+#include "melee_attack.h"
+#include "hat_ability.h"
 #include "states/ascending_state.h"
 #include "states/descending_state.h"
 #include "states/idle_state.h"
@@ -17,7 +19,6 @@
 
 class Player {
   public:
-	enum class Direction { Left, Right };
 	Direction direction = Direction::Left;
 
 	struct States {
@@ -53,11 +54,18 @@ class Player {
 		                       {FRAME_SIZE, FRAME_SIZE});
 	}
 
-	void update(float deltaTime, const World *world = nullptr, bool attackTriggered = false);
+	void update(float deltaTime, const World &world, bool attackTriggered = false, bool hatThrowTriggered = false);
 
 	void draw(sf::RenderWindow &window);
 
 	sf::Vector2f getPosition() const { return sprite.getPosition(); }
+
+	[[nodiscard]] bool isAttackActive() const noexcept
+	{
+		return meleeAttack.isMeleeActive() || hatAbility.isThrowActive();
+	}
+	[[nodiscard]] bool hasHatThrown() const noexcept { return hatAbility.hasProjectile(); }
+	[[nodiscard]] HatProjectile &getThrownHat() noexcept { return hatAbility.getProjectile(); }
 
   private:
 	bool isOnGround = true;
@@ -65,11 +73,13 @@ class Player {
 	bool isSprinting = false;
 	sf::Vector2f velocity;
 
-	AttackLayer attackLayer;
+	MeleeAttack meleeAttack;
+	HatAbility hatAbility;
 
 	States states;
 
 	sf::Sprite sprite;
+	sf::Sprite headSprite;
 	sf::Sprite upperSprite;
 
 	PlayerState *currentState;
@@ -79,8 +89,10 @@ class Player {
 		currentState->onExit(*this);
 		next.onEnter(*this);
 		currentState = &next;
-		if (!currentState->canAttack())
-			attackLayer.reset();
+		if (!currentState->canAttack()) {
+			meleeAttack.reset();
+			hatAbility.reset();
+		}
 	}
 
 	bool isGroundBelow(const World &world) const
@@ -152,7 +164,7 @@ class Player {
 		return futureY;
 	}
 
-	void handleMovement(float deltaTime, const World *world = nullptr);
+	void handleMovement(float deltaTime, const World &world);
 
 	void updateAnimation(float dt);
 

@@ -11,12 +11,13 @@ AssetManager &AssetManager::getInstance()
 
 const sf::Texture &AssetManager::getTexture(const TextureAsset asset)
 {
-	const auto [it, isInserted] = textures.try_emplace(asset);
-	if (isInserted && !it->second.loadFromFile(std::string(texturePath(asset)))) {
-		textures.erase(it);
+	const auto [iterator, isInserted] = textures.try_emplace(asset);
+	if (isInserted && !iterator->second.loadFromFile(std::string(texturePath(asset)))) {
+		textures.erase(iterator);
 		throw std::runtime_error(std::format("AssetManager: failed to load: {}", texturePath(asset)));
 	}
-	return it->second;
+	iterator->second.setSmooth(false);
+	return iterator->second;
 }
 
 std::string_view AssetManager::texturePath(const TextureAsset asset)
@@ -26,24 +27,32 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/player/idle_hat.png";
 	case PLAYER_IDLE_LOWER_BODY:
 		return "./assets/images/player/idle_lower_body_extended.png";
-	case PLAYER_WALK_HAT:
-		return "./assets/images/player/walk.png";
+	case PLAYER_WALK:
+		return "./assets/images/player/walk_no_head.png";
 	case PLAYER_WALK_LOWER_BODY:
 		return "./assets/images/player/walk_lower_body_extended.png";
 	case PLAYER_WALK_UPPER_BODY:
-		return "./assets/images/player/walk_upper_body.png";
+		return "./assets/images/player/walk_upper_body_extended_no_head.png";
 	case PLAYER_RUN_HAT:
-		return "./assets/images/player/run.png";
+		return "./assets/images/player/run_no_head.png";
 	case PLAYER_RUN_LOWER_BODY:
 		return "./assets/images/player/run_lower_body_extended.png";
 	case PLAYER_RUN_UPPER_BODY:
-		return "./assets/images/player/run_upper_body.png";
+		return "./assets/images/player/run_upper_body_extended_no_head.png";
 	case PLAYER_JUMP:
-		return "./assets/images/player/jump.png";
+		return "./assets/images/player/jump_no_head.png";
 	case PLAYER_ATTACK_SWING_UPPER_BODY:
-		return "./assets/images/player/attack_swing_upper_body_extended.png";
+		return "./assets/images/player/attack_swing_upper_body_extended_no_head.png";
 	case PLAYER_ATTACK_OVERHEAD_UPPER_BODY:
-		return "./assets/images/player/attack_overhead_upper_body_extended.png";
+		return "./assets/images/player/attack_overhead_upper_body_extended_no_head.png";
+	case PLAYER_ATTACK_THROW_HAT:
+		return "./assets/images/player/attack_throw_hat_upper_body_no_head.png";
+	case PLAYER_HAT_PROJECTILE:
+		return "./assets/images/player/hat_projectile.png";
+	case PLAYER_HEAD:
+		return "./assets/images/player/head.png";
+	case PLAYER_HEAD_HAT:
+		return "./assets/images/player/head_hat.png";
 	case SLIME_IDLE:
 		return "./assets/images/enemies/race_condition/idle.png";
 	case SLIME_MOVING:

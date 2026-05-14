@@ -3,6 +3,11 @@
 
 PreJumpState::PreJumpState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
 
+sf::Vector2f PreJumpState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSETS[currentFrame];
+}
+
 PlayerState *PreJumpState::update(float dt, Player &p)
 {
 	if (readyToAscend)

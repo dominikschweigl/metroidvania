@@ -2,7 +2,7 @@
 #include "../player.h"
 
 WalkingState::WalkingState()
-    : walk_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_HAT)),
+    : walk_texture(AssetManager::getInstance().getTexture(PLAYER_WALK)),
       walk_lower_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_LOWER_BODY)),
       walk_upper_texture(AssetManager::getInstance().getTexture(PLAYER_WALK_UPPER_BODY))
 {
@@ -24,7 +24,7 @@ PlayerState *WalkingState::update(float dt, Player &p)
 void WalkingState::applyAnimation(float dt, Player &p)
 {
 	// Use extended lower-body texture when attack overlay is active
-	p.sprite.setTexture(p.attackLayer.isActive() ? walk_lower_texture : walk_texture);
+	p.sprite.setTexture(p.isAttackActive() ? walk_lower_texture : walk_texture);
 	frameTimer += dt;
 	if (frameTimer >= WALK_FRAME_DURATION) {
 		frameTimer -= WALK_FRAME_DURATION;

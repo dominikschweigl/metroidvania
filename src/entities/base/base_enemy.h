@@ -1,15 +1,15 @@
 #pragma once
 
+#include "../../core/direction.h"
 #include "../../world/world.h"
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 
 class EnemyState;
 
 // Abstract base for all enemies. Owns common physics, position, velocity and state machine
 class BaseEnemy {
   public:
-	enum class Direction { Left, Right };
-
 	virtual ~BaseEnemy() = default;
 
 	// Template method: runs the state machine, applies gravity and collisions.
@@ -36,6 +36,11 @@ class BaseEnemy {
 	void setPosition(sf::Vector2f p) { pos = p; }
 	EnemyState* getState() const { return currentState; }
 	void setState(EnemyState* s) { currentState = s; }
+
+	[[nodiscard]] bool isAlive() const noexcept { return health > 0; }
+	void takeDamage(int amount) noexcept { health = std::max(0, health - amount); }
+
+	int health = 3;
 
 	// Gravity acceleration; configurable per instance/subclass. Default 1200 u/s².
 	float gravity = 1200.f;

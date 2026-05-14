@@ -28,7 +28,7 @@ EnemyState *ChaseState::update(float deltaTime, BaseEnemy &enemy, const World &w
 	}
 
 	// Move toward player.
-	float direction = (slime.getFacing() == BaseEnemy::Direction::Right) ? 1.f : -1.f;
+	float direction = (slime.getFacing() == Direction::Right) ? 1.f : -1.f;
 	slime.setVelocityX(direction * RaceConditionSlime::MOVE_SPEED);
 
 	slime.tryJumpTowards(heightDiff);
