@@ -7,7 +7,12 @@
 #include <utility>
 
 namespace {
-const std::array<const char *, 4> kFontCandidates = {
+const std::array<const char *, 7> kFontCandidates = {
+    // Windows
+    "C:\\Windows\\Fonts\\arial.ttf",
+    "C:\\Windows\\Fonts\\segoeui.ttf",
+    "C:\\Windows\\Fonts\\calibri.ttf",
+    // Linux
     "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
     "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
