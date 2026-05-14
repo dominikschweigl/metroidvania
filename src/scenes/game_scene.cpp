@@ -24,12 +24,14 @@ void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 		return;
 	}
 	if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
-		    || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) {
+		if (key->code == sf::Keyboard::Key::E) {
+			hatThrowTriggered_ = true;
+		} else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
+		           || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) {
 			if (key->code == sf::Keyboard::Key::Equal)
-				view_.zoom(0.9f);
+				zoomFactor_ *= 0.9f;
 			else if (key->code == sf::Keyboard::Key::Hyphen)
-				view_.zoom(1.1f);
+				zoomFactor_ *= 1.1f;
 		} else if (key->code == sf::Keyboard::Key::Escape) {
 			sceneStack_.push([&stack = sceneStack_, &window]() { return makePauseMenu(stack, window); });
 		}
@@ -42,7 +44,11 @@ void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 
 void GameScene::update(float deltaTime)
 {
-	player_.update(deltaTime, &world_, attackTriggered_);
+	player_.update(deltaTime, world_, attackTriggered_, hatThrowTriggered_);
+	if (player_.hasHatThrown()) {
+		player_.getThrownHat().tryHit(slime1_);
+		player_.getThrownHat().tryHit(slime2_);
+	}
 	slime1_.update(deltaTime, world_, player_.getPosition());
 	slime2_.update(deltaTime, world_, player_.getPosition());
 
@@ -53,12 +59,13 @@ void GameScene::update(float deltaTime)
 
 	view_.setCenter(player_.getPosition());
 	attackTriggered_ = false;
+	hatThrowTriggered_ = false;
 }
 
 void GameScene::draw(sf::RenderWindow &window)
 {
 	sf::Vector2u windowSize = window.getSize();
-	view_.setSize({windowSize.x * 0.4f, windowSize.y * 0.4f});
+	view_.setSize({windowSize.x * zoomFactor_, windowSize.y * zoomFactor_});
 	window.setView(view_);
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
