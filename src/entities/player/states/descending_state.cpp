@@ -1,7 +1,11 @@
 #include "descending_state.h"
 #include "../player.h"
 
-DescendingState::DescendingState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+DescendingState::DescendingState()
+    : jump_lower_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP_LOWER_BODY)),
+      jump_upper_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP_UPPER_BODY))
+{
+}
 
 void DescendingState::onEnter(Player &p)
 {
@@ -14,13 +18,11 @@ PlayerState *DescendingState::update(float dt, Player &p)
 	return this;
 }
 
-sf::Vector2f DescendingState::getHeadOffset() const noexcept
-{
-	return HEAD_OFFSET;
-}
-
 void DescendingState::applyAnimation(float dt, Player &p)
 {
-	p.sprite.setTexture(jump_texture);
-	p.sprite.setTextureRect(sf::IntRect({4 * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
+	const sf::IntRect frameRect({4 * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
+	p.lowerBodySprite.setTexture(jump_lower_texture);
+	p.lowerBodySprite.setTextureRect(frameRect);
+	p.upperBodySprite.setTexture(jump_upper_texture);
+	p.upperBodySprite.setTextureRect(frameRect);
 }

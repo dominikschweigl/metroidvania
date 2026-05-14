@@ -50,15 +50,16 @@ class Player {
 
 	sf::FloatRect getBounds() const
 	{
-		return sf::Rect<float>({sprite.getPosition().x - FRAME_SIZE / 2.f, sprite.getPosition().y - FRAME_SIZE},
-		                       {FRAME_SIZE, FRAME_SIZE});
+		return sf::Rect<float>(
+		    {lowerBodySprite.getPosition().x - FRAME_SIZE / 2.f, lowerBodySprite.getPosition().y - FRAME_SIZE},
+		    {FRAME_SIZE, FRAME_SIZE});
 	}
 
 	void update(float deltaTime, const World &world, bool attackTriggered = false, bool hatThrowTriggered = false);
 
 	void draw(sf::RenderWindow &window);
 
-	sf::Vector2f getPosition() const { return sprite.getPosition(); }
+	sf::Vector2f getPosition() const { return lowerBodySprite.getPosition(); }
 
 	[[nodiscard]] bool isAttackActive() const noexcept
 	{
@@ -78,9 +79,9 @@ class Player {
 
 	States states;
 
-	sf::Sprite sprite;
+	sf::Sprite lowerBodySprite;
 	sf::Sprite headSprite;
-	sf::Sprite upperSprite;
+	sf::Sprite upperBodySprite;
 
 	PlayerState *currentState;
 
@@ -109,7 +110,7 @@ class Player {
 	float handleHorizontalMovement(const World &world, float deltaTime)
 	{
 		float dx = velocity.x * deltaTime;
-		float futureX = sprite.getPosition().x + dx;
+		float futureX = lowerBodySprite.getPosition().x + dx;
 
 		auto bounds = getBounds();
 		auto futureBounds = sf::FloatRect({futureX - FRAME_SIZE / 2.f, bounds.position.y}, {FRAME_SIZE, bounds.size.y});
@@ -122,7 +123,7 @@ class Player {
 
 		if (world.isSolidAtRect(futureBounds)) {
 			velocity.x = 0.f;
-			std::optional<const World::Tile *> tile = world.getTileAtCoordinate(sprite.getPosition());
+			std::optional<const World::Tile *> tile = world.getTileAtCoordinate(lowerBodySprite.getPosition());
 			if (tile.has_value()) {
 				if (dx > 0)
 					futureX = tile.value()->position.x + World::TILE_SIZE - FRAME_SIZE / 2.f - 1.f;
@@ -137,7 +138,7 @@ class Player {
 	float handleVerticalMovement(const World &world, float deltaTime)
 	{
 		float dy = velocity.y * deltaTime;
-		float futureY = sprite.getPosition().y + dy;
+		float futureY = lowerBodySprite.getPosition().y + dy;
 
 		auto bounds = getBounds();
 		auto futureBounds = sf::FloatRect({bounds.position.x, futureY - bounds.size.y}, {FRAME_SIZE, FRAME_SIZE});

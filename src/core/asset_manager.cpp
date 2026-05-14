@@ -23,24 +23,22 @@ const sf::Texture &AssetManager::getTexture(const TextureAsset asset)
 std::string_view AssetManager::texturePath(const TextureAsset asset)
 {
 	switch (asset) {
-	case PLAYER_IDLE_HAT:
-		return "./assets/images/player/idle_hat.png";
 	case PLAYER_IDLE_LOWER_BODY:
 		return "./assets/images/player/idle_lower_body_extended.png";
-	case PLAYER_WALK:
-		return "./assets/images/player/walk_no_head.png";
+	case PLAYER_IDLE_UPPER_BODY:
+		return "./assets/images/player/idle_upper_body_extended_no_head.png";
 	case PLAYER_WALK_LOWER_BODY:
 		return "./assets/images/player/walk_lower_body_extended.png";
 	case PLAYER_WALK_UPPER_BODY:
 		return "./assets/images/player/walk_upper_body_extended_no_head.png";
-	case PLAYER_RUN_HAT:
-		return "./assets/images/player/run_no_head.png";
 	case PLAYER_RUN_LOWER_BODY:
 		return "./assets/images/player/run_lower_body_extended.png";
 	case PLAYER_RUN_UPPER_BODY:
 		return "./assets/images/player/run_upper_body_extended_no_head.png";
-	case PLAYER_JUMP:
-		return "./assets/images/player/jump_no_head.png";
+	case PLAYER_JUMP_LOWER_BODY:
+		return "./assets/images/player/jump_lower_body_extended.png";
+	case PLAYER_JUMP_UPPER_BODY:
+		return "./assets/images/player/jump_upper_body_extended_no_head.png";
 	case PLAYER_ATTACK_SWING_UPPER_BODY:
 		return "./assets/images/player/attack_swing_upper_body_extended_no_head.png";
 	case PLAYER_ATTACK_OVERHEAD_UPPER_BODY:

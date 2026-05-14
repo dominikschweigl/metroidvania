@@ -7,7 +7,6 @@ class Player;
 
 class RunningState : public PlayerState {
   public:
-	const sf::Texture &run_texture;
 	const sf::Texture &run_lower_texture;
 	const sf::Texture &run_upper_texture;
 

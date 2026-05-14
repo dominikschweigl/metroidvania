@@ -2,8 +2,7 @@
 #include "../player.h"
 
 RunningState::RunningState()
-    : run_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_HAT)),
-      run_lower_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_LOWER_BODY)),
+    : run_lower_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_LOWER_BODY)),
       run_upper_texture(AssetManager::getInstance().getTexture(PLAYER_RUN_UPPER_BODY))
 {
 }
@@ -28,15 +27,16 @@ PlayerState *RunningState::update(float dt, Player &p)
 
 void RunningState::applyAnimation(float dt, Player &p)
 {
-	// Use extended lower-body texture when attack overlay is active
-	p.sprite.setTexture(p.isAttackActive() ? run_lower_texture : run_texture);
 	frameTimer += dt;
 	if (frameTimer >= WALK_FRAME_DURATION) {
 		frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;
 		currentFrame = (currentFrame + 1) % 8;
 	}
-	p.sprite.setTextureRect(
-	    sf::IntRect({currentFrame * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
+	const sf::IntRect frameRect({currentFrame * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
+	p.lowerBodySprite.setTexture(run_lower_texture);
+	p.lowerBodySprite.setTextureRect(frameRect);
+	p.upperBodySprite.setTexture(run_upper_texture);
+	p.upperBodySprite.setTextureRect(frameRect);
 }
 
 void RunningState::onEnter(Player &p)
