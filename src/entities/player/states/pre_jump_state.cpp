@@ -1,11 +1,20 @@
 #include "pre_jump_state.h"
 #include "../player.h"
 
-PreJumpState::PreJumpState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
+PreJumpState::PreJumpState()
+    : jump_lower_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP_LOWER_BODY)),
+      jump_upper_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP_UPPER_BODY))
+{
+}
 
 sf::Vector2f PreJumpState::getHeadOffset() const noexcept
 {
 	return HEAD_OFFSETS[currentFrame];
+}
+
+sf::Vector2f PreJumpState::getUpperBodyOffset() const noexcept
+{
+	return UPPER_BODY_OFFSETS[currentFrame];
 }
 
 PlayerState *PreJumpState::update(float dt, Player &p)
@@ -17,9 +26,6 @@ PlayerState *PreJumpState::update(float dt, Player &p)
 
 void PreJumpState::applyAnimation(float dt, Player &p)
 {
-	p.sprite.setTexture(jump_texture);
-	p.sprite.setTextureRect(
-	    sf::IntRect({currentFrame * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
 	frameTimer += dt;
 	if (frameTimer >= PREJUMP_FRAME_DURATION) {
 		frameTimer -= PREJUMP_FRAME_DURATION;
@@ -29,6 +35,11 @@ void PreJumpState::applyAnimation(float dt, Player &p)
 			readyToAscend = true;
 		}
 	}
+	const sf::IntRect frameRect({currentFrame * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
+	p.lowerBodySprite.setTexture(jump_lower_texture);
+	p.lowerBodySprite.setTextureRect(frameRect);
+	p.upperBodySprite.setTexture(jump_upper_texture);
+	p.upperBodySprite.setTextureRect(frameRect);
 }
 
 void PreJumpState::onEnter(Player &p)

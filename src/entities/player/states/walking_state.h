@@ -6,7 +6,6 @@ class Player;
 
 class WalkingState : public PlayerState {
   public:
-	const sf::Texture &walk_texture;
 	const sf::Texture &walk_lower_texture;
 	const sf::Texture &walk_upper_texture;
 

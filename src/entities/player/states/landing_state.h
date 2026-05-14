@@ -7,7 +7,8 @@ class Player;
 
 class LandingState : public PlayerState {
   public:
-	const sf::Texture &jump_texture;
+	const sf::Texture &jump_lower_texture;
+	const sf::Texture &jump_upper_texture;
 
 	LandingState();
 
@@ -15,8 +16,11 @@ class LandingState : public PlayerState {
 
 	static constexpr std::array<sf::Vector2f, 4> HEAD_OFFSETS = {
 	    sf::Vector2f{1.f, 2.f}, {1.f, 3.f}, {1.f, 4.f}, {1.f, 2.f}};
+	static constexpr std::array<sf::Vector2f, 4> UPPER_BODY_OFFSETS = {
+	    sf::Vector2f{0.f, 0.f}, {0.f, 0.f}, {0.f, 0.f}, {0.f, 0.f}};
 
 	sf::Vector2f getHeadOffset() const noexcept override;
+	sf::Vector2f getUpperBodyOffset() const noexcept override;
 	PlayerState *update(float dt, Player &p) override;
 	void applyAnimation(float dt, Player &p) override;
 	void onEnter(Player &p) override;
