@@ -23,6 +23,9 @@ set(GAME_SOURCES
     src/entities/base/base_enemy.cpp
     src/entities/base/entity_physics.cpp
     src/entities/player/player.cpp
+    src/entities/player/melee_attack.cpp
+    src/entities/player/hat_ability.cpp
+    src/entities/player/hat_projectile.cpp
     src/entities/player/states/idle_state.cpp
     src/entities/player/states/walking_state.cpp
     src/entities/player/states/running_state.cpp
@@ -46,6 +49,7 @@ add_executable(metroidvania_tests
     tests/unit/player_state_tests.cpp
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
+    tests/unit/hat_projectile_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System)

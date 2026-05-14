@@ -3,6 +3,11 @@
 
 LandingState::LandingState() : jump_texture(AssetManager::getInstance().getTexture(PLAYER_JUMP)) {}
 
+sf::Vector2f LandingState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSETS[currentFrame];
+}
+
 PlayerState *LandingState::update(float dt, Player &p)
 {
 	if (p.inputJump)

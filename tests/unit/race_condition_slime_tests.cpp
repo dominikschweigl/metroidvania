@@ -234,14 +234,14 @@ TEST_CASE("Slime ChaseState sets velocity in the facing direction when pursuing"
 
 	SECTION("facing right → positive x velocity")
 	{
-		s.setFacing(BaseEnemy::Direction::Right);
+		s.setFacing(Direction::Right);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == RaceConditionSlime::MOVE_SPEED);
 	}
 
 	SECTION("facing left → negative x velocity")
 	{
-		s.setFacing(BaseEnemy::Direction::Left);
+		s.setFacing(Direction::Left);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == -RaceConditionSlime::MOVE_SPEED);
 	}

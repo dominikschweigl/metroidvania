@@ -8,6 +8,11 @@ RunningState::RunningState()
 {
 }
 
+sf::Vector2f RunningState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSETS[currentFrame];
+}
+
 PlayerState *RunningState::update(float dt, Player &p)
 {
 	if (!p.isOnGround)
@@ -24,7 +29,7 @@ PlayerState *RunningState::update(float dt, Player &p)
 void RunningState::applyAnimation(float dt, Player &p)
 {
 	// Use extended lower-body texture when attack overlay is active
-	p.sprite.setTexture(p.attackLayer.isActive() ? run_lower_texture : run_texture);
+	p.sprite.setTexture(p.isAttackActive() ? run_lower_texture : run_texture);
 	frameTimer += dt;
 	if (frameTimer >= WALK_FRAME_DURATION) {
 		frameTimer -= static_cast<int>(frameTimer / WALK_FRAME_DURATION) * WALK_FRAME_DURATION;

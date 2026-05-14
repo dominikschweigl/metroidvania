@@ -18,6 +18,11 @@ PlayerState *AscendingState::update(float dt, Player &p)
 	return this;
 }
 
+sf::Vector2f AscendingState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSET;
+}
+
 void AscendingState::applyAnimation(float dt, Player &p)
 {
 	p.sprite.setTexture(jump_texture);

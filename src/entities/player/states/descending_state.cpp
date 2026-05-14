@@ -14,6 +14,11 @@ PlayerState *DescendingState::update(float dt, Player &p)
 	return this;
 }
 
+sf::Vector2f DescendingState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSET;
+}
+
 void DescendingState::applyAnimation(float dt, Player &p)
 {
 	p.sprite.setTexture(jump_texture);

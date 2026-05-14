@@ -86,7 +86,7 @@ TEST_CASE("BaseEnemy initializes with given position and defaults")
 	TestEnemy e({100.f, 200.f}, 28.f, 28.f);
 	REQUIRE(e.getPosition() == sf::Vector2f{100.f, 200.f});
 	REQUIRE(e.getVelocity() == sf::Vector2f{0.f, 0.f});
-	REQUIRE(e.getFacing() == BaseEnemy::Direction::Right);
+	REQUIRE(e.getFacing() == Direction::Right);
 	REQUIRE_FALSE(e.isOnGroundFlag());
 }
 
@@ -333,16 +333,16 @@ TEST_CASE("BaseEnemy::update updates facing from player position")
 
 	SECTION("player to the right → face right")
 	{
-		e.setFacing(BaseEnemy::Direction::Left);
+		e.setFacing(Direction::Left);
 		e.update(0.016f, w, {e.getPosition().x + 100.f, e.getPosition().y});
-		REQUIRE(e.getFacing() == BaseEnemy::Direction::Right);
+		REQUIRE(e.getFacing() == Direction::Right);
 	}
 
 	SECTION("player to the left → face left")
 	{
-		e.setFacing(BaseEnemy::Direction::Right);
+		e.setFacing(Direction::Right);
 		e.update(0.016f, w, {e.getPosition().x - 100.f, e.getPosition().y});
-		REQUIRE(e.getFacing() == BaseEnemy::Direction::Left);
+		REQUIRE(e.getFacing() == Direction::Left);
 	}
 }
 

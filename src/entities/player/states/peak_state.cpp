@@ -16,6 +16,11 @@ PlayerState *PeakState::update(float dt, Player &p)
 	return this;
 }
 
+sf::Vector2f PeakState::getHeadOffset() const noexcept
+{
+	return HEAD_OFFSET;
+}
+
 void PeakState::applyAnimation(float dt, Player &p)
 {
 	p.sprite.setTexture(jump_texture);

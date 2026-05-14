@@ -15,6 +15,8 @@ class PlayerState {
 	// Override to allow attacks in a specific state.
 	virtual bool canAttack() const noexcept { return false; }
 
+	virtual sf::Vector2f getHeadOffset() const noexcept { return {0.f, 0.f}; }
+
 	virtual void onEnter(Player &p) {}
 	virtual void onExit(Player &p) {}
 
