@@ -28,10 +28,15 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 
 	meleeAttack.update(deltaTime);
 
-	const sf::Vector2f headPos = lowerBodySprite.getPosition() + sf::Vector2f{0.f, -(FRAME_SIZE - 4.f)};
-	const sf::Vector2f spawnPos =
-	    lowerBodySprite.getPosition()
-	    + sf::Vector2f{static_cast<float>(direction) * (FRAME_SIZE / 2.f + 5.f), -FRAME_SIZE / 2.f};
+	constexpr float HEAD_Y_ORIGIN_OFFSET = -(FRAME_SIZE - 4.f);
+	const sf::Vector2f headPos = lowerBodySprite.getPosition() + sf::Vector2f{0.f, HEAD_Y_ORIGIN_OFFSET};
+
+	constexpr float HAT_SPAWN_X_OFFSET = FRAME_SIZE / 2.f + 5.f;
+	constexpr float HAT_SPAWN_Y_OFFSET = -FRAME_SIZE / 2.f;
+	const sf::Vector2f hat_spawn_offset =
+	    sf::Vector2f{static_cast<float>(direction) * HAT_SPAWN_X_OFFSET, HAT_SPAWN_Y_OFFSET};
+	const sf::Vector2f spawnPos = lowerBodySprite.getPosition() + hat_spawn_offset;
+
 	hatAbility.update(deltaTime, headPos, spawnPos, direction, velocity, world);
 
 	updateAnimation(deltaTime);
@@ -39,22 +44,21 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 
 void Player::updateAnimation(float dt)
 {
-	const sf::Vector2f scale{direction == Direction::Left ? -1.f : 1.f, 1.f};
+	const float facingMultiplier = static_cast<float>(direction);
+	const sf::Vector2f scale{facingMultiplier, 1.f};
 
 	currentState->applyAnimation(dt, *this);
 	lowerBodySprite.setScale(scale);
 	upperBodySprite.setScale(scale);
 
 	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset();
-	const float upperMirroredX = upperOffset.x * (direction == Direction::Right ? 1.f : -1.f);
-	upperBodySprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{upperMirroredX, upperOffset.y});
+	upperBodySprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
 
 	const bool hatAbsent = !hatAbility.isHatOnHead();
 	headSprite.setTexture(AssetManager::getInstance().getTexture(hatAbsent ? PLAYER_HEAD : PLAYER_HEAD_HAT));
 	headSprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
 	const sf::Vector2f headOffset = currentState->getHeadOffset();
-	const float headMirroredX = headOffset.x * (direction == Direction::Right ? 1.f : -1.f);
-	headSprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{headMirroredX, headOffset.y});
+	headSprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
 	headSprite.setScale(scale);
 
 	if (isAttackActive() && currentState->canAttack()) {
