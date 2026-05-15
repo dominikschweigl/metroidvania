@@ -61,6 +61,8 @@ build/
 *.toc
 *.synctex.gz
 *.vrb
+*.fls
+*.fdb_latexmk
 
 # vcpkg installed libraries
 vcpkg_installed/
