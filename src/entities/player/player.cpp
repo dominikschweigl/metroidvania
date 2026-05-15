@@ -96,6 +96,17 @@ void Player::handleMovement(float deltaTime, const World &world)
 		transitionTo(states.landing);
 }
 
+void Player::transitionTo(PlayerState &next)
+{
+	currentState->onExit(*this);
+	next.onEnter(*this);
+	currentState = &next;
+	if (!currentState->canAttack()) {
+		meleeAttack.reset();
+		hatAbility.reset();
+	}
+}
+
 void Player::draw(sf::RenderWindow &window)
 {
 	if (debugHorizontalMovement)
