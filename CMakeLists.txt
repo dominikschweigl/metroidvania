@@ -56,4 +56,4 @@ add_executable(metroidvania_tests
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System)
-catch_discover_tests(metroidvania_tests WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+catch_discover_tests(metroidvania_tests WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" DISCOVERY_MODE PRE_TEST)
