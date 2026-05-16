@@ -5,7 +5,7 @@
 struct Theme {
 	const sf::Font &font;
 
-	sf::Color panelFill{20, 20, 30, 220};
+	sf::Color panelFill{20, 20, 30, 255};
 	sf::Color panelBorder{200, 200, 220};
 	float panelBorderThickness = 2.f;
 	float panelPadding = 24.f;

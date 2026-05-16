@@ -1,4 +1,5 @@
 #include "vertical_list.h"
+#include "../core/input_manager.h"
 
 VerticalList::VerticalList(const Theme &theme, float spacing) : spacing_(spacing)
 {
@@ -80,24 +81,19 @@ void VerticalList::applySelection()
 
 void VerticalList::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
 {
-	if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
-		switch (key->code) {
-		case sf::Keyboard::Key::Up:
-		case sf::Keyboard::Key::W:
-			moveFocus(-1);
-			return;
-		case sf::Keyboard::Key::Down:
-		case sf::Keyboard::Key::S:
-			moveFocus(1);
-			return;
-		case sf::Keyboard::Key::Enter:
-		case sf::Keyboard::Key::Space:
-			if (focusIndex_ >= 0 && focusIndex_ < static_cast<int>(items_.size()))
-				items_[focusIndex_]->activate();
-			return;
-		default:
-			break;
-		}
+	InputManager &input = InputManager::getInstance();
+	if (input.consume(MenuAction::NavigateUp)) {
+		moveFocus(-1);
+		return;
+	}
+	if (input.consume(MenuAction::NavigateDown)) {
+		moveFocus(1);
+		return;
+	}
+	if (input.consume(MenuAction::Confirm)) {
+		if (focusIndex_ >= 0 && focusIndex_ < static_cast<int>(items_.size()))
+			items_[focusIndex_]->activate();
+		return;
 	}
 	// Mouse events propagate to all children
 	for (auto &item : items_)

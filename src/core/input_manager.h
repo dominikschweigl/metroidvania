@@ -1,0 +1,98 @@
+#pragma once
+#include <SFML/Graphics.hpp>
+#include <array>
+#include <optional>
+#include <span>
+#include <string>
+#include <string_view>
+#include <variant>
+
+enum class GameAction { MoveLeft, MoveRight, Jump, Sprint, ThrowHat, ZoomIn, ZoomOut, AttackMelee };
+enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown };
+
+using InputBinding = std::variant<sf::Keyboard::Scancode, sf::Mouse::Button>;
+
+struct Binding {
+	InputBinding primary;
+	std::optional<InputBinding> secondary = std::nullopt;
+};
+
+class InputManager {
+  public:
+	struct ActionMeta {
+		GameAction action;
+		std::string_view displayName;
+	};
+
+	[[nodiscard]] static InputManager &getInstance();
+
+	~InputManager() = default;
+	InputManager(const InputManager &) = delete;
+	InputManager &operator=(const InputManager &) = delete;
+	InputManager(InputManager &&) = delete;
+	InputManager &operator=(InputManager &&) = delete;
+
+	void handleEvent(const sf::Event &event);
+	void clearFrameState();
+
+	[[nodiscard]] bool isHeld(GameAction action) const;
+
+	/// True if the action was triggered this frame; does not consume the event.
+	[[nodiscard]] bool wasPressed(GameAction action) const;
+	[[nodiscard]] bool wasPressed(MenuAction action) const;
+
+	/// True if the action was triggered this frame; clears the flag so later callers this frame see false.
+	[[nodiscard]] bool consume(GameAction action);
+	[[nodiscard]] bool consume(MenuAction action);
+
+	void rebind(GameAction action, InputBinding newBinding);
+
+	void resetToDefaults();
+
+	[[nodiscard]] std::string inputName(GameAction action) const;
+	[[nodiscard]] static std::span<const ActionMeta> gameActions() noexcept;
+
+  private:
+	InputManager();
+
+	static constexpr auto gameActionsMeta = std::to_array<ActionMeta>({
+	    {GameAction::MoveLeft, "Move Left"},
+	    {GameAction::MoveRight, "Move Right"},
+	    {GameAction::Jump, "Jump"},
+	    {GameAction::Sprint, "Sprint"},
+	    {GameAction::ThrowHat, "Throw Hat"},
+	    {GameAction::ZoomIn, "Zoom In"},
+	    {GameAction::ZoomOut, "Zoom Out"},
+	    {GameAction::AttackMelee, "Attack (Melee)"},
+	});
+	static constexpr auto menuBindings = std::to_array<Binding>({
+	    Binding{sf::Keyboard::Scancode::Escape},
+	    Binding{sf::Keyboard::Scancode::Enter, sf::Keyboard::Scancode::Space},
+	    Binding{sf::Keyboard::Scancode::Up, sf::Keyboard::Scancode::W},
+	    Binding{sf::Keyboard::Scancode::Down, sf::Keyboard::Scancode::S},
+	});
+
+	static constexpr auto actionCount = gameActionsMeta.size();
+	static constexpr auto menuActionCount = menuBindings.size();
+
+	std::array<Binding, actionCount> bindings_;
+	std::array<bool, actionCount> wasPressed_ = {};
+	std::array<bool, menuActionCount> wasMenuPressed_ = {};
+
+	static const std::array<Binding, actionCount> defaultBindings;
+
+	static constexpr std::size_t idx(GameAction action) noexcept { return static_cast<std::size_t>(action); }
+	static constexpr std::size_t idx(MenuAction action) noexcept { return static_cast<std::size_t>(action); }
+
+	static bool isHeldBinding(const InputBinding &binding);
+	static std::string bindingDisplayName(const InputBinding &binding);
+	static bool matchesKey(const InputBinding &binding, sf::Keyboard::Scancode scancode);
+	static bool matchesKey(const Binding &binding, sf::Keyboard::Scancode scancode);
+	static bool matchesMouse(const InputBinding &binding, sf::Mouse::Button button);
+	static bool matchesMouse(const Binding &binding, sf::Mouse::Button button);
+
+	static constexpr std::array<std::string_view, sf::Mouse::ButtonCount> MOUSE_BUTTON_NAMES = {
+	    "Mouse Left", "Mouse Right", "Mouse Middle", "Mouse 4", "Mouse 5"};
+
+	friend struct InputManagerTestAccess;
+};

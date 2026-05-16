@@ -2,6 +2,7 @@
 #include "../../core/scene_stack.h"
 #include "../game_scene.h"
 #include "../menu_scene.h"
+#include "key_bindings_menu.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
@@ -10,17 +11,21 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 	MenuScene::Config cfg;
 	cfg.title = "Segfault Slayer";
 	cfg.backgroundTexture = &AssetManager::getInstance().getTexture(MAIN_MENU_BACKGROUND);
-	cfg.buttons = {
+	cfg.contentFactory = MenuScene::buttonList({
 	    {"New Game",
 	     [&stack, &window]() {
-		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
-			     return std::make_unique<GameScene>(stack, window.getSize());
-		     });
+		     stack.replace(
+		         [&stack, &window]() -> std::unique_ptr<Scene> { return std::make_unique<GameScene>(stack, window); });
 	     }},
 	    {"Load Game", {}, false},
-	    {"Settings", {}, false},
+	    {"Settings",
+	     [&stack, &window]() {
+		     stack.push([&stack, &window]() -> std::unique_ptr<Scene> {
+			     return makeKeyBindingsMenu(stack, window.getSize());
+		     });
+	     }},
 	    {"Exit", [&window]() { window.close(); }},
-	};
+	});
 	cfg.onEscape = [&window]() { window.close(); };
 	return std::make_unique<MenuScene>(window.getSize(), std::move(cfg));
 }

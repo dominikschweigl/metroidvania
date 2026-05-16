@@ -1,9 +1,11 @@
 #include "game_scene.h"
+#include "../core/input_manager.h"
 #include "menus/pause_menu.h"
 
-GameScene::GameScene(SceneStack &sceneStack, sf::Vector2u windowSize)
-    : sceneStack_(sceneStack), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
+GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
+    : sceneStack_(sceneStack), window_(window), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
 {
+	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
@@ -21,30 +23,24 @@ void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 		view_.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
 		view_.setCenter(player_.getPosition());
 		window.setView(view_);
-		return;
-	}
-	if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
-		if (key->code == sf::Keyboard::Key::E) {
-			hatThrowTriggered_ = true;
-		} else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
-		           || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) {
-			if (key->code == sf::Keyboard::Key::Equal)
-				zoomFactor_ *= 0.9f;
-			else if (key->code == sf::Keyboard::Key::Hyphen)
-				zoomFactor_ *= 1.1f;
-		} else if (key->code == sf::Keyboard::Key::Escape) {
-			sceneStack_.push([&stack = sceneStack_, &window]() { return makePauseMenu(stack, window); });
-		}
-	}
-	if (const auto *mouse = event.getIf<sf::Event::MouseButtonPressed>()) {
-		if (mouse->button == sf::Mouse::Button::Left)
-			attackTriggered_ = true;
 	}
 }
 
 void GameScene::update(float deltaTime)
 {
-	player_.update(deltaTime, world_, attackTriggered_, hatThrowTriggered_);
+	const InputManager &input = InputManager::getInstance();
+
+	if (input.wasPressed(GameAction::ZoomIn))
+		zoomFactor_ *= 0.9f;
+	if (input.wasPressed(GameAction::ZoomOut))
+		zoomFactor_ *= 1.1f;
+	if (input.wasPressed(MenuAction::Back))
+		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
+
+	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
+	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
+
+	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 	if (player_.hasHatThrown()) {
 		player_.getThrownHat().tryHit(slime1_);
 		player_.getThrownHat().tryHit(slime2_);
@@ -58,8 +54,6 @@ void GameScene::update(float deltaTime)
 	}
 
 	view_.setCenter(player_.getPosition());
-	attackTriggered_ = false;
-	hatThrowTriggered_ = false;
 }
 
 void GameScene::draw(sf::RenderWindow &window)

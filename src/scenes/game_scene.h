@@ -9,7 +9,7 @@
 // Gameplay scene. Owns the world, player, enemies and the camera view.
 class GameScene : public Scene {
   public:
-	GameScene(SceneStack &sceneStack, sf::Vector2u windowSize);
+	GameScene(SceneStack &sceneStack, sf::RenderWindow &window);
 
 	void handleEvent(const sf::Event &event, sf::RenderWindow &window) override;
 	void update(float deltaTime) override;
@@ -17,12 +17,11 @@ class GameScene : public Scene {
 
   private:
 	SceneStack &sceneStack_;
+	sf::RenderWindow &window_;
 	sf::View view_;
 	World world_;
 	Player player_;
 	RaceConditionSlime slime1_;
 	RaceConditionSlime slime2_;
-	bool attackTriggered_ = false;
-	bool hatThrowTriggered_ = false;
 	float zoomFactor_ = 0.4f;
 };

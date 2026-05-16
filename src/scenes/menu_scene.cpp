@@ -1,4 +1,5 @@
 #include "menu_scene.h"
+#include "../core/input_manager.h"
 #include "../ui/button.h"
 #include "../ui/vertical_list.h"
 #include <algorithm>
@@ -51,18 +52,22 @@ bool MenuScene::loadFont()
 	return false;
 }
 
+MenuScene::ContentFactory MenuScene::buttonList(std::vector<ButtonSpec> buttons)
+{
+	return [buttons = std::move(buttons)](const Theme &theme) {
+		auto list = std::make_unique<VerticalList>(theme, theme.itemSpacing);
+		for (const auto &spec : buttons)
+			list->addItem(std::make_unique<Button>(theme, spec.label, spec.onActivate, spec.enabled));
+		return std::unique_ptr<Widget>(std::move(list));
+	};
+}
+
 void MenuScene::buildPanel()
 {
-	if (!theme_)
+	if (!theme_ || !config_.contentFactory)
 		return;
-	auto list = std::make_unique<VerticalList>(*theme_, theme_->itemSpacing);
-
-	for (const auto &spec : config_.buttons) {
-		list->addItem(std::make_unique<Button>(*theme_, spec.label, spec.onActivate, spec.enabled));
-	}
-
 	panel_ = std::make_unique<Panel>(*theme_, config_.panelSize, config_.title);
-	panel_->setChild(std::move(list));
+	panel_->setChild(config_.contentFactory(*theme_));
 }
 
 void MenuScene::layoutForSize(sf::Vector2u size)
@@ -100,12 +105,11 @@ void MenuScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 	}
 	// Bind the UI view so widget hit-testing via window.getView() is consistent.
 	window.setView(uiView_);
-	if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
-		if (key->code == sf::Keyboard::Key::Escape) {
-			if (config_.onEscape)
-				config_.onEscape();
-			return;
-		}
+	InputManager &input = InputManager::getInstance();
+	const bool blocked = config_.canEscape && !config_.canEscape();
+	if (!blocked && config_.onEscape && input.consume(MenuAction::Back)) {
+		config_.onEscape();
+		return;
 	}
 	if (panel_)
 		panel_->handleEvent(event, window);

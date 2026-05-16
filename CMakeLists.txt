@@ -13,7 +13,9 @@ include(Catch)
 
 set(GAME_SOURCES
     src/core/asset_manager.cpp
+    src/core/input_manager.cpp
     src/core/scene_stack.cpp
+    src/ui/binding_list.cpp
     src/ui/button.cpp
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
@@ -50,6 +52,7 @@ add_executable(metroidvania_tests
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
     tests/unit/hat_projectile_tests.cpp
+    tests/unit/input_manager_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System)

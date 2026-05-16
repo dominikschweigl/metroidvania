@@ -1,4 +1,5 @@
 #include "player.h"
+#include "../../core/input_manager.h"
 #include "../base/entity_physics.h"
 
 Player::Player()
@@ -72,18 +73,18 @@ void Player::updateAnimation(float dt)
 
 void Player::handleMovement(float deltaTime, const World &world)
 {
-	inputJump = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+	InputManager &input = InputManager::getInstance();
+	inputJump = input.isHeld(GameAction::Jump);
 
 	velocity.x = 0.f;
-	isSprinting =
-	    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift);
-	float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
+	isSprinting = input.isHeld(GameAction::Sprint);
+	const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+	if (input.isHeld(GameAction::MoveLeft)) {
 		velocity.x = -speed;
 		direction = Direction::Left;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+	if (input.isHeld(GameAction::MoveRight)) {
 		velocity.x = speed;
 		direction = Direction::Right;
 	}

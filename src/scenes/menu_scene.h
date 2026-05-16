@@ -2,6 +2,7 @@
 #include "../core/scene.h"
 #include "../ui/panel.h"
 #include "../ui/theme.h"
+#include "../ui/widget.h"
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <memory>
@@ -18,9 +19,13 @@ class MenuScene : public Scene {
 		bool enabled = true;
 	};
 
+	using ContentFactory = std::function<std::unique_ptr<Widget>(const Theme &)>;
+
+	// Convenience factory: builds a VerticalList of Buttons.
+	[[nodiscard]] static ContentFactory buttonList(std::vector<ButtonSpec> buttons);
+
 	struct Config {
 		std::string title;
-		std::vector<ButtonSpec> buttons;
 		sf::Vector2f panelSize = {420.f, 380.f};
 
 		// When transparent, scenes beneath show through
@@ -30,6 +35,11 @@ class MenuScene : public Scene {
 
 		// Optional Escape handler. If empty, Escape is ignored.
 		std::function<void()> onEscape;
+		// When set, gates onEscape: Escape is only acted on when this returns true.
+		// Blocked Escape events fall through to the panel widget.
+		std::function<bool()> canEscape;
+
+		ContentFactory contentFactory; // mandatory
 	};
 
 	MenuScene(sf::Vector2u windowSize, Config config);
