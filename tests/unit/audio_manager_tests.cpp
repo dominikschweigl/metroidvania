@@ -15,6 +15,26 @@ struct AudioManagerTestAccess {
 			voice.reset();
 		}
 	}
+	static std::size_t playingVoiceCount(const AudioManager &audio)
+	{
+		std::size_t count = 0;
+		for (const auto &voice : audio.voices) {
+			if (voice.has_value() && voice->getStatus() == sf::SoundSource::Status::Playing) {
+				++count;
+			}
+		}
+		return count;
+	}
+	static std::size_t pausedVoiceCount(const AudioManager &audio)
+	{
+		std::size_t count = 0;
+		for (const auto &voice : audio.voices) {
+			if (voice.has_value() && voice->getStatus() == sf::SoundSource::Status::Paused) {
+				++count;
+			}
+		}
+		return count;
+	}
 };
 
 // ─── Singleton ───────────────────────────────────────────────────────────────
@@ -60,6 +80,48 @@ TEST_CASE("AudioManager - voice pool overflow drops the extra sound silently")
 
 	const auto droppedAfter = AudioManagerTestAccess::droppedSoundCount(audio);
 	CHECK(droppedAfter == droppedBefore + 1);
+}
+
+// ─── Bulk voice control ──────────────────────────────────────────────────────
+
+TEST_CASE("AudioManager - pauseAllSounds transitions playing voices to Paused")
+{
+	auto &audio = AudioManager::getInstance();
+	AudioManagerTestAccess::clearVoices(audio);
+	audio.playSound(SoundEffect::PLACEHOLDER);
+
+	audio.pauseAllSounds();
+
+	CHECK(AudioManagerTestAccess::playingVoiceCount(audio) == 0);
+	CHECK(AudioManagerTestAccess::pausedVoiceCount(audio) == 1);
+	AudioManagerTestAccess::clearVoices(audio);
+}
+
+TEST_CASE("AudioManager - resumeAllSounds transitions paused voices back to Playing")
+{
+	auto &audio = AudioManager::getInstance();
+	AudioManagerTestAccess::clearVoices(audio);
+	audio.playSound(SoundEffect::PLACEHOLDER);
+	audio.pauseAllSounds();
+
+	audio.resumeAllSounds();
+
+	CHECK(AudioManagerTestAccess::playingVoiceCount(audio) == 1);
+	CHECK(AudioManagerTestAccess::pausedVoiceCount(audio) == 0);
+	AudioManagerTestAccess::clearVoices(audio);
+}
+
+TEST_CASE("AudioManager - stopAllSounds clears all voice activity")
+{
+	auto &audio = AudioManager::getInstance();
+	AudioManagerTestAccess::clearVoices(audio);
+	audio.playSound(SoundEffect::PLACEHOLDER);
+	audio.playSound(SoundEffect::PLAYER_JUMP);
+
+	audio.stopAllSounds();
+
+	CHECK(AudioManagerTestAccess::playingVoiceCount(audio) == 0);
+	CHECK(AudioManagerTestAccess::pausedVoiceCount(audio) == 0);
 }
 
 // ─── Music state machine ─────────────────────────────────────────────────────

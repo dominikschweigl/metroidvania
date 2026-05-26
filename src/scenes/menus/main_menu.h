@@ -9,6 +9,7 @@
 
 inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWindow &window)
 {
+	AudioManager::getInstance().stopAllSounds();
 	AudioManager::getInstance().playMusic(MusicTrack::MAIN_MENU_THEME);
 
 	MenuScene::Config cfg;

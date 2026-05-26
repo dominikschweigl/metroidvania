@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/audio_manager.h"
 #include "../../core/scene_stack.h"
 #include "../menu_scene.h"
 #include "key_bindings_menu.h"
@@ -8,11 +9,23 @@
 
 inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWindow &window)
 {
+	AudioManager::getInstance().pauseMusic();
+	AudioManager::getInstance().pauseAllSounds();
+
+	const auto resumeGameAudio = []() {
+		AudioManager::getInstance().resumeMusic();
+		AudioManager::getInstance().resumeAllSounds();
+	};
+
 	MenuScene::Config cfg;
 	cfg.title = "Segfault Slayer";
 	cfg.transparent = true;
 	cfg.contentFactory = MenuScene::buttonList({
-	    {"Continue", [&stack]() { stack.pop(); }},
+	    {"Continue",
+	     [&stack, resumeGameAudio]() {
+		     resumeGameAudio();
+		     stack.pop();
+	     }},
 	    {"Load Game", {}, false},
 	    {"Settings",
 	     [&stack, &window]() {
@@ -23,6 +36,9 @@ inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWin
 	    {"Exit to Main Menu",
 	     [&stack, &window]() { stack.replace([&stack, &window]() { return makeMainMenu(stack, window); }); }},
 	});
-	cfg.onEscape = [&stack]() { stack.pop(); };
+	cfg.onEscape = [&stack, resumeGameAudio]() {
+		resumeGameAudio();
+		stack.pop();
+	};
 	return std::make_unique<MenuScene>(window.getSize(), std::move(cfg));
 }

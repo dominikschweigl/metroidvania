@@ -23,18 +23,20 @@ const sf::SoundBuffer &AudioManager::getBuffer(const SoundEffect sfx)
 	return iterator->second;
 }
 
-void AudioManager::playSound(const SoundEffect sfx)
+void AudioManager::playSound(const SoundEffect sfx, const float volume)
 {
 	const sf::SoundBuffer &buffer = getBuffer(sfx);
 
 	for (auto &voice : voices) {
 		if (!voice.has_value()) {
 			voice.emplace(buffer);
+			voice->setVolume(volume);
 			voice->play();
 			return;
 		}
 		if (voice->getStatus() == sf::SoundSource::Status::Stopped) {
 			voice->setBuffer(buffer);
+			voice->setVolume(volume);
 			voice->play();
 			return;
 		}
@@ -43,7 +45,34 @@ void AudioManager::playSound(const SoundEffect sfx)
 	++droppedSoundCount;
 }
 
-void AudioManager::playMusic(const MusicTrack track)
+void AudioManager::pauseAllSounds()
+{
+	for (auto &voice : voices) {
+		if (voice.has_value() && voice->getStatus() == sf::SoundSource::Status::Playing) {
+			voice->pause();
+		}
+	}
+}
+
+void AudioManager::resumeAllSounds()
+{
+	for (auto &voice : voices) {
+		if (voice.has_value() && voice->getStatus() == sf::SoundSource::Status::Paused) {
+			voice->play();
+		}
+	}
+}
+
+void AudioManager::stopAllSounds()
+{
+	for (auto &voice : voices) {
+		if (voice.has_value()) {
+			voice->stop();
+		}
+	}
+}
+
+void AudioManager::playMusic(const MusicTrack track, const float volume)
 {
 	const auto path = musicPath(track);
 
@@ -55,6 +84,7 @@ void AudioManager::playMusic(const MusicTrack track)
 	if (!currentMusic->openFromFile(std::string(path))) {
 		throw std::runtime_error(std::format("AudioManager: failed to load music: {}", path));
 	}
+	currentMusic->setVolume(volume);
 	currentMusic->setLooping(true);
 	currentMusic->play();
 }
@@ -101,6 +131,26 @@ std::string_view AudioManager::soundPath(const SoundEffect sfx)
 	switch (sfx) {
 	case SoundEffect::PLACEHOLDER:
 		return "./assets/audio/placeholder.ogg";
+	case SoundEffect::PLAYER_JUMP:
+		return "./assets/audio/player/player_jump.wav";
+	case SoundEffect::PLAYER_LAND:
+		return "./assets/audio/player/player_land.wav";
+	case SoundEffect::PLAYER_ATTACK_MELEE:
+		return "./assets/audio/player/player_attack_melee.wav";
+	case SoundEffect::PLAYER_HAT_THROW:
+		return "./assets/audio/player/player_hat_throw.wav";
+	case SoundEffect::PLAYER_WALK_1:
+		return "./assets/audio/player/player_walk_1.wav";
+	case SoundEffect::PLAYER_WALK_2:
+		return "./assets/audio/player/player_walk_2.wav";
+	case SoundEffect::PLAYER_WALK_3:
+		return "./assets/audio/player/player_walk_3.wav";
+	case SoundEffect::SLIME_ATTACK:
+		return "./assets/audio/entities/race_condition_slime/race_condition_slime_attack.wav";
+	case SoundEffect::SLIME_JUMP:
+		return "./assets/audio/entities/race_condition_slime/race_condition_slime_jump.wav";
+	case SoundEffect::SLIME_MOVE:
+		return "./assets/audio/entities/race_condition_slime/race_condition_slime_move.wav";
 	}
 	throw std::logic_error("soundPath: missing SoundEffect path entry");
 }
@@ -109,7 +159,9 @@ std::string_view AudioManager::musicPath(const MusicTrack track)
 {
 	switch (track) {
 	case MusicTrack::MAIN_MENU_THEME:
-		return "./assets/audio/main_menu.ogg";
+		return "./assets/audio/music/main_menu_theme.ogg";
+	case MusicTrack::GAME_THEME:
+		return "./assets/audio/music/game_theme.ogg";
 	}
 	throw std::logic_error("musicPath: missing MusicTrack path entry");
 }

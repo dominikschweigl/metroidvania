@@ -6,7 +6,7 @@
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
     : sceneStack_(sceneStack), window_(window), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
 {
-	AudioManager::getInstance().stopMusic();
+	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
 
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});

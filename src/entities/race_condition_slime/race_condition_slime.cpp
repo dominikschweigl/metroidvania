@@ -1,4 +1,5 @@
 #include "race_condition_slime.h"
+#include "../../core/audio_manager.h"
 #include <algorithm>
 #include <cmath>
 
@@ -27,6 +28,12 @@ void RaceConditionSlime::onPreUpdate(float deltaTime)
 	attackCooldown = std::max(0.f, attackCooldown - deltaTime);
 	jumpCooldown = std::max(0.f, jumpCooldown - deltaTime);
 	teleportTimer -= deltaTime;
+
+	moveSoundTimer = std::max(0.f, moveSoundTimer - deltaTime);
+	if (moveSoundTimer <= 0.f && isOnGround && std::abs(vel.x) > 0.f) {
+		AudioManager::getInstance().playSound(SoundEffect::SLIME_MOVE, SLIME_VOLUME);
+		moveSoundTimer = MOVE_SOUND_INTERVAL;
+	}
 }
 
 void RaceConditionSlime::tryJumpTowards(float heightDiff)
@@ -34,11 +41,13 @@ void RaceConditionSlime::tryJumpTowards(float heightDiff)
 	if (!isOnGround || heightDiff <= JUMP_THRESHOLD || jumpCooldown > 0.f) {
 		return;
 	}
+	AudioManager::getInstance().playSound(SoundEffect::SLIME_JUMP, SLIME_VOLUME);
 	// Jump velocity: v = sqrt(2 * g * h), capped at MAX_JUMP_SPEED.
 	float necessaryVelocity = std::sqrt(2.f * gravity * (heightDiff + ENTITY_HEIGHT));
 	vel.y = -std::min(necessaryVelocity, MAX_JUMP_SPEED);
 	isOnGround = false;
 	jumpCooldown = JUMP_COOLDOWN;
+	moveSoundTimer = MOVE_SOUND_INTERVAL;
 }
 
 void RaceConditionSlime::maybeTeleport(const World &world, sf::Vector2f playerPos)

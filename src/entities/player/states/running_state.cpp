@@ -1,4 +1,5 @@
 #include "running_state.h"
+#include "../../../core/audio_manager.h"
 #include "../player.h"
 
 RunningState::RunningState()
@@ -22,7 +23,21 @@ PlayerState *RunningState::update(float dt, Player &p)
 		return &p.states.idle;
 	if (!p.isSprinting)
 		return &p.states.walking;
+
+	stepTimer += dt;
+	if (stepTimer >= STEP_INTERVAL) {
+		stepTimer -= STEP_INTERVAL;
+		triggerStep();
+	}
 	return this;
+}
+
+void RunningState::triggerStep()
+{
+	static constexpr std::array<SoundEffect, 3> STEP_SOUNDS = {
+	    SoundEffect::PLAYER_WALK_1, SoundEffect::PLAYER_WALK_2, SoundEffect::PLAYER_WALK_3};
+	AudioManager::getInstance().playSound(STEP_SOUNDS[nextStepIndex], STEP_VOLUME);
+	nextStepIndex = (nextStepIndex + 1) % static_cast<int>(STEP_SOUNDS.size());
 }
 
 void RunningState::applyAnimation(float dt, Player &p)
@@ -39,8 +54,11 @@ void RunningState::applyAnimation(float dt, Player &p)
 	p.upperBodySprite.setTextureRect(frameRect);
 }
 
-void RunningState::onEnter(Player &p)
+void RunningState::onEnter(Player & /*p*/)
 {
 	currentFrame = 0;
 	frameTimer = 0.f;
+	stepTimer = 0.f;
+	nextStepIndex = 0;
+	triggerStep();
 }

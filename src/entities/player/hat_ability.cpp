@@ -1,4 +1,5 @@
 #include "hat_ability.h"
+#include "../../core/audio_manager.h"
 #include <cassert>
 
 HatAbility::HatAbility()
@@ -35,6 +36,7 @@ HatProjectile &HatAbility::getProjectile() noexcept
 
 void HatAbility::trigger()
 {
+	AudioManager::getInstance().playSound(SoundEffect::PLAYER_HAT_THROW);
 	throwActive = true;
 	throwFrame = 0;
 	throwTimer = 0.f;

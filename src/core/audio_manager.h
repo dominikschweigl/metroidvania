@@ -8,10 +8,21 @@
 
 enum class SoundEffect {
 	PLACEHOLDER,
+	PLAYER_JUMP,
+	PLAYER_LAND,
+	PLAYER_ATTACK_MELEE,
+	PLAYER_HAT_THROW,
+	PLAYER_WALK_1,
+	PLAYER_WALK_2,
+	PLAYER_WALK_3,
+	SLIME_ATTACK,
+	SLIME_JUMP,
+	SLIME_MOVE,
 };
 
 enum class MusicTrack {
 	MAIN_MENU_THEME,
+	GAME_THEME,
 };
 
 enum class MusicStatus {
@@ -30,9 +41,12 @@ class AudioManager {
 	AudioManager(AudioManager &&) = delete;
 	AudioManager &operator=(AudioManager &&) = delete;
 
-	void playSound(SoundEffect sfx);
+	void playSound(SoundEffect sfx, float volume = 100.f);
+	void pauseAllSounds();
+	void resumeAllSounds();
+	void stopAllSounds();
 
-	void playMusic(MusicTrack track);
+	void playMusic(MusicTrack track, float volume = 30.f);
 	void stopMusic();
 	void pauseMusic();
 	void resumeMusic();
