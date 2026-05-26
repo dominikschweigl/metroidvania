@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/audio_manager.h"
 #include "../../core/scene_stack.h"
 #include "../game_scene.h"
 #include "../menu_scene.h"
@@ -8,6 +9,8 @@
 
 inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWindow &window)
 {
+	AudioManager::getInstance().playMusic(MusicTrack::MAIN_MENU_THEME);
+
 	MenuScene::Config cfg;
 	cfg.title = "Segfault Slayer";
 	cfg.backgroundTexture = &AssetManager::getInstance().getTexture(MAIN_MENU_BACKGROUND);

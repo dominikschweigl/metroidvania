@@ -1,10 +1,13 @@
 #include "game_scene.h"
+#include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "menus/pause_menu.h"
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
     : sceneStack_(sceneStack), window_(window), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
 {
+	AudioManager::getInstance().stopMusic();
+
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
