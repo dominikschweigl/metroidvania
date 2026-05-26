@@ -34,8 +34,8 @@ class BaseEnemy {
 	bool isOnGroundFlag() const { return isOnGround; }
 	void setOnGround(bool onGround) { isOnGround = onGround; }
 	void setPosition(sf::Vector2f p) { pos = p; }
-	EnemyState* getState() const { return currentState; }
-	void setState(EnemyState* s) { currentState = s; }
+	EnemyState *getState() const { return currentState; }
+	void setState(EnemyState *s) { currentState = s; }
 
 	[[nodiscard]] bool isAlive() const noexcept { return health > 0; }
 	void takeDamage(int amount) noexcept { health = std::max(0, health - amount); }

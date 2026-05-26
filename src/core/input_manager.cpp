@@ -123,6 +123,19 @@ void InputManager::rebind(const GameAction action, InputBinding newBinding)
 	bindings_[targetIdx].primary = newBinding;
 }
 
+std::optional<GameAction> InputManager::findConflict(const InputBinding binding, const GameAction except) const
+{
+	const std::size_t exceptIdx = idx(except);
+	for (std::size_t i = 0; i < actionCount; ++i) {
+		if (i == exceptIdx)
+			continue;
+		if (bindings_[i].primary == binding) {
+			return gameActionsMeta[i].action;
+		}
+	}
+	return std::nullopt;
+}
+
 void InputManager::resetToDefaults()
 {
 	bindings_ = defaultBindings;
@@ -137,8 +150,12 @@ std::string InputManager::bindingDisplayName(const InputBinding &binding)
 		return std::string(index < MOUSE_BUTTON_NAMES.size() ? MOUSE_BUTTON_NAMES[index] : "Mouse?");
 	}
 
-	const sf::String description = sf::Keyboard::getDescription(std::get<sf::Keyboard::Scancode>(binding));
-	return description.isEmpty() ? "?" : description.toAnsiString();
+	const auto scancode = std::get<sf::Keyboard::Scancode>(binding);
+	if (scancode == sf::Keyboard::Scancode::Unknown) {
+		return "(unbound)";
+	}
+	const sf::String description = sf::Keyboard::getDescription(scancode);
+	return description.isEmpty() ? "(unbound)" : description.toAnsiString();
 }
 
 std::string InputManager::inputName(const GameAction action) const

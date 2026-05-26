@@ -30,8 +30,8 @@ PlayerState *WalkingState::update(float dt, Player &p)
 
 void WalkingState::triggerStep()
 {
-	static constexpr std::array<SoundEffect, 3> STEP_SOUNDS = {
-	    SoundEffect::PLAYER_WALK_1, SoundEffect::PLAYER_WALK_2, SoundEffect::PLAYER_WALK_3};
+	static constexpr std::array<SoundEffect, 3> STEP_SOUNDS = {SoundEffect::PLAYER_WALK_1, SoundEffect::PLAYER_WALK_2,
+	                                                           SoundEffect::PLAYER_WALK_3};
 	AudioManager::getInstance().playSound(STEP_SOUNDS[nextStepIndex], STEP_VOLUME);
 	nextStepIndex = (nextStepIndex + 1) % static_cast<int>(STEP_SOUNDS.size());
 }

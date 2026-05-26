@@ -47,6 +47,10 @@ class InputManager {
 
 	void rebind(GameAction action, InputBinding newBinding);
 
+	// Returns the action (other than `except`) that already has `binding` as its
+	// primary, or std::nullopt if none. Used to warn the player before stealing.
+	[[nodiscard]] std::optional<GameAction> findConflict(InputBinding binding, GameAction except) const;
+
 	void resetToDefaults();
 
 	[[nodiscard]] std::string inputName(GameAction action) const;

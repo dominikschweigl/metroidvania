@@ -128,8 +128,7 @@ void AudioSettingsList::handleEvent(const sf::Event &event, const sf::RenderWind
 	}
 
 	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
-		const sf::Vector2f worldPos =
-		    window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		const sf::Vector2f worldPos = window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
 		if (draggingIndex_ >= 0 && draggingIndex_ < rowCount) {
 			sliders_[draggingIndex_]->setValueFromTrackX(worldPos.x);
 			return;

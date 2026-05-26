@@ -15,15 +15,13 @@ inline std::unique_ptr<MenuScene> makeSettingsMenu(SceneStack &stack, sf::Vector
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"Audio",
 	     [&stack, windowSize]() {
-		     stack.push([&stack, windowSize]() -> std::unique_ptr<Scene> {
-			     return makeAudioSettingsMenu(stack, windowSize);
-		     });
+		     stack.push(
+		         [&stack, windowSize]() -> std::unique_ptr<Scene> { return makeAudioSettingsMenu(stack, windowSize); });
 	     }},
 	    {"Controls",
 	     [&stack, windowSize]() {
-		     stack.push([&stack, windowSize]() -> std::unique_ptr<Scene> {
-			     return makeKeyBindingsMenu(stack, windowSize);
-		     });
+		     stack.push(
+		         [&stack, windowSize]() -> std::unique_ptr<Scene> { return makeKeyBindingsMenu(stack, windowSize); });
 	     }},
 	    {"Back", [&stack]() { stack.pop(); }},
 	});

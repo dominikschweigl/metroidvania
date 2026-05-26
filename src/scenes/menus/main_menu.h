@@ -24,9 +24,8 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 	    {"Load Game", {}, false},
 	    {"Settings",
 	     [&stack, &window]() {
-		     stack.push([&stack, &window]() -> std::unique_ptr<Scene> {
-			     return makeSettingsMenu(stack, window.getSize());
-		     });
+		     stack.push(
+		         [&stack, &window]() -> std::unique_ptr<Scene> { return makeSettingsMenu(stack, window.getSize()); });
 	     }},
 	    {"Exit", [&window]() { window.close(); }},
 	});

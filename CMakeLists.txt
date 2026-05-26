@@ -19,6 +19,7 @@ set(GAME_SOURCES
     src/ui/audio_settings_list.cpp
     src/ui/binding_list.cpp
     src/ui/button.cpp
+    src/ui/confirm_dialog.cpp
     src/ui/content_with_back.cpp
     src/ui/slider.cpp
     src/ui/vertical_list.cpp

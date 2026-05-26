@@ -1,8 +1,9 @@
 #include "binding_list.h"
 #include <algorithm>
 
-BindingList::BindingList(const Theme &theme, const float width)
-    : theme_(&theme), rowWidth_(width), awaitingText_(theme.font, "Press any key...", theme.itemSize)
+BindingList::BindingList(const Theme &theme, const float width, RebindHandler handler)
+    : theme_(&theme), rowWidth_(width), awaitingText_(theme.font, "Press any key...", theme.itemSize),
+      rebindHandler_(std::move(handler))
 {
 	const sf::Text sample(theme.font, "X", theme.itemSize);
 	rowHeight_ = sample.getLocalBounds().size.y + 2.f * theme.itemPaddingY;
@@ -35,13 +36,19 @@ void BindingList::refreshRightText(const int row)
 	}
 }
 
-void BindingList::applyRebind(const InputBinding binding)
+void BindingList::requestRebind(const InputBinding binding)
 {
 	const GameAction action = InputManager::gameActions()[static_cast<std::size_t>(selectedRow_)].action;
-	InputManager::getInstance().rebind(action, binding);
+	state_ = State::Normal;
+	if (rebindHandler_) {
+		rebindHandler_(action, binding);
+	}
+}
+
+void BindingList::refresh()
+{
 	for (int i = 0; i < static_cast<int>(InputManager::gameActions().size()); ++i)
 		refreshRightText(i);
-	state_ = State::Normal;
 }
 
 void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
@@ -55,9 +62,9 @@ void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &wi
 		}
 
 		if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
-			applyRebind(key->scancode);
+			requestRebind(key->scancode);
 		} else if (const auto *mouse = event.getIf<sf::Event::MouseButtonPressed>()) {
-			applyRebind(mouse->button);
+			requestRebind(mouse->button);
 		}
 
 		return;
@@ -98,8 +105,7 @@ void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &wi
 	}
 
 	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
-		const sf::Vector2f worldPos =
-		    window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		const sf::Vector2f worldPos = window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
 		for (int i = 0; i < rowCount; ++i) {
 			const sf::FloatRect rowBounds{{position_.x, position_.y + static_cast<float>(i) * rowHeight_},
 			                              {rowWidth_, rowHeight_}};

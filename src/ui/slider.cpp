@@ -123,8 +123,8 @@ void Slider::draw(sf::RenderTarget &target) const
 	target.draw(fillRect_);
 
 	knobRect_.setSize({KNOB_WIDTH, KNOB_HEIGHT});
-	knobRect_.setPosition(
-	    {track.position.x + track.size.x * t - KNOB_WIDTH * 0.5f, track.position.y + (TRACK_HEIGHT - KNOB_HEIGHT) * 0.5f});
+	knobRect_.setPosition({track.position.x + track.size.x * t - KNOB_WIDTH * 0.5f,
+	                       track.position.y + (TRACK_HEIGHT - KNOB_HEIGHT) * 0.5f});
 	knobRect_.setFillColor(textColor);
 	target.draw(knobRect_);
 

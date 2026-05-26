@@ -101,8 +101,7 @@ void VerticalList::handleEvent(const sf::Event &event, const sf::RenderWindow &w
 		return;
 	}
 	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
-		const sf::Vector2f world =
-		    window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		const sf::Vector2f world = window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
 		int hovered = -1;
 		for (int i = 0; i < static_cast<int>(items_.size()); ++i) {
 			const sf::FloatRect bounds{items_[i]->getPosition(), items_[i]->getSize()};

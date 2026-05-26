@@ -29,9 +29,8 @@ inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWin
 	    {"Load Game", {}, false},
 	    {"Settings",
 	     [&stack, &window]() {
-		     stack.push([&stack, &window]() -> std::unique_ptr<Scene> {
-			     return makeSettingsMenu(stack, window.getSize());
-		     });
+		     stack.push(
+		         [&stack, &window]() -> std::unique_ptr<Scene> { return makeSettingsMenu(stack, window.getSize()); });
 	     }},
 	    {"Exit to Main Menu",
 	     [&stack, &window]() { stack.replace([&stack, &window]() { return makeMainMenu(stack, window); }); }},
