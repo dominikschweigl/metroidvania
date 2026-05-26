@@ -16,8 +16,10 @@ set(GAME_SOURCES
     src/core/audio_manager.cpp
     src/core/input_manager.cpp
     src/core/scene_stack.cpp
+    src/ui/audio_settings_list.cpp
     src/ui/binding_list.cpp
     src/ui/button.cpp
+    src/ui/slider.cpp
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
     src/scenes/menu_scene.cpp

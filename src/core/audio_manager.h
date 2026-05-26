@@ -8,6 +8,7 @@
 
 enum class SoundEffect {
 	PLACEHOLDER,
+	VOLUME_PREVIEW,
 	PLAYER_JUMP,
 	PLAYER_LAND,
 	PLAYER_ATTACK_MELEE,
@@ -52,6 +53,13 @@ class AudioManager {
 	void resumeMusic();
 	[[nodiscard]] MusicStatus musicStatus() const;
 
+	// Master volume scales every per-call volume passed to playSound/playMusic.
+	// Range 0..100. 0 = silent, 100 = no attenuation.
+	void setSoundVolume(float volume);
+	void setMusicVolume(float volume);
+	[[nodiscard]] float soundVolume() const noexcept { return soundVolume_; }
+	[[nodiscard]] float musicVolume() const noexcept { return musicVolume_; }
+
   private:
 	AudioManager() = default;
 
@@ -65,6 +73,10 @@ class AudioManager {
 	std::unordered_map<SoundEffect, sf::SoundBuffer> soundBuffers;
 	std::array<std::optional<sf::Sound>, VOICE_POOL_SIZE> voices;
 	std::optional<sf::Music> currentMusic;
+	float lastMusicVolume_ = 100.f;
+
+	float soundVolume_ = 100.f;
+	float musicVolume_ = 100.f;
 
 	std::size_t bufferLoadCount = 0;
 	std::size_t droppedSoundCount = 0;

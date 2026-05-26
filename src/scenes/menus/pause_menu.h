@@ -2,8 +2,8 @@
 #include "../../core/audio_manager.h"
 #include "../../core/scene_stack.h"
 #include "../menu_scene.h"
-#include "key_bindings_menu.h"
 #include "main_menu.h"
+#include "settings_menu.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
@@ -30,7 +30,7 @@ inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWin
 	    {"Settings",
 	     [&stack, &window]() {
 		     stack.push([&stack, &window]() -> std::unique_ptr<Scene> {
-			     return makeKeyBindingsMenu(stack, window.getSize());
+			     return makeSettingsMenu(stack, window.getSize());
 		     });
 	     }},
 	    {"Exit to Main Menu",

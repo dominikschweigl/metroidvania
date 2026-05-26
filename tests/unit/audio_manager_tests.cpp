@@ -193,6 +193,44 @@ TEST_CASE("AudioManager - pauseMusic / resumeMusic from Stopped are no-ops")
 	CHECK(audio.musicStatus() == MusicStatus::Stopped);
 }
 
+// ─── Master volume ───────────────────────────────────────────────────────────
+
+TEST_CASE("AudioManager - setSoundVolume clamps to [0, 100]")
+{
+	auto &audio = AudioManager::getInstance();
+	audio.setSoundVolume(150.f);
+	CHECK(audio.soundVolume() == 100.f);
+	audio.setSoundVolume(-20.f);
+	CHECK(audio.soundVolume() == 0.f);
+	audio.setSoundVolume(50.f);
+	CHECK(audio.soundVolume() == 50.f);
+	audio.setSoundVolume(100.f);
+}
+
+TEST_CASE("AudioManager - setMusicVolume clamps to [0, 100]")
+{
+	auto &audio = AudioManager::getInstance();
+	audio.setMusicVolume(150.f);
+	CHECK(audio.musicVolume() == 100.f);
+	audio.setMusicVolume(-10.f);
+	CHECK(audio.musicVolume() == 0.f);
+	audio.setMusicVolume(75.f);
+	CHECK(audio.musicVolume() == 75.f);
+	audio.setMusicVolume(100.f);
+}
+
+TEST_CASE("AudioManager - playSound respects master sound volume")
+{
+	auto &audio = AudioManager::getInstance();
+	AudioManagerTestAccess::clearVoices(audio);
+	audio.setSoundVolume(0.f);
+
+	CHECK_NOTHROW(audio.playSound(SoundEffect::PLACEHOLDER, 100.f));
+
+	audio.setSoundVolume(100.f);
+	AudioManagerTestAccess::clearVoices(audio);
+}
+
 // ─── Error contract ──────────────────────────────────────────────────────────
 
 TEST_CASE("AudioManager - playSound on unknown SoundEffect throws logic_error")

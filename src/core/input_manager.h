@@ -8,7 +8,7 @@
 #include <variant>
 
 enum class GameAction { MoveLeft, MoveRight, Jump, Sprint, ThrowHat, ZoomIn, ZoomOut, AttackMelee };
-enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown };
+enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown, NavigateLeft, NavigateRight };
 
 using InputBinding = std::variant<sf::Keyboard::Scancode, sf::Mouse::Button>;
 
@@ -70,6 +70,8 @@ class InputManager {
 	    Binding{sf::Keyboard::Scancode::Enter, sf::Keyboard::Scancode::Space},
 	    Binding{sf::Keyboard::Scancode::Up, sf::Keyboard::Scancode::W},
 	    Binding{sf::Keyboard::Scancode::Down, sf::Keyboard::Scancode::S},
+	    Binding{sf::Keyboard::Scancode::Left, sf::Keyboard::Scancode::A},
+	    Binding{sf::Keyboard::Scancode::Right, sf::Keyboard::Scancode::D},
 	});
 
 	static constexpr auto actionCount = gameActionsMeta.size();

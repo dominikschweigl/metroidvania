@@ -1,4 +1,5 @@
 #include "audio_manager.h"
+#include <algorithm>
 #include <format>
 #include <stdexcept>
 #include <string>
@@ -26,17 +27,18 @@ const sf::SoundBuffer &AudioManager::getBuffer(const SoundEffect sfx)
 void AudioManager::playSound(const SoundEffect sfx, const float volume)
 {
 	const sf::SoundBuffer &buffer = getBuffer(sfx);
+	const float effective = std::clamp(volume * soundVolume_ / 100.f, 0.f, 100.f);
 
 	for (auto &voice : voices) {
 		if (!voice.has_value()) {
 			voice.emplace(buffer);
-			voice->setVolume(volume);
+			voice->setVolume(effective);
 			voice->play();
 			return;
 		}
 		if (voice->getStatus() == sf::SoundSource::Status::Stopped) {
 			voice->setBuffer(buffer);
-			voice->setVolume(volume);
+			voice->setVolume(effective);
 			voice->play();
 			return;
 		}
@@ -84,7 +86,8 @@ void AudioManager::playMusic(const MusicTrack track, const float volume)
 	if (!currentMusic->openFromFile(std::string(path))) {
 		throw std::runtime_error(std::format("AudioManager: failed to load music: {}", path));
 	}
-	currentMusic->setVolume(volume);
+	lastMusicVolume_ = volume;
+	currentMusic->setVolume(std::clamp(volume * musicVolume_ / 100.f, 0.f, 100.f));
 	currentMusic->setLooping(true);
 	currentMusic->play();
 }
@@ -110,6 +113,19 @@ void AudioManager::resumeMusic()
 	}
 }
 
+void AudioManager::setSoundVolume(const float volume)
+{
+	soundVolume_ = std::clamp(volume, 0.f, 100.f);
+}
+
+void AudioManager::setMusicVolume(const float volume)
+{
+	musicVolume_ = std::clamp(volume, 0.f, 100.f);
+	if (currentMusic.has_value()) {
+		currentMusic->setVolume(std::clamp(lastMusicVolume_ * musicVolume_ / 100.f, 0.f, 100.f));
+	}
+}
+
 MusicStatus AudioManager::musicStatus() const
 {
 	if (!currentMusic.has_value()) {
@@ -130,6 +146,8 @@ std::string_view AudioManager::soundPath(const SoundEffect sfx)
 {
 	switch (sfx) {
 	case SoundEffect::PLACEHOLDER:
+		return "./assets/audio/placeholder.ogg";
+	case SoundEffect::VOLUME_PREVIEW:
 		return "./assets/audio/placeholder.ogg";
 	case SoundEffect::PLAYER_JUMP:
 		return "./assets/audio/player/player_jump.wav";
