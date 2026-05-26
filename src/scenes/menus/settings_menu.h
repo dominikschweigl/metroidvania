@@ -25,6 +25,7 @@ inline std::unique_ptr<MenuScene> makeSettingsMenu(SceneStack &stack, sf::Vector
 			     return makeKeyBindingsMenu(stack, windowSize);
 		     });
 	     }},
+	    {"Back", [&stack]() { stack.pop(); }},
 	});
 	cfg.onEscape = [&stack]() { stack.pop(); };
 	return std::make_unique<MenuScene>(windowSize, std::move(cfg));

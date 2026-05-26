@@ -1,6 +1,7 @@
 #pragma once
 #include "../../core/scene_stack.h"
 #include "../../ui/binding_list.h"
+#include "../../ui/content_with_back.h"
 #include "../menu_scene.h"
 #include <memory>
 
@@ -14,10 +15,11 @@ inline std::unique_ptr<MenuScene> makeKeyBindingsMenu(SceneStack &stack, sf::Vec
 	// blPtr is shared between the factory (runs in ctor) and canEscape (called later).
 	auto blPtr = std::make_shared<BindingList *>(nullptr);
 
-	cfg.contentFactory = [blPtr, panelWidth = cfg.panelSize.x](const Theme &theme) {
+	cfg.contentFactory = [&stack, blPtr, panelWidth = cfg.panelSize.x](const Theme &theme) {
 		auto bl = std::make_unique<BindingList>(theme, panelWidth - 2.f * theme.itemPaddingX);
 		*blPtr = bl.get();
-		return std::unique_ptr<Widget>(std::move(bl));
+		return std::unique_ptr<Widget>(
+		    std::make_unique<ContentWithBack>(theme, std::move(bl), [&stack]() { stack.pop(); }));
 	};
 	cfg.canEscape = [blPtr]() { return *blPtr == nullptr || !(*blPtr)->isAwaitingInput(); };
 	cfg.onEscape = [&stack]() { stack.pop(); };

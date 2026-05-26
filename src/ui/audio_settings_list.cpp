@@ -104,16 +104,50 @@ void AudioSettingsList::handleEvent(const sf::Event &event, const sf::RenderWind
 			const sf::Vector2f worldPos =
 			    window.mapPixelToCoords({click->position.x, click->position.y}, window.getView());
 			for (int i = 0; i < rowCount; ++i) {
-				if (sliders_[i]->rowBounds().contains(worldPos)) {
-					focusIndex_ = i;
-					applySelection();
-					if (sliders_[i]->trackBounds().contains(worldPos)) {
-						sliders_[i]->setValueFromTrackX(worldPos.x);
-					}
-					return;
+				const sf::FloatRect row = sliders_[i]->rowBounds();
+				if (!row.contains(worldPos))
+					continue;
+				focusIndex_ = i;
+				applySelection();
+				const sf::FloatRect track = sliders_[i]->trackBounds();
+				const sf::FloatRect hit{{track.position.x, row.position.y}, {track.size.x, row.size.y}};
+				if (hit.contains(worldPos)) {
+					sliders_[i]->setValueFromTrackX(worldPos.x);
+					draggingIndex_ = i;
 				}
+				return;
 			}
 		}
+	}
+
+	if (const auto *release = event.getIf<sf::Event::MouseButtonReleased>()) {
+		if (release->button == sf::Mouse::Button::Left) {
+			draggingIndex_ = -1;
+		}
+		return;
+	}
+
+	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
+		const sf::Vector2f worldPos =
+		    window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		if (draggingIndex_ >= 0 && draggingIndex_ < rowCount) {
+			sliders_[draggingIndex_]->setValueFromTrackX(worldPos.x);
+			return;
+		}
+		for (int i = 0; i < rowCount; ++i) {
+			if (sliders_[i]->rowBounds().contains(worldPos)) {
+				if (focusIndex_ != i) {
+					focusIndex_ = i;
+					applySelection();
+				}
+				return;
+			}
+		}
+		if (focusIndex_ != -1) {
+			focusIndex_ = -1;
+			applySelection();
+		}
+		return;
 	}
 }
 

@@ -74,7 +74,8 @@ void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &wi
 		return;
 	}
 	if (input.consume(MenuAction::Confirm)) {
-		state_ = State::AwaitingInput;
+		if (selectedRow_ >= 0 && selectedRow_ < rowCount)
+			state_ = State::AwaitingInput;
 		return;
 	}
 
@@ -94,6 +95,20 @@ void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &wi
 				}
 			}
 		}
+	}
+
+	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
+		const sf::Vector2f worldPos =
+		    window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		for (int i = 0; i < rowCount; ++i) {
+			const sf::FloatRect rowBounds{{position_.x, position_.y + static_cast<float>(i) * rowHeight_},
+			                              {rowWidth_, rowHeight_}};
+			if (rowBounds.contains(worldPos)) {
+				selectedRow_ = i;
+				return;
+			}
+		}
+		selectedRow_ = -1;
 	}
 }
 

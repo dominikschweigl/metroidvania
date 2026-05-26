@@ -25,6 +25,7 @@ class AudioSettingsList : public Widget {
 
 	std::vector<std::unique_ptr<Slider>> sliders_;
 	int focusIndex_ = 0;
+	int draggingIndex_ = -1;
 
 	void relayout();
 	void applySelection();
