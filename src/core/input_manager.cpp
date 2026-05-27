@@ -4,15 +4,15 @@
 
 // clang-format off
 const std::array<Binding, InputManager::actionCount> InputManager::defaultBindings = {{
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::A)},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::D)},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::Space)},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::LShift)},
+    Binding{sf::Keyboard::Scancode::A},
+    Binding{sf::Keyboard::Scancode::D},
+    Binding{sf::Keyboard::Scancode::Space},
+    Binding{sf::Keyboard::Scancode::LShift},
     Binding{sf::Mouse::Button::Right},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::Equal)},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::Hyphen)},
+    Binding{sf::Keyboard::Scancode::PageUp},
+    Binding{sf::Keyboard::Scancode::PageDown},
     Binding{sf::Mouse::Button::Left},
-    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::F3)},
+    Binding{sf::Keyboard::Scancode::F3},
 }};
 // clang-format on
 

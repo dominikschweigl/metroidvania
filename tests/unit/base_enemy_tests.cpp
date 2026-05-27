@@ -243,7 +243,7 @@ TEST_CASE("resolveHorizontal stops at wall and zeros horizontal velocity")
 	float x = EntityPhysics::resolveHorizontal(pos, velX, 28.f, 28.f, 0.1f, w);
 
 	// Formula: adjacent-tile.x + TILE - width/2 - 1.
-	// Current tile (8, 2) has x=256 → expected = 256 + 32 - 14 - 1 = 273.
+	// Current tile (8, 2) has x=256 -> expected = 256 + 32 - 14 - 1 = 273.
 	REQUIRE(x == 273.f);
 	REQUIRE(velX == 0.f);
 }
@@ -335,14 +335,14 @@ TEST_CASE("BaseEnemy::update updates facing from player position")
 	TestState s;
 	e.setState(&s);
 
-	SECTION("player to the right → face right")
+	SECTION("player to the right -> face right")
 	{
 		e.setDirection(Direction::Left);
 		e.update(0.016f, w, {e.getPosition().x + 100.f, e.getPosition().y});
 		REQUIRE(e.getDirection() == Direction::Right);
 	}
 
-	SECTION("player to the left → face left")
+	SECTION("player to the left -> face left")
 	{
 		e.setDirection(Direction::Right);
 		e.update(0.016f, w, {e.getPosition().x - 100.f, e.getPosition().y});

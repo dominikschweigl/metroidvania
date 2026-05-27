@@ -20,7 +20,7 @@ struct Hitbox {
 
 // A damage-receiving rectangle.
 // the CombatSystem uses the health address as the entities identity.
-// `owner` is an optional callback target — when set, CombatSystem notifies it
+// `owner` is an optional callback target - when set, CombatSystem notifies it
 // after damage so the entity can react (hurt flash, knockback).
 struct Hurtbox {
 	sf::FloatRect bounds;

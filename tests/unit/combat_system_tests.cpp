@@ -15,7 +15,7 @@ constexpr sf::FloatRect rectAt(float x, float y, float w = 10.f, float h = 10.f)
 
 } // namespace
 
-TEST_CASE("CombatSystem: opposite teams, overlapping, alive victim — damages once")
+TEST_CASE("CombatSystem: opposite teams, overlapping, alive victim - damages once")
 {
 	Health enemyHp{3, 3};
 	std::vector<Hitbox> hits{{rectAt(0, 0), 1, Team::Player, 1}};

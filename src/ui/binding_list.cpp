@@ -136,7 +136,7 @@ void BindingList::draw(sf::RenderTarget &target) const
 
 		const sf::Color color = isSelected ? theme_->textSelected : theme_->textNormal;
 
-		// Left text — action name
+		// Left text - action name
 		{
 			sf::Text &text = leftTexts_[i];
 			text.setFillColor(color);
@@ -146,7 +146,7 @@ void BindingList::draw(sf::RenderTarget &target) const
 			target.draw(text);
 		}
 
-		// Right text — binding name or "Press any key..."
+		// Right text - binding name or "Press any key..."
 		if (isSelected && state_ == State::AwaitingInput) {
 			awaitingText_.setFillColor(theme_->textSelected);
 			const auto local = awaitingText_.getLocalBounds();

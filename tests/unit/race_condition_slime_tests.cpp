@@ -277,14 +277,14 @@ TEST_CASE("Slime ChaseState sets velocity in the facing direction when pursuing"
 
 	sf::Vector2f midRange = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE + 100.f, 0.f};
 
-	SECTION("facing right → positive x velocity")
+	SECTION("facing right -> positive x velocity")
 	{
 		s.setDirection(Direction::Right);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == RaceConditionSlime::MOVE_SPEED);
 	}
 
-	SECTION("facing left → negative x velocity")
+	SECTION("facing left -> negative x velocity")
 	{
 		s.setDirection(Direction::Left);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
@@ -299,7 +299,7 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 	s.states.chase.onEnter(s);
 	s.setTeleportTimer(10.f);
 
-	SECTION("melee range with cooldown → velocity zero")
+	SECTION("melee range with cooldown -> velocity zero")
 	{
 		s.setAttackCooldown(1.f);
 		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
@@ -308,7 +308,7 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 		REQUIRE(s.getVelocity().x == 0.f);
 	}
 
-	SECTION("beyond lose range → velocity zero")
+	SECTION("beyond lose range -> velocity zero")
 	{
 		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
 		sf::Vector2f far = s.getPosition() + sf::Vector2f{RaceConditionSlime::LOSE_RANGE + 50.f, 0.f};
@@ -346,7 +346,7 @@ TEST_CASE("Slime ChaseState initiates a jump when the player is above and precon
 	s.setOnGround(true);
 
 	// Player above and horizontally in pursuit range (not melee, not lost).
-	// chase.update computes heightDiff = slime.y - player.y, so player.y = slime.y - 200 → heightDiff = 200.
+	// chase.update computes heightDiff = slime.y - player.y, so player.y = slime.y - 200 -> heightDiff = 200.
 	sf::Vector2f aboveAndAhead = {s.getPosition().x + 100.f, s.getPosition().y - 200.f};
 	REQUIRE(s.states.chase.update(0.016f, s, w, aboveAndAhead) == &s.states.chase);
 

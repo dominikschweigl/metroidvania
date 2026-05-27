@@ -44,7 +44,7 @@ TEST_CASE("Health: exactly fatal damage transitions isAlive false at the boundar
 	REQUIRE(h.current == 0);
 }
 
-TEST_CASE("Health: negative damage is rejected (failure case — must not heal)")
+TEST_CASE("Health: negative damage is rejected (failure case - must not heal)")
 {
 	Health h{5, 3};
 	h.damage(-10);
@@ -67,7 +67,7 @@ TEST_CASE("Health: heal(0) is a no-op (boundary)")
 	REQUIRE(h.current == 3);
 }
 
-TEST_CASE("Health: negative heal is rejected (failure case — must not damage)")
+TEST_CASE("Health: negative heal is rejected (failure case - must not damage)")
 {
 	Health h{5, 3};
 	h.heal(-10);
