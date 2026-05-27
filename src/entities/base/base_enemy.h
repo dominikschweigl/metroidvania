@@ -25,6 +25,8 @@ class BaseEnemy {
 	// Shared geometry
 	virtual sf::FloatRect getBounds() const { return {{pos.x - width / 2.f, pos.y - height}, {width, height}}; }
 
+	static constexpr int MAX_HEALTH = 5;
+
 	sf::Vector2f getPosition() const { return pos; }
 	sf::Vector2f getVelocity() const { return vel; }
 	void setVelocity(sf::Vector2f v) { vel = v; }
@@ -43,7 +45,7 @@ class BaseEnemy {
 
 	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Enemy, &health, false}; }
 
-	Health health{3, 3};
+	Health health{MAX_HEALTH, MAX_HEALTH};
 
 	// Gravity acceleration; configurable per instance/subclass. Default 1200 u/s².
 	float gravity = 1200.f;

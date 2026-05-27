@@ -2,6 +2,7 @@
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "menus/pause_menu.h"
+#include <vector>
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
     : sceneStack_(sceneStack), window_(window), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
@@ -44,8 +45,30 @@ void GameScene::update(float deltaTime)
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
-	slime1_.update(deltaTime, world_, player_.getPosition());
-	slime2_.update(deltaTime, world_, player_.getPosition());
+	if (slime1_.isAlive())
+		slime1_.update(deltaTime, world_, player_.getPosition());
+	if (slime2_.isAlive())
+		slime2_.update(deltaTime, world_, player_.getPosition());
+
+	std::vector<Hitbox> hitboxes;
+	if (const auto melee = player_.getMeleeHitbox())
+		hitboxes.push_back(*melee);
+	if (player_.hasHatThrown())
+		hitboxes.push_back(player_.getThrownHat().getHitbox());
+	if (slime1_.isAlive())
+		if (const auto slimeHit = slime1_.getHitbox())
+			hitboxes.push_back(*slimeHit);
+	if (slime2_.isAlive())
+		if (const auto slimeHit = slime2_.getHitbox())
+			hitboxes.push_back(*slimeHit);
+
+	std::vector<Hurtbox> hurtboxes{player_.getHurtbox()};
+	if (slime1_.isAlive())
+		hurtboxes.push_back(slime1_.getHurtbox());
+	if (slime2_.isAlive())
+		hurtboxes.push_back(slime2_.getHurtbox());
+
+	combat_.resolve(hitboxes, hurtboxes);
 
 	if (player_.getPosition().x > 18 * 32.f && player_.getPosition().x <= 19 * 32.f
 	    && player_.getPosition().y > 10 * 32.f && player_.getPosition().y <= 11 * 32.f) {
@@ -63,6 +86,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
 	player_.draw(window);
-	slime1_.draw(window);
-	slime2_.draw(window);
+	if (slime1_.isAlive())
+		slime1_.draw(window);
+	if (slime2_.isAlive())
+		slime2_.draw(window);
 }

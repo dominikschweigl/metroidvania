@@ -1,4 +1,5 @@
 #pragma once
+#include "../combat/combat_system.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
 #include "../entities/player/player.h"
@@ -23,5 +24,6 @@ class GameScene : public Scene {
 	Player player_;
 	RaceConditionSlime slime1_;
 	RaceConditionSlime slime2_;
+	CombatSystem combat_;
 	float zoomFactor_ = 0.4f;
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include "../../combat/hitbox.h"
-#include "../../core/asset_manager.h"
 #include "../base/base_enemy.h"
 #include "states/attack_state.h"
 #include "states/chase_state.h"
@@ -55,12 +54,12 @@ class RaceConditionSlime : public BaseEnemy {
 
 	void draw(sf::RenderWindow &window) override;
 
-	// True while mid-strike — used by the player's collision/damage code.
+	// True while mid-strike - used by the player's collision/damage code.
 	bool isAttacking() const { return currentState == &states.attack; }
 
 	static constexpr int ATTACK_DAMAGE = 1;
 
-	// Active damage rectangle while the slime is mid-strike; nullopt otherwise.
+	// Active damage rectangle while the slime is mid-strike, otherwise nullopt.
 	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept
 	{
 		if (!isAttacking())
