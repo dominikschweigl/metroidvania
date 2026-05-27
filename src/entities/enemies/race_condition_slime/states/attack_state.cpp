@@ -41,4 +41,9 @@ void AttackState::onEnter(BaseEnemy &enemy)
 	static_cast<RaceConditionSlime &>(enemy).beginAttackSource();
 }
 
+void AttackState::onExit(BaseEnemy &enemy)
+{
+	static_cast<RaceConditionSlime &>(enemy).markAttackSourceEnded();
+}
+
 } // namespace rc_slime

@@ -28,6 +28,11 @@ void CombatSystem::clearSource(std::uint32_t sourceId)
 	std::erase_if(resolvedHits, [sourceId](const auto &pair) { return pair.first == sourceId; });
 }
 
+void CombatSystem::clearVictim(const Health *health) noexcept
+{
+	std::erase_if(resolvedHits, [health](const auto &pair) { return pair.second == health; });
+}
+
 void CombatSystem::clear() noexcept
 {
 	resolvedHits.clear();

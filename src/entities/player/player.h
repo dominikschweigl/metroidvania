@@ -74,6 +74,7 @@ class Player : public BaseEntity {
 	}
 
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
   private:
 	bool inputJump = false;

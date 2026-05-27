@@ -58,6 +58,12 @@ void RaceConditionSlime::maybeTeleport(const World &world, sf::Vector2f playerPo
 	}
 }
 
+void RaceConditionSlime::drainEndedSourceIds(std::vector<std::uint32_t> &out)
+{
+	out.insert(out.end(), endedSourceIds.begin(), endedSourceIds.end());
+	endedSourceIds.clear();
+}
+
 void RaceConditionSlime::setAnimation(SlimeAnimation anim, int frame)
 {
 	switch (anim) {

@@ -4,6 +4,7 @@
 #include "../combat/hitbox.h"
 #include "direction.h"
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <vector>
 
 // Shared base for every gameplay entity (player and enemies).
@@ -13,7 +14,7 @@ class BaseEntity {
   public:
 	virtual ~BaseEntity() = default;
 
-	// Derived Entity should not be copyable since it would share it's stats (eg health)
+	// Derived Entity should not be copyable or movable since it would share it's stats (eg health)
 	BaseEntity(const BaseEntity &) = delete;
 	BaseEntity &operator=(const BaseEntity &) = delete;
 	BaseEntity(BaseEntity &&) = delete;
@@ -49,6 +50,11 @@ class BaseEntity {
 
 	// Default: appends this entity's body hurtbox.
 	virtual void collectHurtboxes(std::vector<Hurtbox> &hurtboxes);
+
+	// Append sourceIds of attacks that ended this frame, then clear them.
+	// CombatSystem uses these to prune (sourceId, victim) pairs whose source
+	// will never publish another hitbox, bounding the size of resolvedHits.
+	virtual void drainEndedSourceIds(std::vector<std::uint32_t> & /*out*/) {}
 
 	Health health;
 	float gravity;

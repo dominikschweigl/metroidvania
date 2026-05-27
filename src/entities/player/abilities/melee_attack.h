@@ -31,6 +31,9 @@ class MeleeAttack {
 	void update(float dt);
 	void applyAnimation(sf::Sprite &upper, sf::Vector2f scale, sf::Vector2f pos) const;
 
+	// Append sourceIds whose combo step ended since the last drain.
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) noexcept;
+
 	// Returns the active damage rectangle for the swing, or nullopt if no swing
 	// is active. `playerPos` is the player's foot-centered position. `facing`
 	// decides which side of the body the hitbox is positioned on.
@@ -44,4 +47,5 @@ class MeleeAttack {
 	float frameTimer = 0.f;
 	bool comboQueued = false;
 	std::uint32_t sourceId = 0;
+	std::vector<std::uint32_t> endedSourceIds;
 };

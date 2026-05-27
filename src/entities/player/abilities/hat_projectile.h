@@ -33,6 +33,8 @@ class HatProjectile {
 	// currently ensures each enemy takes damage at most once per throw via sourceId.
 	[[nodiscard]] Hitbox getHitbox() const noexcept { return Hitbox{getBounds(), DAMAGE, Team::Player, sourceId}; }
 
+	[[nodiscard]] std::uint32_t getSourceId() const noexcept { return sourceId; }
+
   private:
 	Phase phase = Phase::Flying;
 	sf::Vector2f startPos;

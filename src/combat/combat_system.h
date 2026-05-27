@@ -25,6 +25,11 @@ class CombatSystem {
 	// Clear every recorded (sourceId, victim) pair for the given source.
 	void clearSource(std::uint32_t sourceId);
 
+	// Clear every recorded (sourceId, victim) pair for the given victim. Call
+	// this before an entity's Health is destroyed so the stored pointer cannot
+	// later be compared against new entries.
+	void clearVictim(const Health *health) noexcept;
+
 	// Clear every recorded hit. Used for tests / scene resets.
 	void clear() noexcept;
 

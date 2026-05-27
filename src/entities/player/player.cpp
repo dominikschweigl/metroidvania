@@ -67,6 +67,12 @@ void Player::collectHitboxes(std::vector<Hitbox> &hitboxes)
 		hitboxes.push_back(getThrownHat().getHitbox());
 }
 
+void Player::drainEndedSourceIds(std::vector<std::uint32_t> &out)
+{
+	meleeAttack.drainEndedSourceIds(out);
+	hatAbility.drainEndedSourceIds(out);
+}
+
 void Player::updateAnimation(float dt)
 {
 	const float facingMultiplier = static_cast<float>(getDirection());

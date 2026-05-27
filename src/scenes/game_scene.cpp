@@ -5,6 +5,7 @@
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
@@ -57,6 +58,10 @@ void GameScene::update(float deltaTime)
 	// Update all alive enemies and remove dead ones
 	for (auto &enemy : enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition());
+	for (auto &enemy : enemies_) {
+		if (!enemy->isAlive())
+			combat_.clearVictim(&enemy->health);
+	}
 	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
 	               enemies_.end());
 
@@ -70,6 +75,13 @@ void GameScene::update(float deltaTime)
 	}
 
 	combat_.resolve(hitboxes, hurtboxes);
+
+	std::vector<std::uint32_t> endedSourceIds;
+	player_.drainEndedSourceIds(endedSourceIds);
+	for (auto &enemy : enemies_)
+		enemy->drainEndedSourceIds(endedSourceIds);
+	for (const std::uint32_t id : endedSourceIds)
+		combat_.clearSource(id);
 
 	resetPlayerIfOutOfBounds();
 

@@ -7,7 +7,9 @@
 #include "states/recover_state.h"
 #include "states/windup_state.h"
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <random>
+#include <vector>
 
 // Race-condition themed enemy. State flow: Idle -> Chase -> WindUp -> Attack -> Recover.
 class RaceConditionSlime : public BaseEnemy {
@@ -70,6 +72,12 @@ class RaceConditionSlime : public BaseEnemy {
 	void beginAttackSource() noexcept { attackSourceId = nextSourceId(); }
 	[[nodiscard]] std::uint32_t getAttackSourceId() const noexcept { return attackSourceId; }
 
+	// Called by AttackState::onExit so the CombatSystem can prune the swing's
+	// (sourceId, victim) entries after it stops publishing a hitbox.
+	void markAttackSourceEnded() noexcept { endedSourceIds.push_back(attackSourceId); }
+
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
+
 	float getAttackCooldown() const { return attackCooldown; }
 	void setAttackCooldown(float t) { attackCooldown = t; }
 	float getJumpCooldown() const { return jumpCooldown; }
@@ -95,6 +103,7 @@ class RaceConditionSlime : public BaseEnemy {
 	float teleportTimer = 0.f;
 	float moveSoundTimer = 0.f;
 	std::uint32_t attackSourceId = 0;
+	std::vector<std::uint32_t> endedSourceIds;
 
 	const sf::Texture &idleTexture;
 	const sf::Texture &movingTexture;

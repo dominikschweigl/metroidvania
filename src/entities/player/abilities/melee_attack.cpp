@@ -12,6 +12,8 @@ MeleeAttack::MeleeAttack()
 
 void MeleeAttack::reset() noexcept
 {
+	if (comboIndex >= 0)
+		endedSourceIds.push_back(sourceId);
 	comboIndex = -1;
 	frame = 0;
 	frameTimer = 0.f;
@@ -41,6 +43,7 @@ void MeleeAttack::update(float dt)
 			frameTimer -= atk.frameDuration;
 			++frame;
 			if (frame >= atk.frameCount) {
+				endedSourceIds.push_back(sourceId);
 				if (comboQueued && comboIndex < static_cast<int>(comboChain.size()) - 1) {
 					comboQueued = false;
 					++comboIndex;
@@ -67,6 +70,12 @@ std::optional<Hitbox> MeleeAttack::getHitbox(sf::Vector2f playerPos, Direction f
 	    facingSign > 0.f ? playerPos.x + HITBOX_SIZE / 2.f : playerPos.x - HITBOX_SIZE / 2.f - HITBOX_SIZE;
 	const sf::FloatRect bounds{{left, playerPos.y - HITBOX_SIZE}, {HITBOX_SIZE, HITBOX_SIZE}};
 	return Hitbox{bounds, DAMAGE, Team::Player, sourceId};
+}
+
+void MeleeAttack::drainEndedSourceIds(std::vector<std::uint32_t> &out) noexcept
+{
+	out.insert(out.end(), endedSourceIds.begin(), endedSourceIds.end());
+	endedSourceIds.clear();
 }
 
 void MeleeAttack::applyAnimation(sf::Sprite &upper, sf::Vector2f scale, sf::Vector2f pos) const

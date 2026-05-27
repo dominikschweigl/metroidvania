@@ -60,9 +60,16 @@ void HatAbility::update(float dt, sf::Vector2f headPos, sf::Vector2f spawnPos, D
 	if (projectile.has_value()) {
 		bool isReturnedToHead = projectile->update(dt, headPos, world);
 		if (isReturnedToHead) {
+			endedSourceIds.push_back(projectile->getSourceId());
 			projectile.reset();
 		}
 	}
+}
+
+void HatAbility::drainEndedSourceIds(std::vector<std::uint32_t> &out) noexcept
+{
+	out.insert(out.end(), endedSourceIds.begin(), endedSourceIds.end());
+	endedSourceIds.clear();
 }
 
 void HatAbility::applyAnimation(sf::Sprite &upper, sf::Vector2f scale, sf::Vector2f pos) const
