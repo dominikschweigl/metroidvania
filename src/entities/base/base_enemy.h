@@ -1,19 +1,16 @@
 #pragma once
 
-#include "../../combat/health.h"
 #include "../../combat/hitbox.h"
-#include "../../core/direction.h"
-#include "../../world/world.h"
+#include "base_entity.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 
 class EnemyState;
+class World;
 
-// Abstract base for all enemies. Owns common physics, position, velocity and state machine
-class BaseEnemy {
+// Abstract base for all enemies. Adds an enemy-side state machine on top of BaseEntity.
+class BaseEnemy : public BaseEntity {
   public:
-	virtual ~BaseEnemy() = default;
-
 	// Template method: runs the state machine, applies gravity and collisions.
 	void update(float deltaTime, const World &world, sf::Vector2f playerPos);
 
@@ -23,38 +20,19 @@ class BaseEnemy {
 	// Derived classes render with their own sprite set.
 	virtual void draw(sf::RenderWindow &window) = 0;
 
-	// Shared geometry
-	virtual sf::FloatRect getBounds() const { return {{pos.x - width / 2.f, pos.y - height}, {width, height}}; }
-
 	static constexpr int MAX_HEALTH = 5;
 
-	sf::Vector2f getPosition() const { return pos; }
-	sf::Vector2f getVelocity() const { return vel; }
-	void setVelocity(sf::Vector2f v) { vel = v; }
-	void setVelocityX(float vx) { vel.x = vx; }
-	void setVelocityY(float vy) { vel.y = vy; }
-	Direction getFacing() const { return facing; }
-	void setFacing(Direction d) { facing = d; }
-	bool isOnGroundFlag() const { return isOnGround; }
-	void setOnGround(bool onGround) { isOnGround = onGround; }
-	void setPosition(sf::Vector2f p) { pos = p; }
 	EnemyState *getState() const { return currentState; }
 	void setState(EnemyState *s) { currentState = s; }
 
-	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
-	void takeDamage(int amount) noexcept { health.damage(amount); }
-
+	// Active damage rectangle for this frame, otherwise nullopt.
 	[[nodiscard]] virtual std::optional<Hitbox> getHitbox() noexcept { return std::nullopt; }
-	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Enemy, &health, false}; }
 
-	Health health{MAX_HEALTH, MAX_HEALTH};
-
-	// Gravity acceleration; configurable per instance/subclass. Default 1200 u/s².
-	float gravity = 1200.f;
+	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 
   protected:
 	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight)
-	    : pos(spawnPos), width(entityWidth), height(entityHeight)
+	    : BaseEntity(spawnPos, entityWidth, entityHeight, MAX_HEALTH, Team::Enemy)
 	{
 	}
 
@@ -62,16 +40,6 @@ class BaseEnemy {
 	virtual bool isGroundBelow(const World &world) const;
 	virtual float resolveHorizontal(float dt, const World &world);
 	virtual float resolveVertical(float dt, const World &world);
-
-	// Shared physics state
-	sf::Vector2f pos;
-	sf::Vector2f vel{0.f, 0.f};
-	bool isOnGround = false;
-	Direction facing = Direction::Right;
-
-	// Dimensions supplied by the concrete enemy at construction time.
-	const float width;
-	const float height;
 
 	// State machine pointer. Derived class must assign an initial state
 	EnemyState *currentState = nullptr;

@@ -2,14 +2,30 @@
 
 #include "combat/combat_system.h"
 #include "combat/hitbox.h"
+#include "entities/base/base_entity.h"
 #include "entities/player/player.h"
 #include "world/world.h"
+#include <type_traits>
+
+static_assert(std::is_base_of_v<BaseEntity, Player>, "Player must inherit from BaseEntity");
 
 namespace {
 
 World makeEmptyWorld()
 {
 	std::vector<std::vector<int>> g(5, std::vector<int>(10, 0));
+	World w;
+	w.loadFromGrid(g);
+	return w;
+}
+
+World makeFlooredWorldForPlayer()
+{
+	// Player spawns at (15*32, 0). Build a wide world with a floor row directly beneath
+	// so the player stays in idle (canAttack=true) after the first update tick.
+	std::vector<std::vector<int>> g(20, std::vector<int>(40, 0));
+	for (int x = 0; x < 40; ++x)
+		g[1][x] = 1;
 	World w;
 	w.loadFromGrid(g);
 	return w;
@@ -61,7 +77,7 @@ TEST_CASE("Player: i-frames decay over time and clamp at zero (boundary)")
 	const float armed = p.getIframes();
 	REQUIRE(armed > 0.f);
 
-	// Tick well past the duration — should clamp at exactly 0, not go negative.
+	// Tick well past the duration - should clamp at exactly 0, not go negative.
 	p.update(10.f, w);
 	REQUIRE(p.getIframes() == 0.f);
 	REQUIRE_FALSE(p.getHurtbox().invulnerable);
@@ -76,7 +92,7 @@ TEST_CASE("Player: repeated damage during i-frames does not double-up the timer"
 	p.update(0.016f, w);
 	const float firstArm = p.getIframes();
 
-	// Damage applied again while still invulnerable — re-arms to full duration.
+	// Damage applied again while still invulnerable - re-arms to full duration.
 	p.health.damage(1);
 	p.update(0.016f, w);
 	const float secondArm = p.getIframes();
@@ -104,6 +120,32 @@ TEST_CASE("Player: zero damage does not arm i-frames (failure case)")
 	REQUIRE_FALSE(p.getHurtbox().invulnerable);
 }
 
+TEST_CASE("Player: setPosition then getPosition round-trips")
+{
+	Player p;
+	const sf::Vector2f target{321.5f, 654.25f};
+	p.setPosition(target);
+	REQUIRE(p.getPosition() == target);
+}
+
+TEST_CASE("Player: getBounds is a 32x32 rectangle anchored at the feet")
+{
+	Player p;
+	p.setPosition({400.f, 200.f});
+	const sf::FloatRect b = p.getBounds();
+	REQUIRE(b.size.x == 32.f);
+	REQUIRE(b.size.y == 32.f);
+	REQUIRE(b.position.x == 400.f - 16.f); // pos.x - FRAME_SIZE/2
+	REQUIRE(b.position.y == 200.f - 32.f); // pos.y - FRAME_SIZE (foot-anchored)
+}
+
+TEST_CASE("Player: default direction is Left and default state is grounded")
+{
+	Player p;
+	REQUIRE(p.getDirection() == Direction::Left);
+	REQUIRE(p.isPlayerOnGround());
+}
+
 TEST_CASE("Player: hurtbox bounds follow the player's body bounds")
 {
 	Player p;
@@ -111,6 +153,42 @@ TEST_CASE("Player: hurtbox bounds follow the player's body bounds")
 	const Hurtbox hurtbox = p.getHurtbox();
 	REQUIRE(hurtbox.bounds.position == body.position);
 	REQUIRE(hurtbox.bounds.size == body.size);
+}
+
+TEST_CASE("Player::collectHitboxes (virtual override) appends the active melee hitbox")
+{
+	Player p;
+	std::vector<Hitbox> hitboxes;
+
+	// No swing -> empty.
+	p.collectHitboxes(hitboxes);
+	REQUIRE(hitboxes.empty());
+
+	// Stay grounded in Idle so canAttack() is true when the attack trigger lands.
+	World w = makeFlooredWorldForPlayer();
+	p.setPosition({15 * 32.f, 32.f}); // feet sitting on top of the floor row
+	p.update(0.016f, w, /*attack=*/true);
+
+	// Drive Player through its base-class interface so we exercise virtual dispatch.
+	BaseEntity &asBase = p;
+	asBase.collectHitboxes(hitboxes);
+	REQUIRE(hitboxes.size() == 1);
+	REQUIRE(hitboxes.front().team == Team::Player);
+}
+
+TEST_CASE("Player::isInvulnerable (virtual override) drives getHurtbox through the base")
+{
+	Player p;
+	World w = makeEmptyWorld();
+	BaseEntity &asBase = p;
+
+	REQUIRE_FALSE(asBase.isInvulnerable());
+	REQUIRE_FALSE(asBase.getHurtbox().invulnerable);
+
+	p.health.damage(1);
+	p.update(0.016f, w);
+	REQUIRE(asBase.isInvulnerable());
+	REQUIRE(asBase.getHurtbox().invulnerable);
 }
 
 TEST_CASE("Player + CombatSystem: enemy hitbox damages player once, then i-frames block follow-ups")

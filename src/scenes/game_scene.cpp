@@ -60,20 +60,14 @@ void GameScene::update(float deltaTime)
 	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
 	               enemies_.end());
 
-	// Collect hitboxes from player and all enemies
 	std::vector<Hitbox> hitboxes;
-	if (const auto melee = player_.getMeleeHitbox())
-		hitboxes.push_back(*melee);
-	if (player_.hasHatThrown())
-		hitboxes.push_back(player_.getThrownHat().getHitbox());
-	for (auto &enemy : enemies_)
-		if (const auto hit = enemy->getHitbox())
-			hitboxes.push_back(*hit);
-
-	// Collect hurtboxes from player and all enemies
-	std::vector<Hurtbox> hurtboxes{player_.getHurtbox()};
-	for (auto &enemy : enemies_)
-		hurtboxes.push_back(enemy->getHurtbox());
+	std::vector<Hurtbox> hurtboxes;
+	player_.collectHitboxes(hitboxes);
+	player_.collectHurtboxes(hurtboxes);
+	for (auto &enemy : enemies_) {
+		enemy->collectHitboxes(hitboxes);
+		enemy->collectHurtboxes(hurtboxes);
+	}
 
 	combat_.resolve(hitboxes, hurtboxes);
 
@@ -111,7 +105,7 @@ void GameScene::resetPlayerIfOutOfBounds()
 	// Track last position where player was on solid ground
 	if (player_.isPlayerOnGround()) {
 		lastGroundPosition = player_.getPosition();
-		lastPlayerDirection = player_.direction;
+		lastPlayerDirection = player_.getDirection();
 	}
 
 	// Check if player fell off the map and apply damage once per fall

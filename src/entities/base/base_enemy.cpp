@@ -7,8 +7,8 @@ void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerP
 	// Let concrete enemies tick their per-frame timers first.
 	onPreUpdate(deltaTime);
 
-	float deltaX = playerPos.x - pos.x;
-	facing = (deltaX >= 0.f) ? Direction::Right : Direction::Left;
+	const float deltaX = playerPos.x - position.x;
+	direction = (deltaX >= 0.f) ? Direction::Right : Direction::Left;
 
 	if (currentState != nullptr) {
 		EnemyState *nextState = currentState->update(deltaTime, *this, world, playerPos);
@@ -20,12 +20,12 @@ void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerP
 		currentState->updateAnimation(deltaTime, *this);
 	}
 
-	EntityPhysics::simulateMovement(deltaTime, pos, vel, isOnGround, gravity, width, height, world);
+	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, gravity, width, height, world);
 }
 
 void BaseEnemy::applyGravity(float dt, const World &world)
 {
-	EntityPhysics::applyGravity(vel.y, isOnGround, dt, gravity, getBounds(), world);
+	EntityPhysics::applyGravity(velocity.y, isOnGround, dt, gravity, getBounds(), world);
 }
 
 bool BaseEnemy::isGroundBelow(const World &world) const
@@ -35,10 +35,16 @@ bool BaseEnemy::isGroundBelow(const World &world) const
 
 float BaseEnemy::resolveHorizontal(float dt, const World &world)
 {
-	return EntityPhysics::resolveHorizontal(pos, vel.x, width, height, dt, world);
+	return EntityPhysics::resolveHorizontal(position, velocity.x, width, height, dt, world);
 }
 
 float BaseEnemy::resolveVertical(float dt, const World &world)
 {
-	return EntityPhysics::resolveVertical(pos, vel.y, isOnGround, width, height, dt, world);
+	return EntityPhysics::resolveVertical(position, velocity.y, isOnGround, width, height, dt, world);
+}
+
+void BaseEnemy::collectHitboxes(std::vector<Hitbox> &hitboxes)
+{
+	if (const auto hit = getHitbox())
+		hitboxes.push_back(*hit);
 }

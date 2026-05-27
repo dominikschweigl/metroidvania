@@ -28,6 +28,7 @@ set(GAME_SOURCES
     src/scenes/game_scene.cpp
     src/world/world.cpp
     src/combat/combat_system.cpp
+    src/entities/base/base_entity.cpp
     src/entities/base/base_enemy.cpp
     src/entities/base/entity_physics.cpp
     src/entities/player/player.cpp
@@ -55,6 +56,7 @@ target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window 
 
 add_executable(metroidvania_tests
     tests/unit/player_state_tests.cpp
+    tests/unit/base_entity_tests.cpp
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
     tests/unit/hat_projectile_tests.cpp

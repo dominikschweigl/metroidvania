@@ -1,10 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../src/entities/base/base_enemy.h"
+#include "../../src/entities/base/base_entity.h"
 #include "../../src/entities/base/enemy_state.h"
 #include "../../src/entities/base/entity_physics.h"
 #include "../../src/world/world.h"
 #include <SFML/Graphics.hpp>
+#include <type_traits>
+
+static_assert(std::is_base_of_v<BaseEntity, BaseEnemy>, "BaseEnemy must inherit from BaseEntity");
 
 namespace {
 
@@ -86,7 +90,7 @@ TEST_CASE("BaseEnemy initializes with given position and defaults")
 	TestEnemy e({100.f, 200.f}, 28.f, 28.f);
 	REQUIRE(e.getPosition() == sf::Vector2f{100.f, 200.f});
 	REQUIRE(e.getVelocity() == sf::Vector2f{0.f, 0.f});
-	REQUIRE(e.getFacing() == Direction::Right);
+	REQUIRE(e.getDirection() == Direction::Right);
 	REQUIRE_FALSE(e.isOnGroundFlag());
 }
 
@@ -124,7 +128,7 @@ TEST_CASE("applyGravity accelerates downward when not grounded")
 
 	EntityPhysics::applyGravity(velY, onGround, 0.1f, 1200.f, bounds, w);
 
-	// GRAVITY=1200, dt=0.1 → vy should be 120
+	// GRAVITY=1200, dt=0.1 -> vy should be 120
 	REQUIRE(velY == 120.f);
 	REQUIRE_FALSE(onGround);
 }
@@ -153,7 +157,7 @@ TEST_CASE("applyGravity with custom gravity values")
 
 		EntityPhysics::applyGravity(velY, onGround, 0.1f, customGravity, bounds, w);
 
-		// With gravity=2000, dt=0.1 → vy should be 200
+		// With gravity=2000, dt=0.1 -> vy should be 200
 		REQUIRE(velY == 200.f);
 	}
 
@@ -165,7 +169,7 @@ TEST_CASE("applyGravity with custom gravity values")
 
 		EntityPhysics::applyGravity(velY, onGround, 0.1f, customGravity, bounds, w);
 
-		// With gravity=600, dt=0.1 → vy should be 60
+		// With gravity=600, dt=0.1 -> vy should be 60
 		REQUIRE(velY == 60.f);
 	}
 
@@ -231,7 +235,7 @@ TEST_CASE("resolveHorizontal stops at wall and zeros horizontal velocity")
 {
 	World w = makeWalledWorld();
 	// Place enemy so one step at moderate speed overlaps the right wall tile.
-	// Wall tile column 9 spans x=[288, 320]; enemy right edge starts ~5px from
+	// Wall tile column 9 spans x=[288, 320]; enemy right edge starts 5px from
 	// it.
 	sf::Vector2f pos{9.f * TILE - 14.f - 5.f, 2.f * TILE};
 	float velX = 200.f;
@@ -247,7 +251,7 @@ TEST_CASE("resolveHorizontal stops at wall and zeros horizontal velocity")
 TEST_CASE("resolveVertical plants enemy on floor and sets isOnGround")
 {
 	World w = makeWalledWorld();
-	// Start 16 px above the floor. With vel=300 and dt=0.1, enemy falls 30 px —
+	// Start 16 px above the floor. With vel=300 and dt=0.1, enemy falls 30 px -
 	// enough for the destination rect to overlap the floor tile without the
 	// head tunneling past the floor's top in a single step.
 	sf::Vector2f pos{5.f * TILE, 3.5f * TILE};
@@ -265,7 +269,7 @@ TEST_CASE("resolveVertical plants enemy on floor and sets isOnGround")
 TEST_CASE("resolveVertical bumps head on ceiling and zeros velocity")
 {
 	World w = makeWalledWorld();
-	// Head just below ceiling; rise at a speed slow enough that the destination
+	// Head just below ceiling. Rise at a speed slow enough that the destination
 	// rect still overlaps the ceiling tile rather than tunneling over it.
 	sf::Vector2f pos{5.f * TILE, 2.f * TILE};
 	float velY = -200.f;
@@ -333,17 +337,45 @@ TEST_CASE("BaseEnemy::update updates facing from player position")
 
 	SECTION("player to the right → face right")
 	{
-		e.setFacing(Direction::Left);
+		e.setDirection(Direction::Left);
 		e.update(0.016f, w, {e.getPosition().x + 100.f, e.getPosition().y});
-		REQUIRE(e.getFacing() == Direction::Right);
+		REQUIRE(e.getDirection() == Direction::Right);
 	}
 
 	SECTION("player to the left → face left")
 	{
-		e.setFacing(Direction::Right);
+		e.setDirection(Direction::Right);
 		e.update(0.016f, w, {e.getPosition().x - 100.f, e.getPosition().y});
-		REQUIRE(e.getFacing() == Direction::Left);
+		REQUIRE(e.getDirection() == Direction::Left);
 	}
+}
+
+TEST_CASE("BaseEnemy: starts alive with full health and dies when health reaches zero")
+{
+	TestEnemy e({0.f, 0.f}, 28.f, 28.f);
+	REQUIRE(e.isAlive());
+	REQUIRE(e.health.current == BaseEnemy::MAX_HEALTH);
+
+	e.takeDamage(BaseEnemy::MAX_HEALTH);
+	REQUIRE(e.health.current == 0);
+	REQUIRE_FALSE(e.isAlive());
+}
+
+TEST_CASE("BaseEnemy: takeDamage clamps at zero (boundary)")
+{
+	TestEnemy e({0.f, 0.f}, 28.f, 28.f);
+	e.takeDamage(BaseEnemy::MAX_HEALTH * 4);
+	REQUIRE(e.health.current == 0);
+	REQUIRE_FALSE(e.isAlive());
+}
+
+TEST_CASE("BaseEnemy: hurtbox carries Team::Enemy and is never invulnerable by default")
+{
+	TestEnemy e({100.f, 200.f}, 28.f, 28.f);
+	const Hurtbox h = e.getHurtbox();
+	REQUIRE(h.team == Team::Enemy);
+	REQUIRE(h.health == &e.health);
+	REQUIRE_FALSE(h.invulnerable);
 }
 
 TEST_CASE("BaseEnemy::update invokes onPreUpdate once per tick with dt")

@@ -3,15 +3,23 @@
 #include "../base/entity_physics.h"
 #include <algorithm>
 
+namespace {
+constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
+} // namespace
+
 Player::Player()
-    : lowerBodySprite(states.idle.idle_lower_texture),
+    : BaseEntity(PLAYER_SPAWN, static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE), MAX_HEALTH,
+                 Team::Player),
+      lowerBodySprite(states.idle.idle_lower_texture),
       headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD_HAT)),
       upperBodySprite(states.idle.idle_upper_texture), currentState(&states.idle)
 {
+	setDirection(Direction::Left);
+	setOnGround(true);
 	lowerBodySprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	headSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	upperBodySprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
-	lowerBodySprite.setPosition({15 * 32.f, 0.f});
+	lowerBodySprite.setPosition(position);
 }
 
 void Player::update(float deltaTime, const World &world, bool attackTriggered, bool hatThrowTriggered)
@@ -38,36 +46,45 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 	meleeAttack.update(deltaTime);
 
 	constexpr float HEAD_Y_ORIGIN_OFFSET = -(FRAME_SIZE - 4.f);
-	const sf::Vector2f headPos = lowerBodySprite.getPosition() + sf::Vector2f{0.f, HEAD_Y_ORIGIN_OFFSET};
+	const sf::Vector2f headPos = position + sf::Vector2f{0.f, HEAD_Y_ORIGIN_OFFSET};
 
 	constexpr float HAT_SPAWN_X_OFFSET = FRAME_SIZE / 2.f + 5.f;
 	constexpr float HAT_SPAWN_Y_OFFSET = -FRAME_SIZE / 2.f;
 	const sf::Vector2f hat_spawn_offset =
-	    sf::Vector2f{static_cast<float>(direction) * HAT_SPAWN_X_OFFSET, HAT_SPAWN_Y_OFFSET};
-	const sf::Vector2f spawnPos = lowerBodySprite.getPosition() + hat_spawn_offset;
+	    sf::Vector2f{static_cast<float>(getDirection()) * HAT_SPAWN_X_OFFSET, HAT_SPAWN_Y_OFFSET};
+	const sf::Vector2f spawnPos = position + hat_spawn_offset;
 
-	hatAbility.update(deltaTime, headPos, spawnPos, direction, velocity, world);
+	hatAbility.update(deltaTime, headPos, spawnPos, getDirection(), velocity, world);
 
 	updateAnimation(deltaTime);
 }
 
+void Player::collectHitboxes(std::vector<Hitbox> &hitboxes)
+{
+	if (const auto melee = getMeleeHitbox())
+		hitboxes.push_back(*melee);
+	if (hasHatThrown())
+		hitboxes.push_back(getThrownHat().getHitbox());
+}
+
 void Player::updateAnimation(float dt)
 {
-	const float facingMultiplier = static_cast<float>(direction);
+	const float facingMultiplier = static_cast<float>(getDirection());
 	const sf::Vector2f scale{facingMultiplier, 1.f};
 
 	currentState->applyAnimation(dt, *this);
+	lowerBodySprite.setPosition(position);
 	lowerBodySprite.setScale(scale);
 	upperBodySprite.setScale(scale);
 
 	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset();
-	upperBodySprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
+	upperBodySprite.setPosition(position + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
 
 	const bool hatAbsent = !hatAbility.isHatOnHead();
 	headSprite.setTexture(AssetManager::getInstance().getTexture(hatAbsent ? PLAYER_HEAD : PLAYER_HEAD_HAT));
 	headSprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
 	const sf::Vector2f headOffset = currentState->getHeadOffset();
-	headSprite.setPosition(lowerBodySprite.getPosition() + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
+	headSprite.setPosition(position + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
 	headSprite.setScale(scale);
 
 	if (isAttackActive() && currentState->canAttack()) {
@@ -90,18 +107,16 @@ void Player::handleMovement(float deltaTime, const World &world)
 
 	if (input.isHeld(GameAction::MoveLeft)) {
 		velocity.x = -speed;
-		direction = Direction::Left;
+		setDirection(Direction::Left);
 	}
 	if (input.isHeld(GameAction::MoveRight)) {
 		velocity.x = speed;
-		direction = Direction::Right;
+		setDirection(Direction::Right);
 	}
 
-	bool old_isOnGround = isOnGround;
-	sf::Vector2f position = lowerBodySprite.getPosition();
-	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, GRAVITY, FRAME_SIZE, FRAME_SIZE, world);
-	lowerBodySprite.setPosition(position);
-	if (!old_isOnGround && isOnGround)
+	const bool wasOnGround = isOnGround;
+	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, gravity, width, height, world);
+	if (!wasOnGround && isOnGround)
 		transitionTo(states.landing);
 }
 

@@ -1,5 +1,6 @@
 #include "race_condition_slime.h"
 #include "../../core/audio_manager.h"
+#include "../../world/world.h"
 #include <algorithm>
 #include <cmath>
 
@@ -18,8 +19,8 @@ RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
 
 void RaceConditionSlime::draw(sf::RenderWindow &window)
 {
-	sprite.setPosition(pos);
-	sprite.setScale({facing == Direction::Right ? 1.f : -1.f, 1.f});
+	sprite.setPosition(position);
+	sprite.setScale({direction == Direction::Right ? 1.f : -1.f, 1.f});
 	window.draw(sprite);
 }
 
@@ -30,7 +31,7 @@ void RaceConditionSlime::onPreUpdate(float deltaTime)
 	teleportTimer -= deltaTime;
 
 	moveSoundTimer = std::max(0.f, moveSoundTimer - deltaTime);
-	if (moveSoundTimer <= 0.f && isOnGround && std::abs(vel.x) > 0.f) {
+	if (moveSoundTimer <= 0.f && isOnGround && std::abs(velocity.x) > 0.f) {
 		AudioManager::getInstance().playSound(SoundEffect::SLIME_MOVE, SLIME_VOLUME);
 		moveSoundTimer = MOVE_SOUND_INTERVAL;
 	}
@@ -44,7 +45,7 @@ void RaceConditionSlime::tryJumpTowards(float heightDiff)
 	AudioManager::getInstance().playSound(SoundEffect::SLIME_JUMP, SLIME_VOLUME);
 	// Jump velocity: v = sqrt(2 * g * h), capped at MAX_JUMP_SPEED.
 	float necessaryVelocity = std::sqrt(2.f * gravity * (heightDiff + ENTITY_HEIGHT));
-	vel.y = -std::min(necessaryVelocity, MAX_JUMP_SPEED);
+	velocity.y = -std::min(necessaryVelocity, MAX_JUMP_SPEED);
 	isOnGround = false;
 	jumpCooldown = JUMP_COOLDOWN;
 	moveSoundTimer = MOVE_SOUND_INTERVAL;
@@ -87,30 +88,30 @@ void RaceConditionSlime::resetTeleportTimer()
 void RaceConditionSlime::glitchTeleport(const World &world, sf::Vector2f playerPos)
 {
 	resetTeleportTimer();
-	float dir = (playerPos.x >= pos.x) ? 1.f : -1.f;
+	const float dir = (playerPos.x >= position.x) ? 1.f : -1.f;
 
 	// Up to 8 attempts to find a landing spot that is neither inside a wall
 	// nor over a pit too deep to jump back out of.
 	for (int attempt = 0; attempt < 8; ++attempt) {
 		switch (std::uniform_int_distribution<int>(0, 2)(rng)) {
 		case 0: { // forward
-			float newX = pos.x + dir * uniformFloat(80.f, 220.f);
-			if (isValidTeleportDest(world, newX, pos.y)) {
-				pos.x = newX;
+			const float newX = position.x + dir * uniformFloat(80.f, 220.f);
+			if (isValidTeleportDest(world, newX, position.y)) {
+				position.x = newX;
 				return;
 			}
 			break;
 		}
 		case 1: { // backward
-			float newX = pos.x - dir * uniformFloat(60.f, 160.f);
-			if (isValidTeleportDest(world, newX, pos.y)) {
-				pos.x = newX;
+			const float newX = position.x - dir * uniformFloat(60.f, 160.f);
+			if (isValidTeleportDest(world, newX, position.y)) {
+				position.x = newX;
 				return;
 			}
 			break;
 		}
 		case 2: // upward in-place velocity boost
-			vel.y = -uniformFloat(380.f, 580.f);
+			velocity.y = -uniformFloat(380.f, 580.f);
 			isOnGround = false;
 			return;
 		}
