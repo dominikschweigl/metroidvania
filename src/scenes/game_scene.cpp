@@ -70,6 +70,11 @@ void GameScene::update(float deltaTime)
 
 	combat_.resolve(hitboxes, hurtboxes);
 
+	// Check for player death
+	if (!player_.isAlive()) {
+		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
+	}
+
 	if (player_.getPosition().x > 18 * 32.f && player_.getPosition().x <= 19 * 32.f
 	    && player_.getPosition().y > 10 * 32.f && player_.getPosition().y <= 11 * 32.f) {
 		world_.setCurrentRoom("boss_room");

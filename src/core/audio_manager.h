@@ -21,10 +21,7 @@ enum class SoundEffect {
 	SLIME_MOVE,
 };
 
-enum class MusicTrack {
-	MAIN_MENU_THEME,
-	GAME_THEME,
-};
+enum class MusicTrack { MAIN_MENU_THEME, GAME_THEME, GAME_OVER_THEME };
 
 enum class MusicStatus {
 	Stopped,
