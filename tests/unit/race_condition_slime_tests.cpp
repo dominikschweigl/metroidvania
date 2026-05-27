@@ -1,7 +1,6 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "entities/base/base_enemy.h"
 #include "entities/race_condition_slime/race_condition_slime.h"
 #include "world/world.h"
 

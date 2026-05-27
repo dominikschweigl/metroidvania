@@ -1,10 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <optional>
 
+#include "../../combat/health.h"
+#include "../../combat/hitbox.h"
 #include "../../core/direction.h"
 #include "../../world/world.h"
-#include "../base/entity_physics.h"
 #include "hat_ability.h"
 #include "melee_attack.h"
 #include "states/ascending_state.h"
@@ -40,6 +40,13 @@ class Player {
 	static constexpr int FRAME_SIZE = 32;
 	static constexpr float PEAK_THRESHOLD = 250.f;
 
+	static constexpr int MAX_HEALTH = 5;
+
+	// Duration of initial invincibility for better combat feel
+	static constexpr float IFRAME_DURATION = 0.5f;
+
+	Health health{MAX_HEALTH, MAX_HEALTH};
+
 	bool debugHorizontalMovement = false;
 	sf::RectangleShape debugHorizontalCollisionCheck;
 	bool debugVerticalMovement = false;
@@ -68,11 +75,18 @@ class Player {
 	[[nodiscard]] bool hasHatThrown() const noexcept { return hatAbility.hasProjectile(); }
 	[[nodiscard]] HatProjectile &getThrownHat() noexcept { return hatAbility.getProjectile(); }
 
+	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
+	[[nodiscard]] float getIframes() const noexcept { return iframes; }
+	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Player, &health, iframes > 0.f}; }
+
   private:
 	bool isOnGround = true;
 	bool inputJump = false;
 	bool isSprinting = false;
 	sf::Vector2f velocity;
+
+	float iframes = 0.f;
+	int previousHealth = MAX_HEALTH;
 
 	MeleeAttack meleeAttack;
 	HatAbility hatAbility;

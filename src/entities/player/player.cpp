@@ -1,6 +1,7 @@
 #include "player.h"
 #include "../../core/input_manager.h"
 #include "../base/entity_physics.h"
+#include <algorithm>
 
 Player::Player()
     : lowerBodySprite(states.idle.idle_lower_texture),
@@ -15,6 +16,13 @@ Player::Player()
 
 void Player::update(float deltaTime, const World &world, bool attackTriggered, bool hatThrowTriggered)
 {
+
+	// iframes put initial invincibility on player for better combat feel
+	iframes = std::max(0.f, iframes - deltaTime);
+	if (health.current < previousHealth)
+		iframes = IFRAME_DURATION;
+	previousHealth = health.current;
+
 	handleMovement(deltaTime, world);
 
 	PlayerState *next = currentState->update(deltaTime, *this);
