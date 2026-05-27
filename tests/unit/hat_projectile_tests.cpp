@@ -130,11 +130,11 @@ TEST_CASE("HatProjectile::tryHit damages enemy on first contact")
 	TestEnemy enemy(pos);
 	enemy.setState(&state);
 
-	const int healthBefore = enemy.health;
+	const int healthBefore = enemy.health.current;
 	const bool hit = hat.tryHit(enemy);
 
 	REQUIRE(hit);
-	REQUIRE(enemy.health == healthBefore - HatProjectile::DAMAGE);
+	REQUIRE(enemy.health.current == healthBefore - HatProjectile::DAMAGE);
 }
 
 TEST_CASE("HatProjectile::tryHit does not damage the same enemy twice")
@@ -150,12 +150,12 @@ TEST_CASE("HatProjectile::tryHit does not damage the same enemy twice")
 	enemy.setState(&state);
 
 	hat.tryHit(enemy);
-	const int healthAfterFirst = enemy.health;
+	const int healthAfterFirst = enemy.health.current;
 
 	const bool secondHit = hat.tryHit(enemy);
 
 	REQUIRE_FALSE(secondHit);
-	REQUIRE(enemy.health == healthAfterFirst);
+	REQUIRE(enemy.health.current == healthAfterFirst);
 }
 
 TEST_CASE("HatProjectile::tryHit returns false when enemy is not overlapping")

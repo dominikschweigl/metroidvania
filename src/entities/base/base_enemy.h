@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../combat/health.h"
 #include "../../core/direction.h"
 #include "../../world/world.h"
 #include <SFML/Graphics.hpp>
-#include <algorithm>
 
 class EnemyState;
 
@@ -37,10 +37,10 @@ class BaseEnemy {
 	EnemyState *getState() const { return currentState; }
 	void setState(EnemyState *s) { currentState = s; }
 
-	[[nodiscard]] bool isAlive() const noexcept { return health > 0; }
-	void takeDamage(int amount) noexcept { health = std::max(0, health - amount); }
+	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
+	void takeDamage(int amount) noexcept { health.damage(amount); }
 
-	int health = 3;
+	Health health{3, 3};
 
 	// Gravity acceleration; configurable per instance/subclass. Default 1200 u/s².
 	float gravity = 1200.f;
