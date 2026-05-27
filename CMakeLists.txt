@@ -60,6 +60,7 @@ add_executable(metroidvania_tests
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp
     tests/unit/health_tests.cpp
+    tests/unit/hitbox_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
