@@ -52,9 +52,6 @@ void GameScene::update(float deltaTime)
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
-	// Store position before physics update to use as safe fallback position
-	const sf::Vector2f positionBeforeUpdate = player_.getPosition();
-
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
 	// Update all alive enemies and remove dead ones
