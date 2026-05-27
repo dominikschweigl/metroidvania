@@ -78,6 +78,10 @@ class Player {
 	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
 	[[nodiscard]] float getIframes() const noexcept { return iframes; }
 	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Player, &health, iframes > 0.f}; }
+	[[nodiscard]] std::optional<Hitbox> getMeleeHitbox() const noexcept
+	{
+		return meleeAttack.getHitbox(lowerBodySprite.getPosition(), direction);
+	}
 
   private:
 	bool isOnGround = true;

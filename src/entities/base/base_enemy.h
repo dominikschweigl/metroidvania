@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../combat/health.h"
+#include "../../combat/hitbox.h"
 #include "../../core/direction.h"
 #include "../../world/world.h"
 #include <SFML/Graphics.hpp>
@@ -39,6 +40,8 @@ class BaseEnemy {
 
 	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
 	void takeDamage(int amount) noexcept { health.damage(amount); }
+
+	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Enemy, &health, false}; }
 
 	Health health{3, 3};
 

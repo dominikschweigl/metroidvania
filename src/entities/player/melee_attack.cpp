@@ -26,6 +26,7 @@ void MeleeAttack::trigger()
 		frame = 0;
 		frameTimer = 0.f;
 		comboQueued = false;
+		sourceId = nextSourceId();
 	} else if (comboIndex < static_cast<int>(comboChain.size()) - 1) {
 		comboQueued = true;
 	}
@@ -45,6 +46,7 @@ void MeleeAttack::update(float dt)
 					++comboIndex;
 					frame = 0;
 					frameTimer = 0.f;
+					sourceId = nextSourceId();
 					AudioManager::getInstance().playSound(SoundEffect::PLAYER_ATTACK_MELEE);
 				} else {
 					comboIndex = -1;
@@ -53,6 +55,18 @@ void MeleeAttack::update(float dt)
 			}
 		}
 	}
+}
+
+std::optional<Hitbox> MeleeAttack::getHitbox(sf::Vector2f playerPos, Direction facing) const noexcept
+{
+	if (!isMeleeActive())
+		return std::nullopt;
+
+	const float facingSign = static_cast<float>(facing);
+	const float left =
+	    facingSign > 0.f ? playerPos.x + HITBOX_SIZE / 2.f : playerPos.x - HITBOX_SIZE / 2.f - HITBOX_SIZE;
+	const sf::FloatRect bounds{{left, playerPos.y - HITBOX_SIZE}, {HITBOX_SIZE, HITBOX_SIZE}};
+	return Hitbox{bounds, DAMAGE, Team::Player, sourceId};
 }
 
 void MeleeAttack::applyAnimation(sf::Sprite &upper, sf::Vector2f scale, sf::Vector2f pos) const

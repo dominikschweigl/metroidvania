@@ -60,6 +60,52 @@ TEST_CASE("RaceConditionSlime::isAttacking only true during AttackState")
 	REQUIRE_FALSE(s.isAttacking());
 }
 
+TEST_CASE("RaceConditionSlime::getHitbox is only present during AttackState")
+{
+	RaceConditionSlime s(groundSpawn());
+
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.chase);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.windup);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.attack);
+	s.beginAttackSource();
+	const auto hit = s.getHitbox();
+	REQUIRE(hit.has_value());
+	REQUIRE(hit->team == Team::Enemy);
+	REQUIRE(hit->damage == RaceConditionSlime::ATTACK_DAMAGE);
+	REQUIRE(hit->sourceId != 0u);
+
+	s.setState(&s.states.recover);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+}
+
+TEST_CASE("RaceConditionSlime::beginAttackSource hands out a fresh id each call")
+{
+	RaceConditionSlime s(groundSpawn());
+	s.beginAttackSource();
+	const std::uint32_t first = s.getAttackSourceId();
+	s.beginAttackSource();
+	const std::uint32_t second = s.getAttackSourceId();
+	REQUIRE(first != second);
+}
+
+TEST_CASE("BaseEnemy::getHurtbox carries the body bounds, Enemy team, and live Health pointer")
+{
+	RaceConditionSlime s(groundSpawn());
+	const sf::FloatRect body = s.getBounds();
+	const Hurtbox hurt = s.getHurtbox();
+	REQUIRE(hurt.bounds.position == body.position);
+	REQUIRE(hurt.bounds.size == body.size);
+	REQUIRE(hurt.team == Team::Enemy);
+	REQUIRE(hurt.health == &s.health);
+	REQUIRE_FALSE(hurt.invulnerable);
+}
+
 TEST_CASE("onPreUpdate decrements per-frame cooldown timers (via BaseEnemy::update)")
 {
 	World w = makeOpenWorld();

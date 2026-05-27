@@ -30,3 +30,12 @@ struct Hurtbox {
 {
 	return hit.bounds.findIntersection(hurt.bounds).has_value();
 }
+
+// New attack instances receive increasing ids to be distinguishable.
+// Attacks capture one on activation and reuse it across frames
+// so the CombatSystem can deduplicate hits per attack.
+[[nodiscard]] inline std::uint32_t nextSourceId() noexcept
+{
+	static std::uint32_t counter = 0;
+	return ++counter;
+}

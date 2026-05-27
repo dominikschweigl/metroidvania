@@ -1,5 +1,4 @@
 #include "hat_projectile.h"
-#include "../base/base_enemy.h"
 #include <cmath>
 
 HatProjectile::HatProjectile(const sf::Vector2f startPos, const Direction direction, const sf::Vector2f playerVelocity,
@@ -54,15 +53,4 @@ sf::FloatRect HatProjectile::getBounds() const noexcept
 {
 	constexpr float halfSize = FRAME_SIZE / 2.f;
 	return {{pos.x - halfSize, pos.y - halfSize}, {static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE)}};
-}
-
-bool HatProjectile::tryHit(BaseEnemy &enemy)
-{
-	if (hitEnemies.contains(&enemy))
-		return false;
-	if (!getBounds().findIntersection(enemy.getBounds()))
-		return false;
-	enemy.takeDamage(DAMAGE);
-	hitEnemies.insert(&enemy);
-	return true;
 }

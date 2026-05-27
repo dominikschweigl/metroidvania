@@ -32,12 +32,13 @@ void AttackState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 	slime.setAnimation(RaceConditionSlime::SlimeAnimation::Attack, currentFrame);
 }
 
-void AttackState::onEnter(BaseEnemy & /*enemy*/)
+void AttackState::onEnter(BaseEnemy &enemy)
 {
 	AudioManager::getInstance().playSound(SoundEffect::SLIME_ATTACK);
 	stateTimer = 0.f;
 	currentFrame = 0;
 	frameTimer = 0.f;
+	static_cast<RaceConditionSlime &>(enemy).beginAttackSource();
 }
 
 } // namespace rc_slime

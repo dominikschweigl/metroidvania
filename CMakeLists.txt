@@ -64,6 +64,7 @@ add_executable(metroidvania_tests
     tests/unit/hitbox_tests.cpp
     tests/unit/combat_system_tests.cpp
     tests/unit/player_combat_tests.cpp
+    tests/unit/melee_attack_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)

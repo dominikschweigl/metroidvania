@@ -1,4 +1,5 @@
 #pragma once
+#include "../../combat/hitbox.h"
 #include "../../core/asset_manager.h"
 #include "../base/base_enemy.h"
 #include "states/attack_state.h"
@@ -57,6 +58,19 @@ class RaceConditionSlime : public BaseEnemy {
 	// True while mid-strike — used by the player's collision/damage code.
 	bool isAttacking() const { return currentState == &states.attack; }
 
+	static constexpr int ATTACK_DAMAGE = 1;
+
+	// Active damage rectangle while the slime is mid-strike; nullopt otherwise.
+	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept
+	{
+		if (!isAttacking())
+			return std::nullopt;
+		return Hitbox{getBounds(), ATTACK_DAMAGE, Team::Enemy, attackSourceId};
+	}
+
+	void beginAttackSource() noexcept { attackSourceId = nextSourceId(); }
+	[[nodiscard]] std::uint32_t getAttackSourceId() const noexcept { return attackSourceId; }
+
 	float getAttackCooldown() const { return attackCooldown; }
 	void setAttackCooldown(float t) { attackCooldown = t; }
 	float getJumpCooldown() const { return jumpCooldown; }
@@ -81,6 +95,7 @@ class RaceConditionSlime : public BaseEnemy {
 	float jumpCooldown = 0.f;
 	float teleportTimer = 0.f;
 	float moveSoundTimer = 0.f;
+	std::uint32_t attackSourceId = 0;
 
 	const sf::Texture &idleTexture;
 	const sf::Texture &movingTexture;

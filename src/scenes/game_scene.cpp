@@ -44,10 +44,6 @@ void GameScene::update(float deltaTime)
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
-	if (player_.hasHatThrown()) {
-		player_.getThrownHat().tryHit(slime1_);
-		player_.getThrownHat().tryHit(slime2_);
-	}
 	slime1_.update(deltaTime, world_, player_.getPosition());
 	slime2_.update(deltaTime, world_, player_.getPosition());
 
