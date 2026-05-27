@@ -1,4 +1,5 @@
 #include "pre_jump_state.h"
+#include "../../../core/audio_manager.h"
 #include "../player.h"
 
 PreJumpState::PreJumpState()
@@ -44,6 +45,7 @@ void PreJumpState::applyAnimation(float dt, Player &p)
 
 void PreJumpState::onEnter(Player &p)
 {
+	AudioManager::getInstance().playSound(SoundEffect::PLAYER_JUMP, 20.f);
 	p.velocity.y = 0.f;
 	currentFrame = 0;
 	frameTimer = 0.f;

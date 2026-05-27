@@ -1,6 +1,7 @@
 #include "melee_attack.h"
 
 #include "../../core/asset_manager.h"
+#include "../../core/audio_manager.h"
 
 MeleeAttack::MeleeAttack()
     : swing_texture(AssetManager::getInstance().getTexture(PLAYER_ATTACK_SWING_UPPER_BODY)),
@@ -20,6 +21,7 @@ void MeleeAttack::reset() noexcept
 void MeleeAttack::trigger()
 {
 	if (comboIndex == -1) {
+		AudioManager::getInstance().playSound(SoundEffect::PLAYER_ATTACK_MELEE);
 		comboIndex = 0;
 		frame = 0;
 		frameTimer = 0.f;
@@ -43,6 +45,7 @@ void MeleeAttack::update(float dt)
 					++comboIndex;
 					frame = 0;
 					frameTimer = 0.f;
+					AudioManager::getInstance().playSound(SoundEffect::PLAYER_ATTACK_MELEE);
 				} else {
 					comboIndex = -1;
 					comboQueued = false;

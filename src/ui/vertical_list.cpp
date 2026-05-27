@@ -61,6 +61,11 @@ void VerticalList::moveFocus(int delta)
 {
 	if (items_.empty())
 		return;
+	if (focusIndex_ < 0) {
+		focusFirstEnabled();
+		applySelection();
+		return;
+	}
 	int n = static_cast<int>(items_.size());
 	int i = focusIndex_;
 	for (int step = 0; step < n; ++step) {
@@ -94,6 +99,18 @@ void VerticalList::handleEvent(const sf::Event &event, const sf::RenderWindow &w
 		if (focusIndex_ >= 0 && focusIndex_ < static_cast<int>(items_.size()))
 			items_[focusIndex_]->activate();
 		return;
+	}
+	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
+		const sf::Vector2f world = window.mapPixelToCoords({moved->position.x, moved->position.y}, window.getView());
+		int hovered = -1;
+		for (int i = 0; i < static_cast<int>(items_.size()); ++i) {
+			const sf::FloatRect bounds{items_[i]->getPosition(), items_[i]->getSize()};
+			if (bounds.contains(world) && items_[i]->isEnabled()) {
+				hovered = i;
+				break;
+			}
+		}
+		focusIndex_ = hovered;
 	}
 	// Mouse events propagate to all children
 	for (auto &item : items_)

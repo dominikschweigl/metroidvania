@@ -1,4 +1,5 @@
 #include "landing_state.h"
+#include "../../../core/audio_manager.h"
 #include "../player.h"
 
 LandingState::LandingState()
@@ -46,8 +47,9 @@ void LandingState::applyAnimation(float dt, Player &p)
 	p.upperBodySprite.setTextureRect(frameRect);
 }
 
-void LandingState::onEnter(Player &p)
+void LandingState::onEnter(Player & /*p*/)
 {
+	AudioManager::getInstance().playSound(SoundEffect::PLAYER_LAND, 20.f);
 	currentFrame = 0;
 	frameTimer = 0.f;
 	animationComplete = false;

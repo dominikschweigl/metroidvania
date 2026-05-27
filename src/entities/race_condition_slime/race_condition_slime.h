@@ -32,6 +32,8 @@ class RaceConditionSlime : public BaseEnemy {
 	static constexpr float JUMP_THRESHOLD = 40.f; // player must be at least this much higher
 	static constexpr float JUMP_COOLDOWN = 1.2f;
 	static constexpr float ATTACK_COOLDOWN = 5.f;
+	static constexpr float MOVE_SOUND_INTERVAL = 0.85f;
+	static constexpr float SLIME_VOLUME = 20.f;
 
 	// Geometry
 	static constexpr float ENTITY_WIDTH = 28.f;
@@ -78,6 +80,7 @@ class RaceConditionSlime : public BaseEnemy {
 	float attackCooldown = 0.f;
 	float jumpCooldown = 0.f;
 	float teleportTimer = 0.f;
+	float moveSoundTimer = 0.f;
 
 	const sf::Texture &idleTexture;
 	const sf::Texture &movingTexture;

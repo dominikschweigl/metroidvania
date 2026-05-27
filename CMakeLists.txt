@@ -6,17 +6,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(fmt CONFIG REQUIRED)
-find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Window System)
+find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Window System Audio)
 find_package(Catch2 CONFIG REQUIRED)
 include(CTest)
 include(Catch)
 
 set(GAME_SOURCES
     src/core/asset_manager.cpp
+    src/core/audio_manager.cpp
     src/core/input_manager.cpp
     src/core/scene_stack.cpp
+    src/ui/audio_settings_list.cpp
     src/ui/binding_list.cpp
     src/ui/button.cpp
+    src/ui/confirm_dialog.cpp
+    src/ui/content_with_back.cpp
+    src/ui/slider.cpp
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
     src/scenes/menu_scene.cpp
@@ -45,7 +50,7 @@ set(GAME_SOURCES
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
-target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 
 add_executable(metroidvania_tests
     tests/unit/player_state_tests.cpp
@@ -53,7 +58,8 @@ add_executable(metroidvania_tests
     tests/unit/race_condition_slime_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
+    tests/unit/audio_manager_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
-target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 catch_discover_tests(metroidvania_tests WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" DISCOVERY_MODE PRE_TEST)
