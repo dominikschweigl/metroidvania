@@ -27,6 +27,7 @@ set(GAME_SOURCES
     src/scenes/menu_scene.cpp
     src/scenes/game_scene.cpp
     src/world/world.cpp
+    src/combat/combat_system.cpp
     src/entities/base/base_enemy.cpp
     src/entities/base/entity_physics.cpp
     src/entities/player/player.cpp
@@ -61,6 +62,7 @@ add_executable(metroidvania_tests
     tests/unit/audio_manager_tests.cpp
     tests/unit/health_tests.cpp
     tests/unit/hitbox_tests.cpp
+    tests/unit/combat_system_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
