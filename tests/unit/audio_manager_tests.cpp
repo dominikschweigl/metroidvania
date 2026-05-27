@@ -236,12 +236,14 @@ TEST_CASE("AudioManager - playSound respects master sound volume")
 TEST_CASE("AudioManager - playSound on unknown SoundEffect throws logic_error")
 {
 	auto &audio = AudioManager::getInstance();
+	// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 	CHECK_THROWS_AS(audio.playSound(static_cast<SoundEffect>(999)), std::logic_error);
 }
 
 TEST_CASE("AudioManager - playMusic on unknown MusicTrack throws logic_error")
 {
 	auto &audio = AudioManager::getInstance();
+	// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 	CHECK_THROWS_AS(audio.playMusic(static_cast<MusicTrack>(999)), std::logic_error);
 	audio.stopMusic();
 }
