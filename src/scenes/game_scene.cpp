@@ -46,6 +46,8 @@ void GameScene::update(float deltaTime)
 		zoomFactor_ *= 1.1f;
 	if (input.wasPressed(MenuAction::Back))
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
+	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
+		showDebugHitboxes_ = !showDebugHitboxes_;
 
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
@@ -65,16 +67,16 @@ void GameScene::update(float deltaTime)
 	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
 	               enemies_.end());
 
-	std::vector<Hitbox> hitboxes;
-	std::vector<Hurtbox> hurtboxes;
-	player_.collectHitboxes(hitboxes);
-	player_.collectHurtboxes(hurtboxes);
+	hitboxes_.clear();
+	hurtboxes_.clear();
+	player_.collectHitboxes(hitboxes_);
+	player_.collectHurtboxes(hurtboxes_);
 	for (auto &enemy : enemies_) {
-		enemy->collectHitboxes(hitboxes);
-		enemy->collectHurtboxes(hurtboxes);
+		enemy->collectHitboxes(hitboxes_);
+		enemy->collectHurtboxes(hurtboxes_);
 	}
 
-	combat_.resolve(hitboxes, hurtboxes);
+	combat_.resolve(hitboxes_, hurtboxes_);
 
 	std::vector<std::uint32_t> endedSourceIds;
 	player_.drainEndedSourceIds(endedSourceIds);
@@ -109,7 +111,31 @@ void GameScene::draw(sf::RenderWindow &window)
 	for (auto &enemy : enemies_)
 		enemy->draw(window);
 
+	if (showDebugHitboxes_)
+		drawDebugHitboxes(window);
+
 	healthBar_.draw(window, player_.health);
+}
+
+void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
+{
+	sf::RectangleShape outline;
+	outline.setFillColor(sf::Color::Transparent);
+	outline.setOutlineThickness(1.f);
+
+	outline.setOutlineColor(sf::Color::Green);
+	for (const Hurtbox &hurt : hurtboxes_) {
+		outline.setPosition(hurt.bounds.position);
+		outline.setSize(hurt.bounds.size);
+		window.draw(outline);
+	}
+
+	outline.setOutlineColor(sf::Color::Red);
+	for (const Hitbox &hit : hitboxes_) {
+		outline.setPosition(hit.bounds.position);
+		outline.setSize(hit.bounds.size);
+		window.draw(outline);
+	}
 }
 
 // Checks if player is falling off the map.

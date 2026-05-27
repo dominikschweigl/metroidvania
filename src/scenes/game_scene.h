@@ -1,5 +1,6 @@
 #pragma once
 #include "../combat/combat_system.h"
+#include "../combat/hitbox.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
 #include "../entities/enemies/base_enemy.h"
@@ -22,6 +23,8 @@ class GameScene : public Scene {
 	void resetPlayerIfOutOfBounds();
 
   private:
+	void drawDebugHitboxes(sf::RenderWindow &window);
+
 	SceneStack &sceneStack_;
 	sf::RenderWindow &window_;
 	sf::View view_;
@@ -30,6 +33,9 @@ class GameScene : public Scene {
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	CombatSystem combat_;
 	HealthBar healthBar_;
+	std::vector<Hitbox> hitboxes_;
+	std::vector<Hurtbox> hurtboxes_;
+	bool showDebugHitboxes_ = false;
 	float zoomFactor_ = 0.4f;
 	bool isPlayerFalling = false;
 	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};

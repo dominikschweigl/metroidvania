@@ -12,6 +12,7 @@ const std::array<Binding, InputManager::actionCount> InputManager::defaultBindin
     Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::Equal)},
     Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::Hyphen)},
     Binding{sf::Mouse::Button::Left},
+    Binding{sf::Keyboard::delocalize(sf::Keyboard::Key::F3)},
 }};
 // clang-format on
 
