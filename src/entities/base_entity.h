@@ -43,6 +43,24 @@ class BaseEntity {
 	// Override to mark the entity as currently invulnerable to incoming damage.
 	[[nodiscard]] virtual bool isInvulnerable() const noexcept { return false; }
 
+	// Knockback variables when receiving damage by an entity.
+	static constexpr float KNOCKBACK_X_SPEED = 380.f;
+	static constexpr float KNOCKBACK_Y_SPEED = 280.f;
+	static constexpr float KNOCKBACK_DURATION = 0.2f;
+	static constexpr float HURT_FLASH_DURATION = 0.2f;
+
+	[[nodiscard]] bool isKnockedBack() const noexcept { return knockbackTimer > 0.f; }
+	[[nodiscard]] bool isHurtFlashing() const noexcept { return hurtFlashTimer > 0.f; }
+
+	// Start the hurt-flash visual without applying knockback.
+	void triggerHurtFlash() noexcept { hurtFlashTimer = HURT_FLASH_DURATION; }
+
+	void tickHurtTimers(float deltaTime) noexcept;
+
+	// Called by CombatSystem when entity receives hit. Default applies
+	// horizontal knockback away from the hitbox and starts hurt-flash.
+	virtual void onHit(const Hitbox &hit) noexcept;
+
 	[[nodiscard]] virtual Hurtbox getHurtbox() noexcept;
 
 	// Default: entities own no active hitboxes. Override to publish them.
@@ -70,4 +88,7 @@ class BaseEntity {
 	const float width;
 	const float height;
 	const Team team;
+
+	float knockbackTimer = 0.f;
+	float hurtFlashTimer = 0.f;
 };

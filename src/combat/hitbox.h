@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 
+class BaseEntity;
+
 enum class Team : std::uint8_t { Player, Enemy };
 
 // An active damage-dealing rectangle for one frame. `sourceId` identifies the
@@ -18,11 +20,14 @@ struct Hitbox {
 
 // A damage-receiving rectangle.
 // the CombatSystem uses the health address as the entities identity.
+// `owner` is an optional callback target — when set, CombatSystem notifies it
+// after damage so the entity can react (hurt flash, knockback).
 struct Hurtbox {
 	sf::FloatRect bounds;
 	Team team;
 	Health *health;
 	bool invulnerable;
+	BaseEntity *owner = nullptr;
 };
 
 // Returns true if two rectangles overlap.

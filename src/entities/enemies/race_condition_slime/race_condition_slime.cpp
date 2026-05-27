@@ -21,6 +21,7 @@ void RaceConditionSlime::draw(sf::RenderWindow &window)
 {
 	sprite.setPosition(position);
 	sprite.setScale({direction == Direction::Right ? 1.f : -1.f, 1.f});
+	sprite.setColor(isHurtFlashing() ? sf::Color{255, 80, 80} : sf::Color::White);
 	window.draw(sprite);
 }
 

@@ -136,6 +136,46 @@ TEST_CASE("BaseEntity::collectHitboxes default is a no-op (failure path)")
 	REQUIRE(hits.empty());
 }
 
+TEST_CASE("BaseEntity::onHit pushes away from hit, starts hurt-flash and knockback timers")
+{
+	TestEntity e({100.f, 200.f}, 28.f, 32.f, 5, Team::Player);
+	e.setOnGround(true);
+
+	const Hitbox rightHit{sf::FloatRect({120.f, 180.f}, {16.f, 16.f}), 1, Team::Enemy, 99};
+	e.onHit(rightHit);
+
+	REQUIRE(e.getVelocity().x < 0.f);
+	REQUIRE(e.getVelocity().y < 0.f);
+	REQUIRE_FALSE(e.isOnGroundFlag());
+	REQUIRE(e.isKnockedBack());
+	REQUIRE(e.isHurtFlashing());
+
+	TestEntity left({100.f, 200.f}, 28.f, 32.f, 5, Team::Player);
+	const Hitbox leftHit{sf::FloatRect({60.f, 180.f}, {16.f, 16.f}), 1, Team::Enemy, 100};
+	left.onHit(leftHit);
+	REQUIRE(left.getVelocity().x > 0.f);
+}
+
+TEST_CASE("BaseEntity::tickHurtTimers decays both timers to zero")
+{
+	TestEntity e({0.f, 0.f}, 28.f, 32.f, 5, Team::Player);
+	const Hitbox hit{sf::FloatRect({100.f, 0.f}, {10.f, 10.f}), 1, Team::Enemy, 1};
+	e.onHit(hit);
+	REQUIRE(e.isKnockedBack());
+	REQUIRE(e.isHurtFlashing());
+
+	e.tickHurtTimers(BaseEntity::KNOCKBACK_DURATION + 0.01f);
+	REQUIRE_FALSE(e.isKnockedBack());
+	REQUIRE_FALSE(e.isHurtFlashing());
+}
+
+TEST_CASE("BaseEntity::getHurtbox publishes the entity as owner")
+{
+	TestEntity e({0.f, 0.f}, 28.f, 32.f, 5, Team::Enemy);
+	const Hurtbox hurt = e.getHurtbox();
+	REQUIRE(hurt.owner == &e);
+}
+
 TEST_CASE("BaseEntity: non-copyable, non-movable (Rule of Five)")
 {
 	STATIC_REQUIRE_FALSE(std::is_copy_constructible_v<BaseEntity>);

@@ -25,6 +25,8 @@ Player::Player()
 void Player::update(float deltaTime, const World &world, bool attackTriggered, bool hatThrowTriggered)
 {
 
+	tickHurtTimers(deltaTime);
+
 	// iframes put initial invincibility on player for better combat feel
 	iframes = std::max(0.f, iframes - deltaTime);
 	if (health.current < previousHealth)
@@ -78,6 +80,12 @@ void Player::updateAnimation(float dt)
 	const float facingMultiplier = static_cast<float>(getDirection());
 	const sf::Vector2f scale{facingMultiplier, 1.f};
 
+	const sf::Color hurtTint{255, 80, 80};
+	const sf::Color spriteColor = isHurtFlashing() ? hurtTint : sf::Color::White;
+	lowerBodySprite.setColor(spriteColor);
+	upperBodySprite.setColor(spriteColor);
+	headSprite.setColor(spriteColor);
+
 	currentState->applyAnimation(dt, *this);
 	lowerBodySprite.setPosition(position);
 	lowerBodySprite.setScale(scale);
@@ -107,17 +115,20 @@ void Player::handleMovement(float deltaTime, const World &world)
 	InputManager &input = InputManager::getInstance();
 	inputJump = input.isHeld(GameAction::Jump);
 
-	velocity.x = 0.f;
-	isSprinting = input.isHeld(GameAction::Sprint);
-	const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
+	// Knockback temporarily runs velocity.
+	if (!isKnockedBack()) {
+		velocity.x = 0.f;
+		isSprinting = input.isHeld(GameAction::Sprint);
+		const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
-	if (input.isHeld(GameAction::MoveLeft)) {
-		velocity.x = -speed;
-		setDirection(Direction::Left);
-	}
-	if (input.isHeld(GameAction::MoveRight)) {
-		velocity.x = speed;
-		setDirection(Direction::Right);
+		if (input.isHeld(GameAction::MoveLeft)) {
+			velocity.x = -speed;
+			setDirection(Direction::Left);
+		}
+		if (input.isHeld(GameAction::MoveRight)) {
+			velocity.x = speed;
+			setDirection(Direction::Right);
+		}
 	}
 
 	const bool wasOnGround = isOnGround;

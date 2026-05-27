@@ -1,5 +1,7 @@
 #include "combat_system.h"
 
+#include "../entities/base_entity.h"
+
 void CombatSystem::resolve(std::span<const Hitbox> hitboxes, std::span<const Hurtbox> hurtboxes)
 {
 	for (const Hitbox &hit : hitboxes) {
@@ -19,6 +21,8 @@ void CombatSystem::resolve(std::span<const Hitbox> hitboxes, std::span<const Hur
 				continue;
 
 			hurt.health->damage(hit.damage);
+			if (hurt.owner != nullptr)
+				hurt.owner->onHit(hit);
 		}
 	}
 }

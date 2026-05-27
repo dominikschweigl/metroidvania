@@ -4,6 +4,8 @@
 
 void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerPos)
 {
+	tickHurtTimers(deltaTime);
+
 	// Let concrete enemies tick their per-frame timers first.
 	onPreUpdate(deltaTime);
 
@@ -11,11 +13,15 @@ void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerP
 	direction = (deltaX >= 0.f) ? Direction::Right : Direction::Left;
 
 	if (currentState != nullptr) {
-		EnemyState *nextState = currentState->update(deltaTime, *this, world, playerPos);
-		if (nextState != currentState) {
-			currentState->onExit(*this);
-			nextState->onEnter(*this);
-			currentState = nextState;
+		// While knocked back, freeze the state machine so it can't overwrite the
+		// knockback velocity.
+		if (!isKnockedBack()) {
+			EnemyState *nextState = currentState->update(deltaTime, *this, world, playerPos);
+			if (nextState != currentState) {
+				currentState->onExit(*this);
+				nextState->onEnter(*this);
+				currentState = nextState;
+			}
 		}
 		currentState->updateAnimation(deltaTime, *this);
 	}

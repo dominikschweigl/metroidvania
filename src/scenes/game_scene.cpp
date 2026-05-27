@@ -125,6 +125,7 @@ void GameScene::resetPlayerIfOutOfBounds()
 	if (player_.getPosition().y > worldHeight) {
 		if (!isPlayerFalling) {
 			player_.health.damage(1);
+			player_.triggerHurtFlash();
 
 			const float safeOffsetX = (lastPlayerDirection == Direction::Left) ? 60.f : -60.f;
 			const sf::Vector2f safePosition{lastGroundPosition.x + safeOffsetX, lastGroundPosition.y - 5.f};
