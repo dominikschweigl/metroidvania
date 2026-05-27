@@ -67,6 +67,9 @@ class Player {
 	void draw(sf::RenderWindow &window);
 
 	sf::Vector2f getPosition() const { return lowerBodySprite.getPosition(); }
+	void setPosition(const sf::Vector2f &newPosition) { lowerBodySprite.setPosition(newPosition); }
+	void resetVelocity() noexcept { velocity = sf::Vector2f{0.f, 0.f}; }
+	[[nodiscard]] bool isPlayerOnGround() const noexcept { return isOnGround; }
 
 	[[nodiscard]] bool isAttackActive() const noexcept
 	{

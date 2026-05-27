@@ -18,6 +18,8 @@ class GameScene : public Scene {
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow &window) override;
 
+	void resetPlayerIfOutOfBounds();
+
   private:
 	SceneStack &sceneStack_;
 	sf::RenderWindow &window_;
@@ -27,4 +29,7 @@ class GameScene : public Scene {
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	CombatSystem combat_;
 	float zoomFactor_ = 0.4f;
+	bool isPlayerFalling = false;
+	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};
+	Direction lastPlayerDirection;
 };

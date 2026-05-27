@@ -49,6 +49,9 @@ void GameScene::update(float deltaTime)
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
+	// Store position before physics update to use as safe fallback position
+	const sf::Vector2f positionBeforeUpdate = player_.getPosition();
+
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
 	// Update all alive enemies and remove dead ones
@@ -74,6 +77,8 @@ void GameScene::update(float deltaTime)
 
 	combat_.resolve(hitboxes, hurtboxes);
 
+	resetPlayerIfOutOfBounds();
+
 	// Check for player death
 	if (!player_.isAlive()) {
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
@@ -97,4 +102,33 @@ void GameScene::draw(sf::RenderWindow &window)
 	player_.draw(window);
 	for (auto &enemy : enemies_)
 		enemy->draw(window);
+}
+
+// Checks if player is falling off the map.
+// Teleports the player back to safe position and deals 1 damage.
+void GameScene::resetPlayerIfOutOfBounds()
+{
+	// Track last position where player was on solid ground
+	if (player_.isPlayerOnGround()) {
+		lastGroundPosition = player_.getPosition();
+		lastPlayerDirection = player_.direction;
+	}
+
+	// Check if player fell off the map and apply damage once per fall
+	const float worldHeight = world_.getWorldHeight();
+	if (player_.getPosition().y > worldHeight) {
+		if (!isPlayerFalling) {
+			player_.health.damage(1);
+
+			const float safeOffsetX = (lastPlayerDirection == Direction::Left) ? 60.f : -60.f;
+			const sf::Vector2f safePosition{lastGroundPosition.x + safeOffsetX, lastGroundPosition.y - 5.f};
+			player_.setPosition(safePosition);
+			player_.resetVelocity();
+
+			isPlayerFalling = true;
+		}
+	} else {
+		// Player is back in bounds
+		isPlayerFalling = false;
+	}
 }
