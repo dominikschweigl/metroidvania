@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../world/world.h"
+#include "../world/world.h"
 #include <SFML/Graphics.hpp>
 
 namespace EntityPhysics {

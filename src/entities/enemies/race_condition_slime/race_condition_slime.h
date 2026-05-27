@@ -1,6 +1,6 @@
 #pragma once
-#include "../../combat/hitbox.h"
-#include "../base/base_enemy.h"
+#include "../../../combat/hitbox.h"
+#include "../base_enemy.h"
 #include "states/attack_state.h"
 #include "states/chase_state.h"
 #include "states/idle_state.h"

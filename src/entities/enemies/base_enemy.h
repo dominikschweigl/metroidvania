@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../combat/hitbox.h"
-#include "base_entity.h"
+#include "../base_entity.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 

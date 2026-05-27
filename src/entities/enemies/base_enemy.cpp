@@ -1,6 +1,6 @@
 #include "base_enemy.h"
+#include "../entity_physics.h"
 #include "enemy_state.h"
-#include "entity_physics.h"
 
 void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerPos)
 {

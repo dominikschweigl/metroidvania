@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "../../src/combat/hitbox.h"
 #include "../../src/combat/health.h"
+#include "../../src/combat/hitbox.h"
 
 TEST_CASE("Teams: Player and Enemy are distinct")
 {

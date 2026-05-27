@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../src/combat/combat_system.h"
-#include "../../src/entities/base/base_enemy.h"
-#include "../../src/entities/base/enemy_state.h"
-#include "../../src/entities/player/hat_projectile.h"
+#include "../../src/entities/enemies/base_enemy.h"
+#include "../../src/entities/enemies/enemy_state.h"
+#include "../../src/entities/player/abilities/hat_projectile.h"
 #include "../../src/world/world.h"
 #include <SFML/Graphics.hpp>
 #include <vector>

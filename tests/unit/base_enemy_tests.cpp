@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "../../src/entities/base/base_enemy.h"
-#include "../../src/entities/base/base_entity.h"
-#include "../../src/entities/base/enemy_state.h"
-#include "../../src/entities/base/entity_physics.h"
+#include "../../src/entities/base_entity.h"
+#include "../../src/entities/enemies/base_enemy.h"
+#include "../../src/entities/enemies/enemy_state.h"
+#include "../../src/entities/entity_physics.h"
 #include "../../src/world/world.h"
 #include <SFML/Graphics.hpp>
 #include <type_traits>

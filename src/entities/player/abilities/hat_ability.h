@@ -1,7 +1,7 @@
 #pragma once
-#include "../../core/asset_manager.h"
-#include "../../core/direction.h"
-#include "../../world/world.h"
+#include "../../../core/asset_manager.h"
+#include "../../../world/world.h"
+#include "../../direction.h"
 #include "hat_projectile.h"
 #include <SFML/Graphics.hpp>
 #include <optional>

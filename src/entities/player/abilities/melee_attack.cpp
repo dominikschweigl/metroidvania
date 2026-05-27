@@ -1,7 +1,7 @@
 #include "melee_attack.h"
 
-#include "../../core/asset_manager.h"
-#include "../../core/audio_manager.h"
+#include "../../../core/asset_manager.h"
+#include "../../../core/audio_manager.h"
 
 MeleeAttack::MeleeAttack()
     : swing_texture(AssetManager::getInstance().getTexture(PLAYER_ATTACK_SWING_UPPER_BODY)),

@@ -2,7 +2,7 @@
 #include "../combat/combat_system.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
-#include "../entities/base/base_enemy.h"
+#include "../entities/enemies/base_enemy.h"
 #include "../entities/player/player.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>

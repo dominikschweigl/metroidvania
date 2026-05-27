@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../src/combat/hitbox.h"
-#include "../../src/core/direction.h"
-#include "../../src/entities/player/melee_attack.h"
+#include "../../src/entities/direction.h"
+#include "../../src/entities/player/abilities/melee_attack.h"
 
 TEST_CASE("MeleeAttack: getHitbox is empty before any trigger")
 {

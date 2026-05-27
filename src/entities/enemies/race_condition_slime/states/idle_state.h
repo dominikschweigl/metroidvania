@@ -1,5 +1,5 @@
 #pragma once
-#include "../../base/enemy_state.h"
+#include "../../enemy_state.h"
 
 namespace rc_slime {
 

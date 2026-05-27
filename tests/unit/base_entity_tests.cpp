@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "combat/hitbox.h"
-#include "entities/base/base_entity.h"
+#include "entities/base_entity.h"
 #include <SFML/Graphics.hpp>
 #include <type_traits>
 

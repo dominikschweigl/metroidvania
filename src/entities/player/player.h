@@ -2,9 +2,9 @@
 #include <SFML/Graphics.hpp>
 
 #include "../../combat/hitbox.h"
-#include "../base/base_entity.h"
-#include "hat_ability.h"
-#include "melee_attack.h"
+#include "../base_entity.h"
+#include "abilities/hat_ability.h"
+#include "abilities/melee_attack.h"
 #include "states/ascending_state.h"
 #include "states/descending_state.h"
 #include "states/idle_state.h"

@@ -2,7 +2,7 @@
 
 #include "combat/combat_system.h"
 #include "combat/hitbox.h"
-#include "entities/base/base_entity.h"
+#include "entities/base_entity.h"
 #include "entities/player/player.h"
 #include "world/world.h"
 #include <type_traits>

@@ -1,6 +1,6 @@
 #include "player.h"
 #include "../../core/input_manager.h"
-#include "../base/entity_physics.h"
+#include "../entity_physics.h"
 #include <algorithm>
 
 namespace {

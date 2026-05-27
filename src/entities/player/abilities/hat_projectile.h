@@ -1,7 +1,7 @@
 #pragma once
-#include "../../combat/hitbox.h"
-#include "../../core/direction.h"
-#include "../../world/world.h"
+#include "../../../combat/hitbox.h"
+#include "../../../world/world.h"
+#include "../../direction.h"
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 

@@ -1,7 +1,7 @@
 #include "game_scene.h"
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
-#include "../entities/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/race_condition_slime/race_condition_slime.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
 #include <algorithm>

@@ -28,13 +28,19 @@ set(GAME_SOURCES
     src/scenes/game_scene.cpp
     src/world/world.cpp
     src/combat/combat_system.cpp
-    src/entities/base/base_entity.cpp
-    src/entities/base/base_enemy.cpp
-    src/entities/base/entity_physics.cpp
+    src/entities/base_entity.cpp
+    src/entities/entity_physics.cpp
+    src/entities/enemies/base_enemy.cpp
+    src/entities/enemies/race_condition_slime/race_condition_slime.cpp
+    src/entities/enemies/race_condition_slime/states/idle_state.cpp
+    src/entities/enemies/race_condition_slime/states/chase_state.cpp
+    src/entities/enemies/race_condition_slime/states/windup_state.cpp
+    src/entities/enemies/race_condition_slime/states/attack_state.cpp
+    src/entities/enemies/race_condition_slime/states/recover_state.cpp
     src/entities/player/player.cpp
-    src/entities/player/melee_attack.cpp
-    src/entities/player/hat_ability.cpp
-    src/entities/player/hat_projectile.cpp
+    src/entities/player/abilities/melee_attack.cpp
+    src/entities/player/abilities/hat_ability.cpp
+    src/entities/player/abilities/hat_projectile.cpp
     src/entities/player/states/idle_state.cpp
     src/entities/player/states/walking_state.cpp
     src/entities/player/states/running_state.cpp
@@ -43,12 +49,6 @@ set(GAME_SOURCES
     src/entities/player/states/peak_state.cpp
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
-    src/entities/race_condition_slime/race_condition_slime.cpp
-    src/entities/race_condition_slime/states/idle_state.cpp
-    src/entities/race_condition_slime/states/chase_state.cpp
-    src/entities/race_condition_slime/states/windup_state.cpp
-    src/entities/race_condition_slime/states/attack_state.cpp
-    src/entities/race_condition_slime/states/recover_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})

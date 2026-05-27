@@ -1,6 +1,6 @@
 #include "race_condition_slime.h"
-#include "../../core/audio_manager.h"
-#include "../../world/world.h"
+#include "../../../core/audio_manager.h"
+#include "../../../world/world.h"
 #include <algorithm>
 #include <cmath>
 

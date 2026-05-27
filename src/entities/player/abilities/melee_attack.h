@@ -1,6 +1,6 @@
 #pragma once
-#include "../../combat/hitbox.h"
-#include "../../core/direction.h"
+#include "../../../combat/hitbox.h"
+#include "../../direction.h"
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <functional>

@@ -1,14 +1,14 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "entities/race_condition_slime/race_condition_slime.h"
+#include "entities/enemies/race_condition_slime/race_condition_slime.h"
 #include "world/world.h"
 
-#include "entities/race_condition_slime/states/attack_state.h"
-#include "entities/race_condition_slime/states/chase_state.h"
-#include "entities/race_condition_slime/states/idle_state.h"
-#include "entities/race_condition_slime/states/recover_state.h"
-#include "entities/race_condition_slime/states/windup_state.h"
+#include "entities/enemies/race_condition_slime/states/attack_state.h"
+#include "entities/enemies/race_condition_slime/states/chase_state.h"
+#include "entities/enemies/race_condition_slime/states/idle_state.h"
+#include "entities/enemies/race_condition_slime/states/recover_state.h"
+#include "entities/enemies/race_condition_slime/states/windup_state.h"
 
 #include <cmath>
 
