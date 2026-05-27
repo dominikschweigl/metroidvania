@@ -60,7 +60,7 @@ class RaceConditionSlime : public BaseEnemy {
 	static constexpr int ATTACK_DAMAGE = 1;
 
 	// Active damage rectangle while the slime is mid-strike, otherwise nullopt.
-	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept
+	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept override
 	{
 		if (!isAttacking())
 			return std::nullopt;

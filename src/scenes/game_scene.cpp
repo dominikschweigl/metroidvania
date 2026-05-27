@@ -1,11 +1,13 @@
 #include "game_scene.h"
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
+#include "../entities/race_condition_slime/race_condition_slime.h"
+#include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
+#include <algorithm>
 #include <vector>
 
-GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
-    : sceneStack_(sceneStack), window_(window), slime1_({25 * 32.f, 18 * 32.f}), slime2_({30 * 32.f, 18 * 32.f})
+GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
 {
 	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
 
@@ -17,6 +19,9 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
 	world_.loadRoom("start_room", "data/maps/start_room.tmj");
 	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
 	world_.setCurrentRoom("start_room");
+
+	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
+	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
 
 	view_.setCenter(player_.getPosition());
 }
@@ -45,28 +50,27 @@ void GameScene::update(float deltaTime)
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
-	if (slime1_.isAlive())
-		slime1_.update(deltaTime, world_, player_.getPosition());
-	if (slime2_.isAlive())
-		slime2_.update(deltaTime, world_, player_.getPosition());
 
+	// Update all alive enemies and remove dead ones
+	for (auto &enemy : enemies_)
+		enemy->update(deltaTime, world_, player_.getPosition());
+	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
+	               enemies_.end());
+
+	// Collect hitboxes from player and all enemies
 	std::vector<Hitbox> hitboxes;
 	if (const auto melee = player_.getMeleeHitbox())
 		hitboxes.push_back(*melee);
 	if (player_.hasHatThrown())
 		hitboxes.push_back(player_.getThrownHat().getHitbox());
-	if (slime1_.isAlive())
-		if (const auto slimeHit = slime1_.getHitbox())
-			hitboxes.push_back(*slimeHit);
-	if (slime2_.isAlive())
-		if (const auto slimeHit = slime2_.getHitbox())
-			hitboxes.push_back(*slimeHit);
+	for (auto &enemy : enemies_)
+		if (const auto hit = enemy->getHitbox())
+			hitboxes.push_back(*hit);
 
+	// Collect hurtboxes from player and all enemies
 	std::vector<Hurtbox> hurtboxes{player_.getHurtbox()};
-	if (slime1_.isAlive())
-		hurtboxes.push_back(slime1_.getHurtbox());
-	if (slime2_.isAlive())
-		hurtboxes.push_back(slime2_.getHurtbox());
+	for (auto &enemy : enemies_)
+		hurtboxes.push_back(enemy->getHurtbox());
 
 	combat_.resolve(hitboxes, hurtboxes);
 
@@ -91,8 +95,6 @@ void GameScene::draw(sf::RenderWindow &window)
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
 	player_.draw(window);
-	if (slime1_.isAlive())
-		slime1_.draw(window);
-	if (slime2_.isAlive())
-		slime2_.draw(window);
+	for (auto &enemy : enemies_)
+		enemy->draw(window);
 }

@@ -5,6 +5,7 @@
 #include "../../core/direction.h"
 #include "../../world/world.h"
 #include <SFML/Graphics.hpp>
+#include <optional>
 
 class EnemyState;
 
@@ -43,6 +44,7 @@ class BaseEnemy {
 	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
 	void takeDamage(int amount) noexcept { health.damage(amount); }
 
+	[[nodiscard]] virtual std::optional<Hitbox> getHitbox() noexcept { return std::nullopt; }
 	[[nodiscard]] Hurtbox getHurtbox() noexcept { return Hurtbox{getBounds(), Team::Enemy, &health, false}; }
 
 	Health health{MAX_HEALTH, MAX_HEALTH};

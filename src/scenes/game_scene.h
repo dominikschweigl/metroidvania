@@ -2,10 +2,12 @@
 #include "../combat/combat_system.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
+#include "../entities/base/base_enemy.h"
 #include "../entities/player/player.h"
-#include "../entities/race_condition_slime/race_condition_slime.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>
+#include <memory>
+#include <vector>
 
 // Gameplay scene. Owns the world, player, enemies and the camera view.
 class GameScene : public Scene {
@@ -22,8 +24,7 @@ class GameScene : public Scene {
 	sf::View view_;
 	World world_;
 	Player player_;
-	RaceConditionSlime slime1_;
-	RaceConditionSlime slime2_;
+	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	CombatSystem combat_;
 	float zoomFactor_ = 0.4f;
 };
