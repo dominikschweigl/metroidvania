@@ -24,6 +24,7 @@ set(GAME_SOURCES
     src/ui/slider.cpp
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
+    src/ui/health_bar.cpp
     src/scenes/menu_scene.cpp
     src/scenes/game_scene.cpp
     src/world/world.cpp

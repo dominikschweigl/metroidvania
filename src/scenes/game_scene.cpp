@@ -108,6 +108,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	player_.draw(window);
 	for (auto &enemy : enemies_)
 		enemy->draw(window);
+
+	healthBar_.draw(window, player_.health);
 }
 
 // Checks if player is falling off the map.

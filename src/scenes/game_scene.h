@@ -4,6 +4,7 @@
 #include "../core/scene_stack.h"
 #include "../entities/enemies/base_enemy.h"
 #include "../entities/player/player.h"
+#include "../ui/health_bar.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -28,6 +29,7 @@ class GameScene : public Scene {
 	Player player_;
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	CombatSystem combat_;
+	HealthBar healthBar_;
 	float zoomFactor_ = 0.4f;
 	bool isPlayerFalling = false;
 	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};
