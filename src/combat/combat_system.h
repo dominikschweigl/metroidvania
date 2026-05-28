@@ -1,14 +1,12 @@
 #pragma once
 
 #include "hitbox.h"
-
 #include <cstdint>
 #include <set>
 #include <span>
 #include <utility>
 
-// Central per-frame combat resolver.
-//
+// Central combat resolver.
 // Resolves every Hitbox against every Hurtbox of the opposite team. Each
 // (sourceId, victim) pair damages at most once. Invulnerable hurtboxes are skipped.
 class CombatSystem {
@@ -25,9 +23,7 @@ class CombatSystem {
 	// Clear every recorded (sourceId, victim) pair for the given source.
 	void clearSource(std::uint32_t sourceId);
 
-	// Clear every recorded (sourceId, victim) pair for the given victim. Call
-	// this before an entity's Health is destroyed so the stored pointer cannot
-	// later be compared against new entries.
+	// Clear every recorded (sourceId, victim) pair for the given victim.
 	void clearVictim(const Health *health) noexcept;
 
 	// Clear every recorded hit. Used for tests / scene resets.
