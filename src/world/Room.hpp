@@ -14,6 +14,14 @@ struct Door {
 
 class Room {
   public:
+	// unique_ptr deletes copy — explicitly default move Room() = default;
+	Room(Room &&) = default;
+	Room &operator=(Room &&) = default;
+
+	// explicitly delete copy
+	Room(const Room &) = delete;
+	Room &operator=(const Room &) = delete;
+
 	int width{}, height{};
 	std::unique_ptr<tson::Map> map;
 
