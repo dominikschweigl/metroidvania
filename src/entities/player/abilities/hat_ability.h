@@ -1,10 +1,11 @@
 #pragma once
-#include "../../core/asset_manager.h"
-#include "../../core/direction.h"
-#include "../../world/world.h"
+#include "../../../world/world.h"
+#include "../../direction.h"
 #include "hat_projectile.h"
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <optional>
+#include <vector>
 
 class HatAbility {
   public:
@@ -24,6 +25,9 @@ class HatAbility {
 	void draw(sf::RenderWindow &window) const;
 	void reset() noexcept;
 
+	// Append sourceIds of projectiles caught since the last drain.
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) noexcept;
+
   private:
 	static constexpr int THROW_FRAME_COUNT = 8;
 	static constexpr float THROW_FRAME_DUR = 0.06f;
@@ -37,4 +41,5 @@ class HatAbility {
 	float throwTimer = 0.f;
 
 	std::optional<HatProjectile> projectile;
+	std::vector<std::uint32_t> endedSourceIds;
 };

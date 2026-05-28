@@ -104,6 +104,40 @@ void World::setCurrentRoom(const std::string &roomId)
 	}
 }
 
+const Room *World::getCurrentRoom() const
+{
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return nullptr;
+	}
+	return &rooms.at(currentRoomId);
+}
+
+float World::getWorldHeight() const
+{
+	const Room *room = getCurrentRoom();
+	if (room == nullptr) {
+		return 0.f;
+	}
+	return room->height * TILE_SIZE;
+}
+
+const Room *World::getCurrentRoom() const
+{
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return nullptr;
+	}
+	return &rooms.at(currentRoomId);
+}
+
+float World::getWorldHeight() const
+{
+	const Room *room = getCurrentRoom();
+	if (room == nullptr) {
+		return 0.f;
+	}
+	return room->height * TILE_SIZE;
+}
+
 const tson::Tile *World::getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const
 {
 	if (currentRoomId.empty())

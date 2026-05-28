@@ -24,15 +24,24 @@ set(GAME_SOURCES
     src/ui/slider.cpp
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
+    src/ui/health_bar.cpp
     src/scenes/menu_scene.cpp
     src/scenes/game_scene.cpp
     src/world/world.cpp
-    src/entities/base/base_enemy.cpp
-    src/entities/base/entity_physics.cpp
+    src/combat/combat_system.cpp
+    src/entities/base_entity.cpp
+    src/entities/entity_physics.cpp
+    src/entities/enemies/base_enemy.cpp
+    src/entities/enemies/race_condition_slime/race_condition_slime.cpp
+    src/entities/enemies/race_condition_slime/states/idle_state.cpp
+    src/entities/enemies/race_condition_slime/states/chase_state.cpp
+    src/entities/enemies/race_condition_slime/states/windup_state.cpp
+    src/entities/enemies/race_condition_slime/states/attack_state.cpp
+    src/entities/enemies/race_condition_slime/states/recover_state.cpp
     src/entities/player/player.cpp
-    src/entities/player/melee_attack.cpp
-    src/entities/player/hat_ability.cpp
-    src/entities/player/hat_projectile.cpp
+    src/entities/player/abilities/melee_attack.cpp
+    src/entities/player/abilities/hat_ability.cpp
+    src/entities/player/abilities/hat_projectile.cpp
     src/entities/player/states/idle_state.cpp
     src/entities/player/states/walking_state.cpp
     src/entities/player/states/running_state.cpp
@@ -41,12 +50,6 @@ set(GAME_SOURCES
     src/entities/player/states/peak_state.cpp
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
-    src/entities/race_condition_slime/race_condition_slime.cpp
-    src/entities/race_condition_slime/states/idle_state.cpp
-    src/entities/race_condition_slime/states/chase_state.cpp
-    src/entities/race_condition_slime/states/windup_state.cpp
-    src/entities/race_condition_slime/states/attack_state.cpp
-    src/entities/race_condition_slime/states/recover_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -54,13 +57,19 @@ target_include_directories(metroidvania PRIVATE src external/tileson)
 target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 
 add_executable(metroidvania_tests
-tests/unit/player_state_tests.cpp
-tests/unit/base_enemy_tests.cpp
-tests/unit/race_condition_slime_tests.cpp
-tests/unit/hat_projectile_tests.cpp
-tests/unit/input_manager_tests.cpp
-tests/unit/audio_manager_tests.cpp
-${GAME_SOURCES})
+    tests/unit/player_state_tests.cpp
+    tests/unit/base_entity_tests.cpp
+    tests/unit/base_enemy_tests.cpp
+    tests/unit/race_condition_slime_tests.cpp
+    tests/unit/hat_projectile_tests.cpp
+    tests/unit/input_manager_tests.cpp
+    tests/unit/audio_manager_tests.cpp
+    tests/unit/health_tests.cpp
+    tests/unit/hitbox_tests.cpp
+    tests/unit/combat_system_tests.cpp
+    tests/unit/player_combat_tests.cpp
+    tests/unit/melee_attack_tests.cpp
+    ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)

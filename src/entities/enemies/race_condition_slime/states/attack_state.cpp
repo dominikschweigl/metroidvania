@@ -1,5 +1,5 @@
 #include "attack_state.h"
-#include "../../../core/audio_manager.h"
+#include "../../../../core/audio_manager.h"
 #include "../race_condition_slime.h"
 
 namespace rc_slime {
@@ -32,12 +32,18 @@ void AttackState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 	slime.setAnimation(RaceConditionSlime::SlimeAnimation::Attack, currentFrame);
 }
 
-void AttackState::onEnter(BaseEnemy & /*enemy*/)
+void AttackState::onEnter(BaseEnemy &enemy)
 {
 	AudioManager::getInstance().playSound(SoundEffect::SLIME_ATTACK);
 	stateTimer = 0.f;
 	currentFrame = 0;
 	frameTimer = 0.f;
+	static_cast<RaceConditionSlime &>(enemy).beginAttackSource();
+}
+
+void AttackState::onExit(BaseEnemy &enemy)
+{
+	static_cast<RaceConditionSlime &>(enemy).markAttackSourceEnded();
 }
 
 } // namespace rc_slime

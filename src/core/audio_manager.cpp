@@ -180,6 +180,8 @@ std::string_view AudioManager::musicPath(const MusicTrack track)
 		return "./assets/audio/music/main_menu_theme.ogg";
 	case MusicTrack::GAME_THEME:
 		return "./assets/audio/music/game_theme.ogg";
+	case MusicTrack::GAME_OVER_THEME:
+		return "./assets/audio/music/game_over_theme.ogg";
 	}
 	throw std::logic_error("musicPath: missing MusicTrack path entry");
 }

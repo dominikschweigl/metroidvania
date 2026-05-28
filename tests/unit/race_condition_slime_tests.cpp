@@ -1,15 +1,14 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "entities/base/base_enemy.h"
-#include "entities/race_condition_slime/race_condition_slime.h"
+#include "entities/enemies/race_condition_slime/race_condition_slime.h"
 #include "world/world.h"
 
-#include "entities/race_condition_slime/states/attack_state.h"
-#include "entities/race_condition_slime/states/chase_state.h"
-#include "entities/race_condition_slime/states/idle_state.h"
-#include "entities/race_condition_slime/states/recover_state.h"
-#include "entities/race_condition_slime/states/windup_state.h"
+#include "entities/enemies/race_condition_slime/states/attack_state.h"
+#include "entities/enemies/race_condition_slime/states/chase_state.h"
+#include "entities/enemies/race_condition_slime/states/idle_state.h"
+#include "entities/enemies/race_condition_slime/states/recover_state.h"
+#include "entities/enemies/race_condition_slime/states/windup_state.h"
 
 #include <cmath>
 
@@ -59,6 +58,52 @@ TEST_CASE("RaceConditionSlime::isAttacking only true during AttackState")
 
 	s.setState(&s.states.recover);
 	REQUIRE_FALSE(s.isAttacking());
+}
+
+TEST_CASE("RaceConditionSlime::getHitbox is only present during AttackState")
+{
+	RaceConditionSlime s(groundSpawn());
+
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.chase);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.windup);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+
+	s.setState(&s.states.attack);
+	s.beginAttackSource();
+	const auto hit = s.getHitbox();
+	REQUIRE(hit.has_value());
+	REQUIRE(hit->team == Team::Enemy);
+	REQUIRE(hit->damage == RaceConditionSlime::ATTACK_DAMAGE);
+	REQUIRE(hit->sourceId != 0u);
+
+	s.setState(&s.states.recover);
+	REQUIRE_FALSE(s.getHitbox().has_value());
+}
+
+TEST_CASE("RaceConditionSlime::beginAttackSource hands out a fresh id each call")
+{
+	RaceConditionSlime s(groundSpawn());
+	s.beginAttackSource();
+	const std::uint32_t first = s.getAttackSourceId();
+	s.beginAttackSource();
+	const std::uint32_t second = s.getAttackSourceId();
+	REQUIRE(first != second);
+}
+
+TEST_CASE("BaseEnemy::getHurtbox carries the body bounds, Enemy team, and live Health pointer")
+{
+	RaceConditionSlime s(groundSpawn());
+	const sf::FloatRect body = s.getBounds();
+	const Hurtbox hurt = s.getHurtbox();
+	REQUIRE(hurt.bounds.position == body.position);
+	REQUIRE(hurt.bounds.size == body.size);
+	REQUIRE(hurt.team == Team::Enemy);
+	REQUIRE(hurt.health == &s.health);
+	REQUIRE_FALSE(hurt.invulnerable);
 }
 
 TEST_CASE("onPreUpdate decrements per-frame cooldown timers (via BaseEnemy::update)")
@@ -232,16 +277,16 @@ TEST_CASE("Slime ChaseState sets velocity in the facing direction when pursuing"
 
 	sf::Vector2f midRange = s.getPosition() + sf::Vector2f{RaceConditionSlime::ATTACK_RANGE + 100.f, 0.f};
 
-	SECTION("facing right → positive x velocity")
+	SECTION("facing right -> positive x velocity")
 	{
-		s.setFacing(Direction::Right);
+		s.setDirection(Direction::Right);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == RaceConditionSlime::MOVE_SPEED);
 	}
 
-	SECTION("facing left → negative x velocity")
+	SECTION("facing left -> negative x velocity")
 	{
-		s.setFacing(Direction::Left);
+		s.setDirection(Direction::Left);
 		(void)s.states.chase.update(0.016f, s, w, midRange);
 		REQUIRE(s.getVelocity().x == -RaceConditionSlime::MOVE_SPEED);
 	}
@@ -254,7 +299,7 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 	s.states.chase.onEnter(s);
 	s.setTeleportTimer(10.f);
 
-	SECTION("melee range with cooldown → velocity zero")
+	SECTION("melee range with cooldown -> velocity zero")
 	{
 		s.setAttackCooldown(1.f);
 		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
@@ -263,7 +308,7 @@ TEST_CASE("Slime ChaseState zeros velocity when entering melee range or losing s
 		REQUIRE(s.getVelocity().x == 0.f);
 	}
 
-	SECTION("beyond lose range → velocity zero")
+	SECTION("beyond lose range -> velocity zero")
 	{
 		s.setVelocity({RaceConditionSlime::MOVE_SPEED, 0.f});
 		sf::Vector2f far = s.getPosition() + sf::Vector2f{RaceConditionSlime::LOSE_RANGE + 50.f, 0.f};
@@ -301,7 +346,7 @@ TEST_CASE("Slime ChaseState initiates a jump when the player is above and precon
 	s.setOnGround(true);
 
 	// Player above and horizontally in pursuit range (not melee, not lost).
-	// chase.update computes heightDiff = slime.y - player.y, so player.y = slime.y - 200 → heightDiff = 200.
+	// chase.update computes heightDiff = slime.y - player.y, so player.y = slime.y - 200 -> heightDiff = 200.
 	sf::Vector2f aboveAndAhead = {s.getPosition().x + 100.f, s.getPosition().y - 200.f};
 	REQUIRE(s.states.chase.update(0.016f, s, w, aboveAndAhead) == &s.states.chase);
 

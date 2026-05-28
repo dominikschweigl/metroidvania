@@ -42,7 +42,9 @@ class World {
 	// New room-based methods
 	void loadRoom(const std::string &roomId, const std::string &tmjFile);
 	void setCurrentRoom(const std::string &roomId);
-	const Room &getCurrentRoom() const { return rooms.at(currentRoomId); }
+	const std::string &getCurrentRoomId() const { return currentRoomId; }
+	const Room *getCurrentRoom() const;
+	[[nodiscard]] float getWorldHeight() const;
 
 	void loadTileset();
 	void loadTilesets(tson::Map &map);
@@ -57,7 +59,7 @@ class World {
 
 	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
 	{
-		return World::getCurrentRoom().getTouchingDoorTargetRoom(entityBounds);
+		return getCurrentRoom()->getTouchingDoorTargetRoom(entityBounds);
 	}
 
   private:

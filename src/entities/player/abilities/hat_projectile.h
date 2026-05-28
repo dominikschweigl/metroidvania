@@ -1,11 +1,9 @@
 #pragma once
-#include "../../core/asset_manager.h"
-#include "../../core/direction.h"
-#include "../../world/world.h"
+#include "../../../combat/hitbox.h"
+#include "../../../world/world.h"
+#include "../../direction.h"
 #include <SFML/Graphics.hpp>
-#include <set>
-
-class BaseEnemy;
+#include <cstdint>
 
 class HatProjectile {
   public:
@@ -31,8 +29,11 @@ class HatProjectile {
 
 	[[nodiscard]] sf::FloatRect getBounds() const noexcept;
 
-	// Deals damage to enemy on first contact per throw. Returns true if a new hit landed.
-	bool tryHit(BaseEnemy &enemy);
+	// Active damage rectangle for the lifetime of the projectile. CombatSystem
+	// currently ensures each enemy takes damage at most once per throw via sourceId.
+	[[nodiscard]] Hitbox getHitbox() const noexcept { return Hitbox{getBounds(), DAMAGE, Team::Player, sourceId}; }
+
+	[[nodiscard]] std::uint32_t getSourceId() const noexcept { return sourceId; }
 
   private:
 	Phase phase = Phase::Flying;
@@ -44,5 +45,5 @@ class HatProjectile {
 	int spinFrame = 0;
 	float spinTimer = 0.f;
 	sf::Sprite sprite;
-	std::set<const BaseEnemy *> hitEnemies;
+	std::uint32_t sourceId = nextSourceId();
 };

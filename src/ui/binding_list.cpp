@@ -62,6 +62,15 @@ void BindingList::handleEvent(const sf::Event &event, const sf::RenderWindow &wi
 		}
 
 		if (const auto *key = event.getIf<sf::Event::KeyPressed>()) {
+			// The rebind key may also match a menu binding (e.g. Space -> Confirm).
+			// Drop any such flags so the captured keystroke does not trigger UI
+			// actions in scenes pushed by the rebind handler
+			// (e.g. occured previously in the conflict dialog).
+			static_cast<void>(input.consume(MenuAction::Confirm));
+			static_cast<void>(input.consume(MenuAction::NavigateUp));
+			static_cast<void>(input.consume(MenuAction::NavigateDown));
+			static_cast<void>(input.consume(MenuAction::NavigateLeft));
+			static_cast<void>(input.consume(MenuAction::NavigateRight));
 			requestRebind(key->scancode);
 		} else if (const auto *mouse = event.getIf<sf::Event::MouseButtonPressed>()) {
 			requestRebind(mouse->button);
@@ -136,7 +145,7 @@ void BindingList::draw(sf::RenderTarget &target) const
 
 		const sf::Color color = isSelected ? theme_->textSelected : theme_->textNormal;
 
-		// Left text — action name
+		// Left text - action name
 		{
 			sf::Text &text = leftTexts_[i];
 			text.setFillColor(color);
@@ -146,7 +155,7 @@ void BindingList::draw(sf::RenderTarget &target) const
 			target.draw(text);
 		}
 
-		// Right text — binding name or "Press any key..."
+		// Right text - binding name or "Press any key..."
 		if (isSelected && state_ == State::AwaitingInput) {
 			awaitingText_.setFillColor(theme_->textSelected);
 			const auto local = awaitingText_.getLocalBounds();

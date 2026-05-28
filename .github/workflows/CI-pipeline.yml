@@ -47,13 +47,8 @@ jobs:
         run: cmake --preset vcpkg-linux
       - name: Build Project
         run: cmake --build --preset linux
-      - name: Start Xvfb
-        run: |
-          Xvfb :99 -screen 0 1024x768x24 &
-          echo "DISPLAY=:99" >> $GITHUB_ENV
-          sleep 1
-      - name: Run Tests
-        run: ctest --test-dir build/linux -C Release --output-on-failure
+      - name: Run Tests (with Xvfb)
+        run: xvfb-run -a -s "-screen 0 1024x768x24" ctest --test-dir build/linux --output-on-failure
 
   build-windows-mingw:
     name: Build & Test (Windows MinGW)
@@ -101,7 +96,7 @@ jobs:
       - name: Build Project
         run: cmake --build --preset windows-mingw
       - name: Run Tests
-        run: ctest --test-dir build/windows-mingw -C Release --output-on-failure
+        run: ctest --test-dir build/windows-mingw --output-on-failure
 
   clang-format:
     name: Clang-Format Check
@@ -149,4 +144,4 @@ jobs:
       - name: Configure with Tidy
         run: cmake --preset vcpkg-linux -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
       - name: Build & Lint
-        run: cmake --build --preset linux -C Release
+        run: cmake --build --preset linux
