@@ -10,8 +10,12 @@
 class World {
   public:
 	static constexpr float TILE_SIZE = 32.f;
-	World();
 	~World() = default;
+	World() = default;
+	World(World &&) = default;
+	World &operator=(World &&) = default;
+	World(const World &) = delete;
+	World &operator=(const World &) = delete;
 
 	// New room-based methods
 	void loadRoom(const std::string &roomId, const std::string &tmjFile);
@@ -24,7 +28,7 @@ class World {
 	void loadTilesets(tson::Map &map);
 
 	// Just a helper for retrieving tile at a specific world coordinate
-	const tson::Tile *getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const;
+	tson::Tile *getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const;
 	// Return true if any solid tile intersects with the given rectangle
 	bool isSolidAtRect(const sf::FloatRect &rect) const;
 

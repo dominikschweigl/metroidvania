@@ -1,20 +1,8 @@
 #include "world.h"
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <tileson.hpp>
-
-struct Level {
-	int width{};
-	int height{};
-	std::vector<int> tiles;
-};
-
-#include <fstream>
-
-World::World()
-{
-	// Constructor - rooms will be populated via loadRoom
-}
 
 void World::loadTilesets(tson::Map &map)
 {
@@ -118,20 +106,23 @@ float World::getWorldHeight() const
 	return room->height * TILE_SIZE;
 }
 
-const tson::Tile *World::getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const
+tson::Tile *World::getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const
 {
 	if (currentRoomId.empty())
 		return nullptr;
 	const Room &room = rooms.at(currentRoomId);
 
-	tson::Layer *layer = room.map->getLayer(layerName);
-	if (!layer)
-		return nullptr;
-
 	const int x = static_cast<int>(worldPos.x / TILE_SIZE);
 	const int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
-	return layer->getTileData(x, y); // returns nullptr if out of bounds
+	// No real map (test grid) — return nullptr, callers must use isSolidAtRect
+	if (!room.map)
+		return nullptr;
+
+	tson::Layer *layer = room.map->getLayer(layerName);
+	if (!layer)
+		return nullptr;
+	return layer->getTileData(x, y);
 }
 
 bool World::isSolidAtRect(const sf::FloatRect &rect) const
@@ -140,23 +131,34 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 		return false;
 	const Room &room = rooms.at(currentRoomId);
 
-	tson::Layer *layer = room.map->getLayer("Foreground");
-	if (!layer)
-		return false;
-
 	const int left = static_cast<int>(rect.position.x / TILE_SIZE);
 	const int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
 	const int top = static_cast<int>(rect.position.y / TILE_SIZE);
 	const int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
 
-	for (int y = top; y <= bottom; ++y) {
-		for (int x = left; x <= right; ++x) {
-			tson::Tile *tile = layer->getTileData(x, y);
-			if (tile && !tile->getObjectgroup().getObjects().empty())
+	// Path 1: real Tiled map
+	if (room.map) {
+		tson::Layer *layer = room.map->getLayer("Solid");
+		if (!layer)
+			return false;
+
+		for (int y = top; y <= bottom; ++y) {
+			for (int x = left; x <= right; ++x) {
+				tson::Tile *tile = layer->getTileData(x, y);
+				if (tile && !tile->getObjectgroup().getObjects().empty())
+					return true;
+			}
+		}
+		return false;
+	}
+
+	// Path 2: synthetic grid (tests)
+	for (int y = std::max(top, 0); y <= std::min(bottom, room.height - 1); ++y) {
+		for (int x = std::max(left, 0); x <= std::min(right, room.width - 1); ++x) {
+			if (room.solidGrid[y][x])
 				return true;
 		}
 	}
-
 	return false;
 }
 
@@ -165,62 +167,14 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 	if (grid.empty())
 		return;
 
-	const int height = grid.size();
-	const int width = grid[0].size();
-
-	// Build a minimal TMJ JSON string
-	std::string tileData;
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			tileData += std::to_string(grid[y][x]);
-			if (y != height - 1 || x != width - 1)
-				tileData += ",";
-		}
-	}
-
-	std::string tmj = R"({
-        "width":)" + std::to_string(width)
-	                  + R"(,
-        "height":)" + std::to_string(height)
-	                  + R"(,
-        "tilewidth":32, "tileheight":32,
-        "infinite":false,
-        "orientation":"orthogonal",
-        "renderorder":"right-down",
-        "type":"map",
-        "version":"1.10",
-        "tiledversion":"1.12.1",
-        "nextlayerid":2,
-        "nextobjectid":1,
-        "tilesets":[],
-        "layers":[{
-            "type":"tilelayer",
-            "name":"Solid",
-            "id":1,
-            "width":)" + std::to_string(width)
-	                  + R"(,
-            "height":)"
-	                  + std::to_string(height) + R"(,
-            "x":0, "y":0,
-            "opacity":1,
-            "visible":true,
-            "data":[)" + tileData
-	                  + R"(]
-        }]
-    })";
-
-	tson::Tileson t;
-	auto map = t.parse(tmj.data(), tmj.size());
-
-	if (!map || map->getStatus() != tson::ParseStatus::OK) {
-		std::cerr << "loadFromGrid parse failed: " << (map ? map->getStatusMessage() : "null") << "\n";
-		return;
-	}
-
 	Room room;
-	room.width = width;
-	room.height = height;
-	room.map = std::move(map);
+	room.width = grid[0].size();
+	room.height = grid.size();
+	room.solidGrid.resize(room.height, std::vector<bool>(room.width, false));
+
+	for (int y = 0; y < room.height; ++y)
+		for (int x = 0; x < room.width; ++x)
+			room.solidGrid[y][x] = (grid[y][x] != 0);
 
 	rooms["default"] = std::move(room);
 	if (currentRoomId.empty())

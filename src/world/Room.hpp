@@ -12,23 +12,20 @@ struct Door {
 	sf::FloatRect bounds;
 };
 
-class Room {
-  public:
-	// unique_ptr deletes copy — explicitly default move Room() = default;
+struct Room {
+	int width{}, height{};
+	std::shared_ptr<tson::Map> map;
+	std::vector<std::vector<bool>> solidGrid; // used when map is null
+
+	sf::Vector2f playerSpawn{};
+	std::vector<sf::Vector2f> raceConditionSpawns;
+	std::vector<Door> doors;
+
 	Room() = default;
 	Room(Room &&) = default;
 	Room &operator=(Room &&) = default;
-
-	// explicitly delete copy
-	Room(const Room &) = delete;
-	Room &operator=(const Room &) = delete;
-
-	int width{}, height{};
-	std::unique_ptr<tson::Map> map;
-
-	sf::Vector2f playerSpawn{};
-	std::vector<sf::Vector2i> raceConditionSpawns;
-	std::vector<Door> doors; // define Door as needed
+	Room(const Room &) = default;
+	Room &operator=(const Room &) = default;
 
 	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds) const
 	{

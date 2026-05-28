@@ -24,11 +24,10 @@ static float tileLeft(const tson::Tile *tile, const World &world)
 bool isGroundBelow(sf::FloatRect bounds, const World &world)
 {
 	float bottom = bounds.position.y + bounds.size.y + 1.f;
-	const tson::Tile *left = world.getTileAtCoordinate({bounds.position.x, bottom}, "Foreground");
-	const tson::Tile *right = world.getTileAtCoordinate({bounds.position.x + bounds.size.x, bottom}, "Foreground");
-	return isSolidTile(left) || isSolidTile(right);
+	// Use isSolidAtRect with a thin strip below the entity
+	sf::FloatRect probe({bounds.position.x, bottom}, {bounds.size.x, 1.f});
+	return world.isSolidAtRect(probe);
 }
-
 void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::FloatRect bounds, const World &world)
 {
 	if (!isGroundBelow(bounds, world)) {
