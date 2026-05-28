@@ -17,7 +17,7 @@ class Room {
 	int width{}, height{};
 	std::unique_ptr<tson::Map> map;
 
-	sf::Vector2i playerSpawn{};
+	sf::Vector2f playerSpawn{};
 	std::vector<sf::Vector2i> raceConditionSpawns;
 	std::vector<Door> doors; // define Door as needed
 

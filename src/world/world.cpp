@@ -41,8 +41,6 @@ void World::loadTilesets(tson::Map &map)
 			}
 
 			auto pair = tileTextures.emplace(gid, std::cref(*texture));
-			std::cout << "Loaded tileset image for GID " << gid << ": " << imagePath
-			          << (pair.second ? " [new texture]" : " [already loaded]") << "\n";
 		}
 	}
 }
@@ -80,7 +78,6 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 					door.targetRoomId = targetRoomProp->getValue<std::string>();
 				}
 				room.doors.push_back(door);
-				std::cout << "Loaded door to " << door.targetRoomId << " at (" << p.x << ", " << p.y << ")\n";
 			} else if (name == "RaceCondition") {
 				room.raceConditionSpawns.push_back({float(p.x), float(p.y)});
 			}
@@ -90,7 +87,7 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	room.map = std::move(map); // move last, after all parsing is done
 
 	if (currentRoomId.empty())
-		currentRoomId = roomId;
+		setCurrentRoom(roomId);
 
 	rooms[roomId] = std::move(room);
 }
@@ -102,23 +99,6 @@ void World::setCurrentRoom(const std::string &roomId)
 	} else {
 		std::cerr << "Room " << roomId << " not found" << std::endl;
 	}
-}
-
-const Room *World::getCurrentRoom() const
-{
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return nullptr;
-	}
-	return &rooms.at(currentRoomId);
-}
-
-float World::getWorldHeight() const
-{
-	const Room *room = getCurrentRoom();
-	if (room == nullptr) {
-		return 0.f;
-	}
-	return room->height * TILE_SIZE;
 }
 
 const Room *World::getCurrentRoom() const

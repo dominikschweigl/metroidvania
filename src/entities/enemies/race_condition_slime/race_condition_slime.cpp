@@ -3,7 +3,7 @@
 #include "../../../world/world.h"
 #include <algorithm>
 #include <cmath>
-#include <entities/base/entity_physics.h>
+#include <entities/entity_physics.h>
 
 RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),

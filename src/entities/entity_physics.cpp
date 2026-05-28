@@ -15,7 +15,7 @@ static float tileLeft(const tson::Tile *tile, const World &world)
 {
 	// reconstruct x position from GID and map width
 	const uint32_t gid = tile->getGid();
-	const int mapWidth = world.getCurrentRoom().width;
+	const int mapWidth = world.getCurrentRoom()->width;
 	const int localId = gid - tile->getTileset()->getFirstgid();
 	const int x = localId % mapWidth;
 	return float(x * World::TILE_SIZE);
@@ -67,7 +67,7 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 			isOnGround = true;
 			futureY = float(tileY * World::TILE_SIZE) - 1;
 		} else if (deltaY < 0.f) {
-			futureY = float((tileY + 1) * World::TILE_SIZE) + height;
+			futureY = float((tileY + 1) * World::TILE_SIZE);
 		}
 		velY = 0.f;
 	}
