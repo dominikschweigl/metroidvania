@@ -10,7 +10,7 @@ Player::Player()
 	lowerBodySprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	headSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	upperBodySprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
-	lowerBodySprite.setPosition({15 * 32.f, 0.f});
+	lowerBodySprite.setPosition({5 * 32.f, 0.f});
 }
 
 void Player::update(float deltaTime, const World &world, bool attackTriggered, bool hatThrowTriggered)

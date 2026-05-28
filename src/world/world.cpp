@@ -1,11 +1,7 @@
 #include "world.h"
 #include <algorithm>
 #include <iostream>
-#include <nlohmann/json.hpp>
-#include <tinyxml2.h>
-
-using namespace tinyxml2;
-using json = nlohmann::json;
+#include <tileson.hpp>
 
 struct Level {
 	int width{};
@@ -15,65 +11,88 @@ struct Level {
 
 #include <fstream>
 
-std::string readFile(const std::string &path)
-{
-	std::ifstream file(path);
-	return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-}
-
 World::World()
 {
 	// Constructor - rooms will be populated via loadRoom
 }
 
-void World::loadTileset()
+void World::loadTilesets(tson::Map &map)
 {
 	AssetManager &am = AssetManager::getInstance();
-	const std::vector<std::pair<int, TextureAsset>> entries = {
-	    {19, TILE_BLACK},     {20, TILE_LEFT_EDGE}, {21, TILE_RIGHT_EDGE},
-	    {22, TILE_STRUCTURE}, {23, TILE_TOP_1},     {24, TILE_TOP_2},
-	};
-	for (const auto &[id, asset] : entries)
-		tileTextures.emplace(id, std::cref(am.getTexture(asset)));
+
+	for (tson::Tileset &tileset : map.getTilesets()) {
+		for (tson::Tile &tile : tileset.getTiles()) {
+			const int gid = tile.getGid();
+
+			// Skip if already loaded
+			if (tileTextures.count(gid))
+				continue;
+
+			// Each tile in a collection tileset has its own image path
+			fs::path imagePath = tile.getImage();
+			if (imagePath.empty())
+				continue;
+
+			// Load into AssetManager and cache by GID
+			auto texture = std::make_shared<sf::Texture>();
+			if (!texture->loadFromFile(imagePath.string())) {
+				std::cerr << "Failed to load tile texture: " << imagePath << "\n";
+				continue;
+			}
+
+			auto pair = tileTextures.emplace(gid, std::cref(*texture));
+			std::cout << "Loaded tileset image for GID " << gid << ": " << imagePath
+			          << (pair.second ? " [new texture]" : " [already loaded]") << "\n";
+		}
+	}
 }
 
 void World::loadRoom(const std::string &roomId, const std::string &file)
 {
-	TiledMap map = loadMap(file);
+	tson::Tileson t;
+	auto map = t.parse(fs::path(file));
 
-	if (map.layers.empty()) {
-		std::cerr << "No tile layers found in " << file << std::endl;
+	if (!map || map->getStatus() != tson::ParseStatus::OK) {
+		std::cerr << "Failed to parse " << file << ": " << (map ? map->getStatusMessage() : "null map") << "\n";
 		return;
 	}
 
-	const auto &layer = map.layers[0];
-
 	Room room;
-	room.width = map.width;
-	room.height = map.height;
-	room.tiles.resize(map.height);
+	room.width = map->getSize().x;
+	room.height = map->getSize().y;
 
-	for (int y = 0; y < map.height; y++) {
-		room.tiles[y].resize(map.width);
+	// --- Load textures ---
+	loadTilesets(*map);
 
-		for (int x = 0; x < map.width; x++) {
-			int value = layer.data[y * map.width + x];
+	// --- Parse objects ---
+	if (tson::Layer *objLayer = map->getLayer("Object Layer 1")) {
+		for (auto &obj : objLayer->getObjects()) {
+			const tson::Vector2i p = obj.getPosition();
+			const std::string &name = obj.getName();
 
-			Tile &tile = room.tiles[y][x];
-
-			tile.position = {(float)x * map.tilewidth, (float)y * map.tileheight};
-			tile.size = {(float)map.tilewidth, (float)map.tileheight};
-			tile.isSolid = (value != 19 && value != 22);
-			tile.textureId = value;
+			if (name == "Player") {
+				room.playerSpawn = {float(p.x), float(p.y)};
+			} else if (name == "Door") {
+				Door door;
+				door.bounds = sf::FloatRect({float(p.x), float(p.y)}, {float(obj.getSize().x), float(obj.getSize().y)});
+				tson::Property *targetRoomProp = obj.getProp("targetRoomId");
+				if (targetRoomProp) {
+					door.targetRoomId = targetRoomProp->getValue<std::string>();
+				}
+				room.doors.push_back(door);
+				std::cout << "Loaded door to " << door.targetRoomId << " at (" << p.x << ", " << p.y << ")\n";
+			} else if (name == "RaceCondition") {
+				room.raceConditionSpawns.push_back({float(p.x), float(p.y)});
+			}
 		}
 	}
 
-	rooms[roomId] = std::move(room);
+	room.map = std::move(map); // move last, after all parsing is done
 
-	// If this is the first room, set it as current
-	if (currentRoomId.empty()) {
+	if (currentRoomId.empty())
 		currentRoomId = roomId;
-	}
+
+	rooms[roomId] = std::move(room);
 }
 
 void World::setCurrentRoom(const std::string &roomId)
@@ -85,130 +104,41 @@ void World::setCurrentRoom(const std::string &roomId)
 	}
 }
 
-void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
+const tson::Tile *World::getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const
 {
-	Room room;
-	room.tiles.clear();
-	room.tiles.resize(grid.size());
-	room.width = grid.empty() ? 0 : grid[0].size();
-	room.height = grid.size();
+	if (currentRoomId.empty())
+		return nullptr;
+	const Room &room = rooms.at(currentRoomId);
 
-	for (size_t y = 0; y < grid.size(); ++y) {
-		room.tiles[y].clear();
-		for (size_t x = 0; x < grid[y].size(); ++x) {
-			int tileType = grid[y][x];
-			Tile tile;
-			tile.position = {x * TILE_SIZE, y * TILE_SIZE};
-			tile.size = {TILE_SIZE, TILE_SIZE};
-			tile.isSolid = tileType > 0;
-			tile.textureId = tileType;
-			room.tiles[y].push_back(tile);
-		}
-	}
+	tson::Layer *layer = room.map->getLayer(layerName);
+	if (!layer)
+		return nullptr;
 
-	rooms["default"] = std::move(room);
-	if (currentRoomId.empty()) {
-		currentRoomId = "default";
-	}
-}
+	const int x = static_cast<int>(worldPos.x / TILE_SIZE);
+	const int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
-void World::loadFromJson(const std::string &filename)
-{
-	std::string data = readFile(filename);
-
-	json j = json::parse(data);
-
-	Level level;
-	level.width = j["width"];
-	level.height = j["height"];
-	level.tiles = j["tiles"].get<std::vector<int>>();
-
-	Room room;
-	room.width = level.width;
-	room.height = level.height;
-	room.tiles.resize(level.height);
-
-	for (int y = 0; y < level.height; y++) {
-		room.tiles[y].resize(level.width);
-
-		for (int x = 0; x < level.width; x++) {
-			int value = level.tiles[y * level.width + x];
-
-			Tile &tile = room.tiles[y][x];
-			tile.position = {x * TILE_SIZE, y * TILE_SIZE};
-			tile.size = {TILE_SIZE, TILE_SIZE};
-			tile.isSolid = (value > 0);
-			tile.textureId = value;
-		}
-	}
-
-	rooms["default"] = std::move(room);
-	if (currentRoomId.empty()) {
-		currentRoomId = "default";
-	}
-}
-
-TiledMap World::loadMap(const std::string &file)
-{
-	std::ifstream f(file);
-	json j;
-	f >> j;
-
-	TiledMap map;
-
-	map.width = j["width"];
-	map.height = j["height"];
-	map.tilewidth = j["tilewidth"];
-	map.tileheight = j["tileheight"];
-
-	for (auto &layer : j["layers"]) {
-		if (layer["type"] != "tilelayer")
-			continue;
-
-		TiledLayer l;
-		l.width = layer["width"];
-		l.height = layer["height"];
-		l.data = layer["data"].get<std::vector<int>>();
-
-		map.layers.push_back(std::move(l));
-	}
-
-	return map;
-}
-
-void World::loadFromTMJ(const std::string &file)
-{
-	loadRoom("default", file);
-}
-
-const std::optional<const World::Tile *> World::getTileAtCoordinate(const sf::Vector2f &worldPos) const
-{
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return std::nullopt;
-	}
-
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
-
-	int x = static_cast<int>(worldPos.x / TILE_SIZE);
-	int y = static_cast<int>(worldPos.y / TILE_SIZE);
-
-	if (y < 0 || y >= (int)tiles.size())
-		return std::nullopt;
-
-	if (x < 0 || x >= (int)tiles[y].size())
-		return std::nullopt;
-
-	return &tiles[y][x];
+	return layer->getTileData(x, y); // returns nullptr if out of bounds
 }
 
 bool World::isSolidAtRect(const sf::FloatRect &rect) const
 {
-	std::vector<std::vector<const World::Tile *>> tilesInRect = World::getTilesAtRect(rect);
+	if (currentRoomId.empty())
+		return false;
+	const Room &room = rooms.at(currentRoomId);
 
-	for (const std::vector<const World::Tile *> &tileRow : tilesInRect) {
-		for (const World::Tile *tile : tileRow) {
-			if (tile->isSolid && tile->getBounds().findIntersection(rect).has_value())
+	tson::Layer *layer = room.map->getLayer("Foreground");
+	if (!layer)
+		return false;
+
+	const int left = static_cast<int>(rect.position.x / TILE_SIZE);
+	const int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
+	const int top = static_cast<int>(rect.position.y / TILE_SIZE);
+	const int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
+
+	for (int y = top; y <= bottom; ++y) {
+		for (int x = left; x <= right; ++x) {
+			tson::Tile *tile = layer->getTileData(x, y);
+			if (tile && !tile->getObjectgroup().getObjects().empty())
 				return true;
 		}
 	}
@@ -216,72 +146,54 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 	return false;
 }
 
-std::vector<std::vector<const World::Tile *>> World::getTilesAtRect(const sf::FloatRect &rect) const
-{
-	std::vector<std::vector<const Tile *>> result;
-
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
-		return result;
-	}
-
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
-
-	if (tiles.empty() || tiles[0].empty())
-		return result;
-
-	int left = static_cast<int>(rect.position.x / TILE_SIZE);
-	int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
-	int top = static_cast<int>(rect.position.y / TILE_SIZE);
-	int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
-
-	int maxY = (int)tiles.size() - 1;
-	int maxX = (int)tiles[0].size() - 1;
-
-	left = std::clamp(left, 0, maxX);
-	right = std::clamp(right, 0, maxX);
-	top = std::clamp(top, 0, maxY);
-	bottom = std::clamp(bottom, 0, maxY);
-
-	for (int y = top; y <= bottom; ++y) {
-		result.push_back(std::vector<const Tile *>());
-		for (int x = left; x <= right; ++x) {
-			result.back().push_back(&tiles[y][x]);
-		}
-	}
-
-	return result;
-}
-
 void World::draw(sf::RenderWindow &window, const sf::View &view) const
 {
-	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+	if (currentRoomId.empty())
 		return;
+	const Room &room = rooms.at(currentRoomId);
+
+	const sf::Vector2f center = view.getCenter();
+	const sf::Vector2f size = view.getSize();
+
+	const int left = static_cast<int>((center.x - size.x * 0.5f) / TILE_SIZE);
+	const int right = static_cast<int>((center.x + size.x * 0.5f) / TILE_SIZE);
+	const int top = static_cast<int>((center.y - size.y * 0.5f) / TILE_SIZE);
+	const int bottom = static_cast<int>((center.y + size.y * 0.5f) / TILE_SIZE);
+
+	for (const std::string &layerName : {"Foreground", "Solid"}) {
+		tson::Layer *layer = room.map->getLayer(layerName);
+		if (!layer)
+			continue;
+
+		for (int y = top; y <= bottom; ++y) {
+			for (int x = left; x <= right; ++x) {
+				tson::Tile *tile = layer->getTileData(x, y);
+				if (!tile) {
+					// std::cout << "Tile at (" << x << ", " << y << ") is null\n";
+					continue;
+				}
+
+				auto it = tileTextures.find(tile->getGid());
+				// std::cout << "Drawing tile at (" << x << ", " << y << ") with GID " << tile->getGid()
+				//   << (it != tileTextures.end() ? " [texture found]" : " [no texture]") << "\n";
+
+				sf::RectangleShape shape({float(TILE_SIZE), float(TILE_SIZE)});
+				shape.setPosition({float(x * TILE_SIZE), float(y * TILE_SIZE)});
+
+				if (it != tileTextures.end())
+					shape.setTexture(&it->second);
+				else
+					shape.setFillColor(sf::Color(255, 0, 255));
+
+				window.draw(shape);
+			}
+		}
 	}
 
-	const auto &room = rooms.at(currentRoomId);
-	const auto &tiles = room.tiles;
-
-	sf::Vector2f center = view.getCenter();
-	sf::Vector2f size = view.getSize();
-
-	sf::FloatRect viewRect({center.x - size.x * 0.5f, center.y - size.y * 0.5f}, {size.x, size.y});
-
-	std::vector<std::vector<const Tile *>> visibleTiles = World::getTilesAtRect(viewRect);
-
-	for (auto &row : visibleTiles) {
-		for (auto &tile : row) {
-			sf::RectangleShape shape(tile->size);
-			shape.setPosition(tile->position);
-
-			auto it = tileTextures.find(tile->textureId);
-			if (it != tileTextures.end()) {
-				shape.setTexture(&it->second.get());
-			} else {
-				shape.setFillColor(sf::Color(255, 0, 255));
-			}
-
-			window.draw(shape);
-		}
+	for (const Door &door : room.doors) {
+		sf::RectangleShape shape(door.bounds.size);
+		shape.setPosition(door.bounds.position);
+		shape.setFillColor(sf::Color(0, 255, 255, 128));
+		window.draw(shape);
 	}
 }

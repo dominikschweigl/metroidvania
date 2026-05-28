@@ -2,12 +2,31 @@
 
 namespace EntityPhysics {
 
+static bool isSolidTile(const tson::Tile *tile)
+{
+	if (!tile)
+		return false;
+	tson::Tile copy = *tile;
+	// return copy.getProperties().getProperty("solid");
+	return !copy.getObjectgroup().getObjects().empty();
+}
+
+static float tileLeft(const tson::Tile *tile, const World &world)
+{
+	// reconstruct x position from GID and map width
+	const uint32_t gid = tile->getGid();
+	const int mapWidth = world.getCurrentRoom().width;
+	const int localId = gid - tile->getTileset()->getFirstgid();
+	const int x = localId % mapWidth;
+	return float(x * World::TILE_SIZE);
+}
+
 bool isGroundBelow(sf::FloatRect bounds, const World &world)
 {
-	float bott = bounds.position.y + bounds.size.y;
-	auto left = world.getTileAtCoordinate({bounds.position.x, bott + 1.f});
-	auto right = world.getTileAtCoordinate({bounds.position.x + bounds.size.x, bott + 1.f});
-	return (left.has_value() && left.value()->isSolid) || (right.has_value() && right.value()->isSolid);
+	float bottom = bounds.position.y + bounds.size.y + 1.f;
+	const tson::Tile *left = world.getTileAtCoordinate({bounds.position.x, bottom}, "Foreground");
+	const tson::Tile *right = world.getTileAtCoordinate({bounds.position.x + bounds.size.x, bottom}, "Foreground");
+	return isSolidTile(left) || isSolidTile(right);
 }
 
 void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::FloatRect bounds, const World &world)
@@ -22,19 +41,15 @@ float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height
 {
 	float deltaX = velX * dt;
 	float futureX = pos.x + deltaX;
-	sf::FloatRect bounds({pos.x - width / 2.f, pos.y - height}, {width, height});
+	sf::FloatRect future({futureX - width / 2.f, pos.y - height}, {width, height});
 
-	sf::FloatRect future({futureX - width / 2.f, bounds.position.y}, {width, height});
 	if (world.isSolidAtRect(future)) {
 		velX = 0.f;
-		auto tile = world.getTileAtCoordinate(pos);
-		if (tile.has_value()) {
-			if (deltaX >= 0.f) {
-				return tile.value()->position.x + World::TILE_SIZE - width / 2.f - 1.f;
-			}
-			return tile.value()->position.x + width / 2.f;
-		}
-		return pos.x;
+		// snap to tile boundary using grid position directly
+		int tileX = static_cast<int>(pos.x / World::TILE_SIZE);
+		if (deltaX >= 0.f)
+			return float((tileX + 1) * World::TILE_SIZE) - width / 2.f - 1.f;
+		return float(tileX * World::TILE_SIZE) + width / 2.f;
 	}
 	return futureX;
 }
@@ -44,18 +59,15 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 {
 	float deltaY = velY * dt;
 	float futureY = pos.y + deltaY;
-	sf::FloatRect bounds({pos.x - width / 2.f, pos.y - height}, {width, height});
+	sf::FloatRect future({pos.x - width / 2.f, futureY - height}, {width, height});
 
-	sf::FloatRect future({bounds.position.x, futureY - height}, {width, height});
 	if (world.isSolidAtRect(future)) {
-		auto tile = world.getTileAtCoordinate(future.position);
-		if (tile.has_value()) {
-			if (deltaY > 0.f) {
-				futureY = tile.value()->position.y + World::TILE_SIZE;
-				isOnGround = true;
-			} else if (deltaY < 0.f) {
-				futureY = tile.value()->position.y + World::TILE_SIZE + height;
-			}
+		int tileY = static_cast<int>(futureY / World::TILE_SIZE);
+		if (deltaY > 0.f) {
+			isOnGround = true;
+			futureY = float(tileY * World::TILE_SIZE) - 1;
+		} else if (deltaY < 0.f) {
+			futureY = float((tileY + 1) * World::TILE_SIZE) + height;
 		}
 		velY = 0.f;
 	}
@@ -75,4 +87,5 @@ void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &vel
 		counter += step;
 	}
 }
+
 } // namespace EntityPhysics

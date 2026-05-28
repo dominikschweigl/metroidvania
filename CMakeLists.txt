@@ -50,16 +50,18 @@ set(GAME_SOURCES
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
+target_include_directories(metroidvania PRIVATE src external/tileson)
 target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 
 add_executable(metroidvania_tests
-    tests/unit/player_state_tests.cpp
-    tests/unit/base_enemy_tests.cpp
-    tests/unit/race_condition_slime_tests.cpp
-    tests/unit/hat_projectile_tests.cpp
-    tests/unit/input_manager_tests.cpp
-    tests/unit/audio_manager_tests.cpp
-    ${GAME_SOURCES})
+tests/unit/player_state_tests.cpp
+tests/unit/base_enemy_tests.cpp
+tests/unit/race_condition_slime_tests.cpp
+tests/unit/hat_projectile_tests.cpp
+tests/unit/input_manager_tests.cpp
+tests/unit/audio_manager_tests.cpp
+${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
+target_include_directories(metroidvania_tests PRIVATE src external/tileson)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 catch_discover_tests(metroidvania_tests WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" DISCOVERY_MODE PRE_TEST)

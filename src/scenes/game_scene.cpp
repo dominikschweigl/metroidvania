@@ -12,7 +12,6 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window)
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadTileset();
 	world_.loadRoom("start_room", "data/maps/start_room.tmj");
 	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
 	world_.setCurrentRoom("start_room");
@@ -43,6 +42,8 @@ void GameScene::update(float deltaTime)
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
+	// world_.updateCurrentRoom(deltaTime, &player_, attackTriggered, hatThrowTriggered);
+
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 	if (player_.hasHatThrown()) {
 		player_.getThrownHat().tryHit(slime1_);
@@ -51,9 +52,9 @@ void GameScene::update(float deltaTime)
 	slime1_.update(deltaTime, world_, player_.getPosition());
 	slime2_.update(deltaTime, world_, player_.getPosition());
 
-	if (player_.getPosition().x > 18 * 32.f && player_.getPosition().x <= 19 * 32.f
-	    && player_.getPosition().y > 10 * 32.f && player_.getPosition().y <= 11 * 32.f) {
-		world_.setCurrentRoom("boss_room");
+	std::string touchingDoorTargetRoom = world_.getTouchingDoorTargetRoom(player_.getBounds());
+	if (!touchingDoorTargetRoom.empty()) {
+		world_.setCurrentRoom(touchingDoorTargetRoom);
 	}
 
 	view_.setCenter(player_.getPosition());

@@ -2,6 +2,7 @@
 #include "../../core/audio_manager.h"
 #include <algorithm>
 #include <cmath>
+#include <entities/base/entity_physics.h>
 
 RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
@@ -129,9 +130,7 @@ bool RaceConditionSlime::isValidTeleportDest(const World &world, float newX, flo
 	for (int i = 1; i * STEP <= MAX_FALL; ++i) {
 		float delta = i * STEP;
 		float y = newY + delta;
-		auto lhs = world.getTileAtCoordinate({newX - ENTITY_WIDTH / 2.f, y});
-		auto rhs = world.getTileAtCoordinate({newX + ENTITY_WIDTH / 2.f, y});
-		if ((lhs.has_value() && lhs.value()->isSolid) || (rhs.has_value() && rhs.value()->isSolid)) {
+		if (EntityPhysics::isGroundBelow({{newX - ENTITY_WIDTH / 2.f, y}, {ENTITY_WIDTH, 1.f}}, world)) {
 			return true;
 		}
 	}
