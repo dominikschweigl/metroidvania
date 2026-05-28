@@ -7,37 +7,11 @@
 #include <unordered_map>
 #include <vector>
 
-// struct TileDef {
-// 	int id;
-// 	std::string imagePath;
-// };
-
-// struct TiledLayer {
-// 	std::vector<int> data;
-// 	int width{};
-// 	int height{};
-// };
-
-// struct TiledMap {
-// 	int width{};
-// 	int height{};
-// 	int tilewidth{};
-// 	int tileheight{};
-// 	std::vector<TiledLayer> layers;
-// };
-
 class World {
   public:
 	static constexpr float TILE_SIZE = 32.f;
 	World();
 	~World() = default;
-
-	// // Build world from a simple grid layout (deprecated, use rooms)
-	// void loadFromGrid(const std::vector<std::vector<int>> &grid);
-	// void loadFromJson(const std::string &filename);
-	// void loadFromTMJ(const std::string &file);
-
-	// TiledMap loadMap(const std::string &file);
 
 	// New room-based methods
 	void loadRoom(const std::string &roomId, const std::string &tmjFile);
@@ -53,6 +27,8 @@ class World {
 	const tson::Tile *getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const;
 	// Return true if any solid tile intersects with the given rectangle
 	bool isSolidAtRect(const sf::FloatRect &rect) const;
+
+	void loadFromGrid(const std::vector<std::vector<int>> &grid);
 
 	// Render all visible tiles
 	void draw(sf::RenderWindow &window, const sf::View &view) const;

@@ -160,6 +160,73 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 	return false;
 }
 
+void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
+{
+	if (grid.empty())
+		return;
+
+	const int height = grid.size();
+	const int width = grid[0].size();
+
+	// Build a minimal TMJ JSON string
+	std::string tileData;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			tileData += std::to_string(grid[y][x]);
+			if (y != height - 1 || x != width - 1)
+				tileData += ",";
+		}
+	}
+
+	std::string tmj = R"({
+        "width":)" + std::to_string(width)
+	                  + R"(,
+        "height":)" + std::to_string(height)
+	                  + R"(,
+        "tilewidth":32, "tileheight":32,
+        "infinite":false,
+        "orientation":"orthogonal",
+        "renderorder":"right-down",
+        "type":"map",
+        "version":"1.10",
+        "tiledversion":"1.12.1",
+        "nextlayerid":2,
+        "nextobjectid":1,
+        "tilesets":[],
+        "layers":[{
+            "type":"tilelayer",
+            "name":"Solid",
+            "id":1,
+            "width":)" + std::to_string(width)
+	                  + R"(,
+            "height":)"
+	                  + std::to_string(height) + R"(,
+            "x":0, "y":0,
+            "opacity":1,
+            "visible":true,
+            "data":[)" + tileData
+	                  + R"(]
+        }]
+    })";
+
+	tson::Tileson t;
+	auto map = t.parse(tmj.data(), tmj.size());
+
+	if (!map || map->getStatus() != tson::ParseStatus::OK) {
+		std::cerr << "loadFromGrid parse failed: " << (map ? map->getStatusMessage() : "null") << "\n";
+		return;
+	}
+
+	Room room;
+	room.width = width;
+	room.height = height;
+	room.map = std::move(map);
+
+	rooms["default"] = std::move(room);
+	if (currentRoomId.empty())
+		currentRoomId = "default";
+}
+
 void World::draw(sf::RenderWindow &window, const sf::View &view) const
 {
 	if (currentRoomId.empty())
