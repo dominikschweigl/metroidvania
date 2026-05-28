@@ -15,6 +15,7 @@ struct Door {
 class Room {
   public:
 	// unique_ptr deletes copy — explicitly default move Room() = default;
+	Room() = default;
 	Room(Room &&) = default;
 	Room &operator=(Room &&) = default;
 
