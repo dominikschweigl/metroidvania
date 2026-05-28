@@ -7,7 +7,17 @@
 #include <string_view>
 #include <variant>
 
-enum class GameAction { MoveLeft, MoveRight, Jump, Sprint, ThrowHat, ZoomIn, ZoomOut, AttackMelee };
+enum class GameAction {
+	MoveLeft,
+	MoveRight,
+	Jump,
+	Sprint,
+	ThrowHat,
+	ZoomIn,
+	ZoomOut,
+	AttackMelee,
+	ToggleDebugHitboxes,
+};
 enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown, NavigateLeft, NavigateRight };
 
 using InputBinding = std::variant<sf::Keyboard::Scancode, sf::Mouse::Button>;
@@ -68,6 +78,7 @@ class InputManager {
 	    {GameAction::ZoomIn, "Zoom In"},
 	    {GameAction::ZoomOut, "Zoom Out"},
 	    {GameAction::AttackMelee, "Attack (Melee)"},
+	    {GameAction::ToggleDebugHitboxes, "Toggle Debug Hitboxes"},
 	});
 	static constexpr auto menuBindings = std::to_array<Binding>({
 	    Binding{sf::Keyboard::Scancode::Escape},

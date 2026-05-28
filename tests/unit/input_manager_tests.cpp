@@ -128,7 +128,7 @@ TEST_CASE("InputManager - rebind clears conflicting action's binding")
 	auto &im = InputManager::getInstance();
 	im.resetToDefaults();
 
-	// Rebind Jump to MoveRight's scancode — MoveRight should lose its binding
+	// Rebind Jump to MoveRight's scancode - MoveRight should lose its binding
 	const auto moveRightScancode = sf::Keyboard::delocalize(sf::Keyboard::Key::D);
 	im.rebind(GameAction::Jump, moveRightScancode);
 	im.handleEvent(keyPressed(moveRightScancode));

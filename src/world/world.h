@@ -58,6 +58,8 @@ class World {
 	void loadRoom(const std::string &roomId, const std::string &tmjFile);
 	void setCurrentRoom(const std::string &roomId);
 	const std::string &getCurrentRoomId() const { return currentRoomId; }
+	const Room *getCurrentRoom() const;
+	[[nodiscard]] float getWorldHeight() const;
 
 	void loadTileset();
 

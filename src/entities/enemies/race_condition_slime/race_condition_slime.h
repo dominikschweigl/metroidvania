@@ -1,13 +1,15 @@
 #pragma once
-#include "../../core/asset_manager.h"
-#include "../base/base_enemy.h"
+#include "../../../combat/hitbox.h"
+#include "../base_enemy.h"
 #include "states/attack_state.h"
 #include "states/chase_state.h"
 #include "states/idle_state.h"
 #include "states/recover_state.h"
 #include "states/windup_state.h"
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <random>
+#include <vector>
 
 // Race-condition themed enemy. State flow: Idle -> Chase -> WindUp -> Attack -> Recover.
 class RaceConditionSlime : public BaseEnemy {
@@ -54,8 +56,27 @@ class RaceConditionSlime : public BaseEnemy {
 
 	void draw(sf::RenderWindow &window) override;
 
-	// True while mid-strike — used by the player's collision/damage code.
+	// True while mid-strike - used by the player's collision/damage code.
 	bool isAttacking() const { return currentState == &states.attack; }
+
+	static constexpr int ATTACK_DAMAGE = 1;
+
+	// Active damage rectangle while the slime is mid-strike, otherwise nullopt.
+	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept override
+	{
+		if (!isAttacking())
+			return std::nullopt;
+		return Hitbox{getBounds(), ATTACK_DAMAGE, Team::Enemy, attackSourceId};
+	}
+
+	void beginAttackSource() noexcept { attackSourceId = nextSourceId(); }
+	[[nodiscard]] std::uint32_t getAttackSourceId() const noexcept { return attackSourceId; }
+
+	// Called by AttackState::onExit so the CombatSystem can prune the swing's
+	// (sourceId, victim) entries after it stops publishing a hitbox.
+	void markAttackSourceEnded() noexcept { endedSourceIds.push_back(attackSourceId); }
+
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
 	float getAttackCooldown() const { return attackCooldown; }
 	void setAttackCooldown(float t) { attackCooldown = t; }
@@ -81,6 +102,8 @@ class RaceConditionSlime : public BaseEnemy {
 	float jumpCooldown = 0.f;
 	float teleportTimer = 0.f;
 	float moveSoundTimer = 0.f;
+	std::uint32_t attackSourceId = 0;
+	std::vector<std::uint32_t> endedSourceIds;
 
 	const sf::Texture &idleTexture;
 	const sf::Texture &movingTexture;

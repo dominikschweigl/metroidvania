@@ -85,6 +85,23 @@ void World::setCurrentRoom(const std::string &roomId)
 	}
 }
 
+const World::Room *World::getCurrentRoom() const
+{
+	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
+		return nullptr;
+	}
+	return &rooms.at(currentRoomId);
+}
+
+float World::getWorldHeight() const
+{
+	const Room *room = getCurrentRoom();
+	if (room == nullptr) {
+		return 0.f;
+	}
+	return room->height * TILE_SIZE;
+}
+
 void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 {
 	Room room;

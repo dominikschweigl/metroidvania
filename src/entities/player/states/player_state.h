@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class Player; // forward declaration — method bodies only need the pointer/ref type
+class Player; // forward declaration - method bodies only need the pointer/ref type
 
 class PlayerState {
   public:

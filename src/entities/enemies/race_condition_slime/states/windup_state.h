@@ -1,11 +1,10 @@
 #pragma once
-#include "../../base/enemy_state.h"
+#include "../../enemy_state.h"
 
 namespace rc_slime {
 
-// Slime is recovering after an attack. Stationary; transitions to Chase
-// if player still in range or back to Idle.
-class RecoverState : public EnemyState {
+// Slime is anticipating an attack: stationary, brief wind-up.
+class WindUpState : public EnemyState {
   public:
 	[[nodiscard]] EnemyState *update(float deltaTime, BaseEnemy &enemy, const World &world,
 	                                 sf::Vector2f playerPos) override;
