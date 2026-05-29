@@ -7,6 +7,16 @@ DescendingState::DescendingState()
 {
 }
 
+sf::Vector2f DescendingState::getHeadOffset(Player & /*p*/) const noexcept
+{
+	return HEAD_OFFSET;
+}
+
+sf::Vector2f DescendingState::getUpperBodyOffset(Player &p) const noexcept
+{
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSET : UPPER_BODY_OFFSET;
+}
+
 void DescendingState::onEnter(Player &p)
 {
 	currentFrame = 0;

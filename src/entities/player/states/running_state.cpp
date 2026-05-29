@@ -8,7 +8,7 @@ RunningState::RunningState()
 {
 }
 
-sf::Vector2f RunningState::getHeadOffset() const noexcept
+sf::Vector2f RunningState::getHeadOffset(Player & /*p*/) const noexcept
 {
 	return HEAD_OFFSETS[currentFrame];
 }

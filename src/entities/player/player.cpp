@@ -91,13 +91,13 @@ void Player::updateAnimation(float dt)
 	lowerBodySprite.setScale(scale);
 	upperBodySprite.setScale(scale);
 
-	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset();
+	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset(*this);
 	upperBodySprite.setPosition(position + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
 
 	const bool hatAbsent = !hatAbility.isHatOnHead();
 	headSprite.setTexture(AssetManager::getInstance().getTexture(hatAbsent ? PLAYER_HEAD : PLAYER_HEAD_HAT));
 	headSprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
-	const sf::Vector2f headOffset = currentState->getHeadOffset();
+	const sf::Vector2f headOffset = currentState->getHeadOffset(*this);
 	headSprite.setPosition(position + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
 	headSprite.setScale(scale);
 

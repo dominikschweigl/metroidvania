@@ -8,14 +8,14 @@ PreJumpState::PreJumpState()
 {
 }
 
-sf::Vector2f PreJumpState::getHeadOffset() const noexcept
+sf::Vector2f PreJumpState::getHeadOffset(Player & /*p*/) const noexcept
 {
 	return HEAD_OFFSETS[currentFrame];
 }
 
-sf::Vector2f PreJumpState::getUpperBodyOffset() const noexcept
+sf::Vector2f PreJumpState::getUpperBodyOffset(Player &p) const noexcept
 {
-	return UPPER_BODY_OFFSETS[currentFrame];
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSETS[currentFrame] : UPPER_BODY_OFFSETS[currentFrame];
 }
 
 PlayerState *PreJumpState::update(float dt, Player &p)

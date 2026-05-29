@@ -39,12 +39,12 @@ PlayerState *WallSlideState::update(float dt, Player &p)
 	return this;
 }
 
-sf::Vector2f WallSlideState::getHeadOffset() const noexcept
+sf::Vector2f WallSlideState::getHeadOffset(Player & /*p*/) const noexcept
 {
 	return HEAD_OFFSET;
 }
 
-sf::Vector2f WallSlideState::getUpperBodyOffset() const noexcept
+sf::Vector2f WallSlideState::getUpperBodyOffset(Player & /*p*/) const noexcept
 {
 	return UPPER_BODY_OFFSET;
 }

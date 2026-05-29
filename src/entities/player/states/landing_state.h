@@ -18,9 +18,12 @@ class LandingState : public PlayerState {
 	    sf::Vector2f{1.f, 2.f}, {1.f, 3.f}, {1.f, 4.f}, {1.f, 2.f}};
 	static constexpr std::array<sf::Vector2f, 4> UPPER_BODY_OFFSETS = {
 	    sf::Vector2f{0.f, 0.f}, {0.f, 0.f}, {0.f, 0.f}, {0.f, 0.f}};
+	static constexpr std::array<sf::Vector2f, 4> ATTACK_UPPER_BODY_OFFSETS = {
+	    sf::Vector2f{0.f, 2.f}, {0.f, 3.f}, {0.f, 4.f}, {0.f, 2.f}};
 
-	sf::Vector2f getHeadOffset() const noexcept override;
-	sf::Vector2f getUpperBodyOffset() const noexcept override;
+	bool canAttack() const noexcept { return true; };
+	sf::Vector2f getHeadOffset(Player &p) const noexcept override;
+	sf::Vector2f getUpperBodyOffset(Player &p) const noexcept override;
 	PlayerState *update(float dt, Player &p) override;
 	void applyAnimation(float dt, Player &p) override;
 	void onEnter(Player &p) override;

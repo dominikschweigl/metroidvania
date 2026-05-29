@@ -16,8 +16,8 @@ class WallSlideState : public PlayerState {
 
 	WallSlideState();
 
-	sf::Vector2f getHeadOffset() const noexcept override;
-	sf::Vector2f getUpperBodyOffset() const noexcept override;
+	sf::Vector2f getHeadOffset(Player &p) const noexcept override;
+	sf::Vector2f getUpperBodyOffset(Player &p) const noexcept override;
 	PlayerState *update(float dt, Player &p) override;
 	void applyAnimation(float dt, Player &p) override;
 	void onEnter(Player &p) override;

@@ -8,14 +8,14 @@ LandingState::LandingState()
 {
 }
 
-sf::Vector2f LandingState::getHeadOffset() const noexcept
+sf::Vector2f LandingState::getHeadOffset(Player & /*p*/) const noexcept
 {
 	return HEAD_OFFSETS[currentFrame];
 }
 
-sf::Vector2f LandingState::getUpperBodyOffset() const noexcept
+sf::Vector2f LandingState::getUpperBodyOffset(Player &p) const noexcept
 {
-	return UPPER_BODY_OFFSETS[currentFrame];
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSETS[currentFrame] : UPPER_BODY_OFFSETS[currentFrame];
 }
 
 PlayerState *LandingState::update(float dt, Player &p)

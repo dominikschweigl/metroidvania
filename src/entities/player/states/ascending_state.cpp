@@ -26,14 +26,14 @@ PlayerState *AscendingState::update(float dt, Player &p)
 	return this;
 }
 
-sf::Vector2f AscendingState::getHeadOffset() const noexcept
+sf::Vector2f AscendingState::getHeadOffset(Player &p) const noexcept
 {
 	return HEAD_OFFSET;
 }
 
-sf::Vector2f AscendingState::getUpperBodyOffset() const noexcept
+sf::Vector2f AscendingState::getUpperBodyOffset(Player &p) const noexcept
 {
-	return UPPER_BODY_OFFSET;
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSET : UPPER_BODY_OFFSET;
 }
 
 void AscendingState::applyAnimation(float dt, Player &p)
