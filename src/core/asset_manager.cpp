@@ -51,6 +51,10 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/player/head.png";
 	case PLAYER_HEAD_HAT:
 		return "./assets/images/player/head_hat.png";
+	case PLAYER_WALL_SLIDE_LOWER_BODY:
+		return "./assets/images/player/wall_slide_lower_body_extended.png";
+	case PLAYER_WALL_SLIDE_UPPER_BODY:
+		return "./assets/images/player/wall_slide_upper_body_extended_no_head.png";
 	case SLIME_IDLE:
 		return "./assets/images/enemies/race_condition/idle.png";
 	case SLIME_MOVING:

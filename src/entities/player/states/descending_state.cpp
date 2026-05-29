@@ -15,6 +15,10 @@ void DescendingState::onEnter(Player &p)
 
 PlayerState *DescendingState::update(float dt, Player &p)
 {
+	if (p.isAgainstLeftWall && p.inputLeft)
+		return &p.states.wallSlide;
+	if (p.isAgainstRightWall && p.inputRight)
+		return &p.states.wallSlide;
 	return this;
 }
 

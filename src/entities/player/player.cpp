@@ -114,25 +114,33 @@ void Player::handleMovement(float deltaTime, const World &world)
 {
 	InputManager &input = InputManager::getInstance();
 	inputJump = input.isHeld(GameAction::Jump);
+	inputLeft = input.isHeld(GameAction::MoveLeft);
+	inputRight = input.isHeld(GameAction::MoveRight);
 
-	// Knockback temporarily runs velocity.
+	// Knockback temporarily overrides velocity.
 	if (!isKnockedBack()) {
-		velocity.x = 0.f;
-		isSprinting = input.isHeld(GameAction::Sprint);
-		const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
+		if (wallJumpTimer > 0.f) {
+			wallJumpTimer -= deltaTime;
+		} else {
+			velocity.x = 0.f;
+			isSprinting = input.isHeld(GameAction::Sprint);
+			const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
-		if (input.isHeld(GameAction::MoveLeft)) {
-			velocity.x = -speed;
-			setDirection(Direction::Left);
-		}
-		if (input.isHeld(GameAction::MoveRight)) {
-			velocity.x = speed;
-			setDirection(Direction::Right);
+			if (inputLeft) {
+				velocity.x = -speed;
+				setDirection(Direction::Left);
+			}
+			if (inputRight) {
+				velocity.x = speed;
+				setDirection(Direction::Right);
+			}
 		}
 	}
 
 	const bool wasOnGround = isOnGround;
 	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, gravity, width, height, world);
+	isAgainstLeftWall = EntityPhysics::isWallOnLeft(position, width, height, world);
+	isAgainstRightWall = EntityPhysics::isWallOnRight(position, width, height, world);
 	if (!wasOnGround && isOnGround)
 		transitionTo(states.landing);
 }

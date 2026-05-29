@@ -32,7 +32,7 @@ void PreJumpState::applyAnimation(float dt, Player &p)
 		frameTimer -= PREJUMP_FRAME_DURATION;
 		currentFrame++;
 		if (currentFrame >= 2) {
-			currentFrame = 2;
+			currentFrame = 1;
 			readyToAscend = true;
 		}
 	}

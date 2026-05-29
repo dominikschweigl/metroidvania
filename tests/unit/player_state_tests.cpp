@@ -3,6 +3,7 @@
 #include "entities/player/player.h"
 #include "entities/player/states/landing_state.h"
 #include "entities/player/states/pre_jump_state.h"
+#include "entities/player/states/wall_slide_state.h"
 
 // Grants test-only access to Player private members via the friend relationship
 // declared in player.h. Define it here so no game code depends on it.
@@ -10,7 +11,14 @@ struct PlayerTestAccess {
 	static void setOnGround(Player &p, bool v) { p.isOnGround = v; }
 	static void setVelocity(Player &p, sf::Vector2f v) { p.velocity = v; }
 	static void setInputJump(Player &p, bool v) { p.inputJump = v; }
+	static void setInputLeft(Player &p, bool v) { p.inputLeft = v; }
+	static void setInputRight(Player &p, bool v) { p.inputRight = v; }
 	static void setIsSprinting(Player &p, bool v) { p.isSprinting = v; }
+	static void setAgainstLeftWall(Player &p, bool v) { p.isAgainstLeftWall = v; }
+	static void setAgainstRightWall(Player &p, bool v) { p.isAgainstRightWall = v; }
+	static sf::Vector2f getVelocity(const Player &p) { return p.velocity; }
+	static float getWallJumpTimer(Player &p) { return p.wallJumpTimer; }
+	static float getGravity(Player &p) { return p.gravity; }
 	static PlayerState *getCurrentState(Player &p) { return p.currentState; }
 	static Player::States &getStates(Player &p) { return p.states; }
 };
@@ -177,6 +185,30 @@ TEST_CASE("AscendingState transitions")
 		PlayerTestAccess::setVelocity(p, {0.f, 1.f});
 		REQUIRE(states.ascending.update(0.1f, p) == &states.peak);
 	}
+
+	SECTION("transitions to wallSlide when pressing into left wall")
+	{
+		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.ascending.update(0.1f, p) == &states.wallSlide);
+	}
+
+	SECTION("transitions to wallSlide when pressing into right wall")
+	{
+		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		PlayerTestAccess::setInputRight(p, true);
+		REQUIRE(states.ascending.update(0.1f, p) == &states.wallSlide);
+	}
+
+	SECTION("does not transition to wallSlide when against wall but not pressing into it")
+	{
+		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, false);
+		REQUIRE(states.ascending.update(0.1f, p) == &states.ascending);
+	}
 }
 
 // ─── PreJumpState ─────────────────────────────────────────────────────────────
@@ -243,5 +275,132 @@ TEST_CASE("LandingState transitions")
 		states.landing.onEnter(p);
 		PlayerTestAccess::setInputJump(p, false);
 		REQUIRE(states.landing.update(0.1f, p) == &states.landing);
+	}
+}
+
+// ─── PeakState / DescendingState wall slide entry ─────────────────────────────
+
+TEST_CASE("PeakState transitions to wallSlide when pressing into a wall")
+{
+	Player p;
+	auto &states = PlayerTestAccess::getStates(p);
+	states.peak.onEnter(p);
+
+	SECTION("transitions to wallSlide on left wall with left input")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.peak.update(0.1f, p) == &states.wallSlide);
+	}
+
+	SECTION("transitions to wallSlide on right wall with right input")
+	{
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		PlayerTestAccess::setInputRight(p, true);
+		REQUIRE(states.peak.update(0.1f, p) == &states.wallSlide);
+	}
+}
+
+TEST_CASE("DescendingState transitions to wallSlide when pressing into a wall")
+{
+	Player p;
+	auto &states = PlayerTestAccess::getStates(p);
+	states.descending.onEnter(p);
+
+	SECTION("transitions to wallSlide on left wall with left input")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.descending.update(0.1f, p) == &states.wallSlide);
+	}
+
+	SECTION("stays descending when no wall input")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, false);
+		PlayerTestAccess::setAgainstRightWall(p, false);
+		REQUIRE(states.descending.update(0.1f, p) == &states.descending);
+	}
+}
+
+// ─── WallSlideState ───────────────────────────────────────────────────────────
+
+TEST_CASE("WallSlideState transitions")
+{
+	Player p;
+	auto &states = PlayerTestAccess::getStates(p);
+
+	SECTION("wall jump on left wall launches right and sets wallJumpTimer")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setAgainstRightWall(p, false);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setInputJump(p, true);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.ascending);
+		REQUIRE(PlayerTestAccess::getVelocity(p).x == Player::RUNNING_SPEED);
+		REQUIRE(PlayerTestAccess::getWallJumpTimer(p) == Player::WALL_JUMP_DURATION);
+	}
+
+	SECTION("wall jump on right wall launches left and sets wallJumpTimer")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, false);
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setInputJump(p, true);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.ascending);
+		REQUIRE(PlayerTestAccess::getVelocity(p).x == -Player::RUNNING_SPEED);
+		REQUIRE(PlayerTestAccess::getWallJumpTimer(p) == Player::WALL_JUMP_DURATION);
+	}
+
+	SECTION("exits to descending when no longer against wall")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setAgainstLeftWall(p, false);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.descending);
+	}
+
+	SECTION("exits to descending when direction key released")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setInputLeft(p, false);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.descending);
+	}
+
+	SECTION("stays in wallSlide while against wall with input held")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setInputLeft(p, true);
+		PlayerTestAccess::setInputJump(p, false);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.wallSlide);
+	}
+
+	SECTION("onExit restores gravity")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		const float gravityBefore = PlayerTestAccess::getGravity(p);
+		states.wallSlide.onEnter(p);
+		REQUIRE(PlayerTestAccess::getGravity(p) < gravityBefore);
+		states.wallSlide.onExit(p);
+		REQUIRE(PlayerTestAccess::getGravity(p) == gravityBefore);
+	}
+
+	SECTION("onEnter diminishes upward velocity from ascending")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setVelocity(p, {0.f, -Player::JUMP_SPEED});
+		states.wallSlide.onEnter(p);
+		REQUIRE(PlayerTestAccess::getVelocity(p).y > -Player::JUMP_SPEED);
+	}
+
+	SECTION("onEnter diminishes fast downward velocity")
+	{
+		sf::Vector2f originalVelocity = {0.f, 800.f};
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setVelocity(p, originalVelocity);
+		states.wallSlide.onEnter(p);
+		REQUIRE(PlayerTestAccess::getVelocity(p).y < originalVelocity.y);
 	}
 }
