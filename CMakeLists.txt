@@ -50,6 +50,7 @@ set(GAME_SOURCES
     src/entities/player/states/peak_state.cpp
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
+    src/entities/player/states/wall_slide_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})

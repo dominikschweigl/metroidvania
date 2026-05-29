@@ -15,6 +15,10 @@ void PeakState::onEnter(Player &p)
 
 PlayerState *PeakState::update(float dt, Player &p)
 {
+	if (p.isAgainstLeftWall && p.inputLeft)
+		return &p.states.wallSlide;
+	if (p.isAgainstRightWall && p.inputRight)
+		return &p.states.wallSlide;
 	if (p.velocity.y > Player::PEAK_THRESHOLD)
 		return &p.states.descending;
 	return this;

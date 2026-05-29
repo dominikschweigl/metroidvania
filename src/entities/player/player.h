@@ -14,6 +14,7 @@
 #include "states/pre_jump_state.h"
 #include "states/running_state.h"
 #include "states/walking_state.h"
+#include "states/wall_slide_state.h"
 #include <vector>
 
 class World;
@@ -29,6 +30,7 @@ class Player : public BaseEntity {
 		PeakState peak;
 		DescendingState descending;
 		LandingState landing;
+		WallSlideState wallSlide;
 	};
 
 	static constexpr float WALKING_SPEED = 200.f;
@@ -42,6 +44,7 @@ class Player : public BaseEntity {
 
 	// Duration of initial invincibility for better combat feel
 	static constexpr float IFRAME_DURATION = 0.5f;
+	static constexpr float WALL_JUMP_DURATION = 0.35f;
 
 	bool debugHorizontalMovement = false;
 	sf::RectangleShape debugHorizontalCollisionCheck;
@@ -78,7 +81,12 @@ class Player : public BaseEntity {
 
   private:
 	bool inputJump = false;
+	bool inputLeft = false;
+	bool inputRight = false;
 	bool isSprinting = false;
+	bool isAgainstLeftWall = false;
+	bool isAgainstRightWall = false;
+	float wallJumpTimer = 0.f;
 
 	float iframes = 0.f;
 	int previousHealth = MAX_HEALTH;
@@ -108,6 +116,7 @@ class Player : public BaseEntity {
 	friend class PeakState;
 	friend class DescendingState;
 	friend class LandingState;
+	friend class WallSlideState;
 
 	friend struct PlayerTestAccess;
 };
