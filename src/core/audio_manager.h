@@ -69,7 +69,6 @@ class AudioManager {
 	std::unordered_map<SoundEffect, sf::SoundBuffer> soundBuffers;
 	std::array<std::optional<sf::Sound>, VOICE_POOL_SIZE> voices;
 	std::optional<sf::Music> currentMusic;
-	float lastMusicVolume_ = 100.f;
 
 	float soundVolume_ = 100.f;
 	float musicVolume_ = 100.f;

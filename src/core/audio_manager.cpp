@@ -86,8 +86,8 @@ void AudioManager::playMusic(const MusicTrack track, const float volume)
 	if (!currentMusic->openFromFile(std::string(path))) {
 		throw std::runtime_error(std::format("AudioManager: failed to load music: {}", path));
 	}
-	lastMusicVolume_ = volume;
-	currentMusic->setVolume(std::clamp(volume * musicVolume_ / 100.f, 0.f, 100.f));
+	const float effective = std::clamp(volume * musicVolume_ / 100.f, 0.f, 100.f);
+	currentMusic->setVolume(effective);
 	currentMusic->setLooping(true);
 	currentMusic->play();
 }
@@ -122,7 +122,7 @@ void AudioManager::setMusicVolume(const float volume)
 {
 	musicVolume_ = std::clamp(volume, 0.f, 100.f);
 	if (currentMusic.has_value()) {
-		currentMusic->setVolume(std::clamp(lastMusicVolume_ * musicVolume_ / 100.f, 0.f, 100.f));
+		currentMusic->setVolume(musicVolume_);
 	}
 }
 
