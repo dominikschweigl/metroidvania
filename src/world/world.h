@@ -1,5 +1,7 @@
 #pragma once
 #include "../core/asset_manager.h"
+#include "../entities/enemies/base_enemy.h"
+#include "../items/world_item.h"
 #include "Room.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
@@ -18,7 +20,8 @@ class World {
 	World &operator=(const World &) = delete;
 
 	// New room-based methods
-	void loadRoom(const std::string &roomId, const std::string &tmjFile);
+	void loadRoom(std::vector<std::unique_ptr<BaseEnemy>> &enemies, std::vector<std::unique_ptr<WorldItem>> &items,
+	              const std::string &roomId, const std::string &tmjFile);
 	void setCurrentRoom(const std::string &roomId);
 	const std::string &getCurrentRoomId() const { return currentRoomId; }
 	const Room *getCurrentRoom() const;

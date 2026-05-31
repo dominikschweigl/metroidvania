@@ -1,4 +1,8 @@
 #include "world.h"
+#include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../items/chewing_gum_item.h"
+#include "../items/hat_item.h"
+#include "../items/healing_potion_item.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -35,7 +39,8 @@ void World::loadTilesets(tson::Map &map)
 	}
 }
 
-void World::loadRoom(const std::string &roomId, const std::string &file)
+void World::loadRoom(std::vector<std::unique_ptr<BaseEnemy>> &enemies, std::vector<std::unique_ptr<WorldItem>> &items,
+                     const std::string &roomId, const std::string &file)
 {
 	tson::Tileson t;
 	auto map = t.parse(fs::path(file));
@@ -68,8 +73,17 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 					door.targetRoomId = targetRoomProp->getValue<std::string>();
 				}
 				room.doors.push_back(door);
-			} else if (name == "RaceCondition") {
-				room.raceConditionSpawns.push_back({float(p.x), float(p.y)});
+			} else if (name == "RaceConditionEnemy") {
+				enemies.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "ChewingGumItem") {
+				items.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                            std::make_unique<ChewingGumItem>()));
+			} else if (name == "HatItem") {
+				items.push_back(
+				    std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)}, std::make_unique<HatItem>()));
+			} else if (name == "HealingPotionItem") {
+				items.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                            std::make_unique<HealingPotionItem>()));
 			}
 		}
 	}

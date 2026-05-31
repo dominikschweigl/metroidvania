@@ -20,18 +20,18 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadRoom("start_room", "data/maps/start_room.tmj");
-	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
+	world_.loadRoom(enemies_, items_, "start_room", "data/maps/start_room.tmj");
+	world_.loadRoom(enemies_, items_, "boss_room", "data/maps/boss_room.tmj");
 	world_.setCurrentRoom("start_room");
 
-	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
-	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
+	// enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
+	// enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
 
-	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
+	// items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
+	// items_.push_back(
+	//     std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
+	// items_.push_back(
+	//     std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
 
 	view_.setCenter(player_.getPosition());
 }
