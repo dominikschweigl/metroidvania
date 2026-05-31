@@ -134,11 +134,10 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 	const Room &room = rooms.at(currentRoomId);
 
 	const int left = static_cast<int>(rect.position.x / TILE_SIZE);
-	const int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
+	const int right = static_cast<int>((rect.position.x + rect.size.x - 0.001f) / TILE_SIZE);
 	const int top = static_cast<int>(rect.position.y / TILE_SIZE);
-	const int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
+	const int bottom = static_cast<int>((rect.position.y + rect.size.y - 0.001f) / TILE_SIZE);
 
-	// Path 1: real Tiled map
 	if (room.map) {
 		tson::Layer *layer = room.map->getLayer("Solid");
 		if (!layer)
@@ -154,7 +153,6 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 		return false;
 	}
 
-	// Path 2: synthetic grid (tests)
 	for (int y = std::max(top, 0); y <= std::min(bottom, room.height - 1); ++y) {
 		for (int x = std::max(left, 0); x <= std::min(right, room.width - 1); ++x) {
 			if (room.solidGrid[y][x])

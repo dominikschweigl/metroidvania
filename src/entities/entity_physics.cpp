@@ -5,36 +5,17 @@ namespace EntityPhysics {
 bool isWallOnLeft(const sf::Vector2f position, const float width, const float height, const World &world)
 {
 	const float probeX = position.x - width / 2.f - 1.f;
-	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f});
-	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f});
-	return (top.has_value() && top.value()->isSolid) || (mid.has_value() && mid.value()->isSolid);
+	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f}, "Solid");
+	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f}, "Solid");
+	return (top || mid);
 }
 
 bool isWallOnRight(const sf::Vector2f position, const float width, const float height, const World &world)
 {
 	const float probeX = position.x + width / 2.f + 1.f;
-	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f});
-	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f});
-	return (top.has_value() && top.value()->isSolid) || (mid.has_value() && mid.value()->isSolid);
-}
-
-static bool isSolidTile(const tson::Tile *tile)
-{
-	if (!tile)
-		return false;
-	tson::Tile copy = *tile;
-	// return copy.getProperties().getProperty("solid");
-	return !copy.getObjectgroup().getObjects().empty();
-}
-
-static float tileLeft(const tson::Tile *tile, const World &world)
-{
-	// reconstruct x position from GID and map width
-	const uint32_t gid = tile->getGid();
-	const int mapWidth = world.getCurrentRoom()->width;
-	const int localId = gid - tile->getTileset()->getFirstgid();
-	const int x = localId % mapWidth;
-	return float(x * World::TILE_SIZE);
+	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f}, "Solid");
+	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f}, "Solid");
+	return (top || mid);
 }
 
 bool isGroundBelow(sf::FloatRect bounds, const World &world)
@@ -61,7 +42,7 @@ float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height
 	if (world.isSolidAtRect(future)) {
 		velX = 0.f;
 		// snap to tile boundary using grid position directly
-		int tileX = static_cast<int>(pos.x / World::TILE_SIZE);
+		int tileX = static_cast<int>(futureX / World::TILE_SIZE);
 		if (deltaX >= 0.f)
 			return float((tileX + 1) * World::TILE_SIZE) - width / 2.f - 1.f;
 		return float(tileX * World::TILE_SIZE) + width / 2.f;
