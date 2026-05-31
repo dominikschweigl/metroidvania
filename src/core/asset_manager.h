@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <span>
 #include <string_view>
 #include <unordered_map>
 
@@ -39,6 +40,15 @@ enum TextureAsset {
 
 	// Menus
 	MAIN_MENU_BACKGROUND,
+
+	// Items
+	ITEM_HAT,
+	ITEM_CHEWING_GUM,
+	ITEM_HEALING_POTION,
+};
+
+enum FontAsset {
+	UI_FONT,
 };
 
 class AssetManager {
@@ -53,11 +63,14 @@ class AssetManager {
 	AssetManager &operator=(AssetManager &&) = delete;
 
 	[[nodiscard]] const sf::Texture &getTexture(TextureAsset asset);
+	[[nodiscard]] const sf::Font &getFont(FontAsset asset);
 
   private:
 	AssetManager() = default;
 
 	static std::string_view texturePath(TextureAsset asset);
+	static std::span<const char *const> fontCandidates(FontAsset asset);
 
 	std::unordered_map<TextureAsset, sf::Texture> textures;
+	std::unordered_map<FontAsset, sf::Font> fonts;
 };

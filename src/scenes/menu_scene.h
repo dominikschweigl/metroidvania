@@ -54,7 +54,6 @@ class MenuScene : public Scene {
 	sf::View uiView_;
 	sf::Vector2u windowSize_;
 
-	sf::Font font_;
 	std::optional<Theme> theme_;
 
 	std::optional<sf::Sprite> backgroundSprite_;
@@ -62,7 +61,6 @@ class MenuScene : public Scene {
 
 	std::unique_ptr<Panel> panel_;
 
-	bool loadFont();
 	void buildPanel();
 	void layoutForSize(sf::Vector2u size);
 };

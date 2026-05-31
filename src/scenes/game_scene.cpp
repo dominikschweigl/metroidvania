@@ -2,6 +2,10 @@
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../items/chewing_gum_item.h"
+#include "../items/hat_item.h"
+#include "../items/healing_potion_item.h"
+#include "inventory_scene.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
 #include <algorithm>
@@ -23,6 +27,12 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 
 	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
 	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
+
+	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
 
 	view_.setCenter(player_.getPosition());
 }
@@ -49,20 +59,46 @@ void GameScene::update(float deltaTime)
 	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
 		showDebugHitboxes_ = !showDebugHitboxes_;
 
+	if (input.wasPressed(GameAction::OpenInventory))
+		sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
+			return std::make_unique<InventoryScene>(player, stack, windowSize);
+		});
+
+	for (int i = 0; i < Inventory::HOTBAR_SIZE; ++i) {
+		if (input.wasPressed(InputManager::hotbarSlotActions()[i])) {
+			hotbarHud_.flashSlot(i);
+			player_.useHotbarSlot(i);
+		}
+	}
+
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
-	// Update all alive enemies and remove dead ones
+	// Update all alive enemies; collect drops before removing dead ones.
 	for (auto &enemy : enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition());
 	for (auto &enemy : enemies_) {
-		if (!enemy->isAlive())
+		if (!enemy->isAlive()) {
+			for (std::unique_ptr<Item> &drop : enemy->rollDrops())
+				items_.push_back(std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop)));
 			combat_.clearVictim(&enemy->health);
+		}
 	}
 	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
 	               enemies_.end());
+
+	// Update world items and check for player pickup.
+	for (auto &item : items_)
+		item->update(deltaTime, world_);
+	for (std::unique_ptr<WorldItem> &worldItem : items_) {
+		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
+		if (collected)
+			player_.inventory().addItem(std::move(collected));
+	}
+	items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
+	             items_.end());
 
 	hitboxes_.clear();
 	hurtboxes_.clear();
@@ -82,6 +118,7 @@ void GameScene::update(float deltaTime)
 	for (const std::uint32_t id : endedSourceIds)
 		combat_.clearSource(id);
 
+	hotbarHud_.update(deltaTime);
 	resetPlayerIfOutOfBounds();
 
 	// Check for player death
@@ -104,6 +141,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	window.setView(view_);
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
+	for (auto &item : items_)
+		item->draw(window);
 	player_.draw(window);
 	for (auto &enemy : enemies_)
 		enemy->draw(window);
@@ -112,6 +151,7 @@ void GameScene::draw(sf::RenderWindow &window)
 		drawDebugHitboxes(window);
 
 	healthBar_.draw(window, player_.health);
+	hotbarHud_.draw(window, player_.inventory());
 }
 
 void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
@@ -131,6 +171,14 @@ void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
 	for (const Hitbox &hit : hitboxes_) {
 		outline.setPosition(hit.bounds.position);
 		outline.setSize(hit.bounds.size);
+		window.draw(outline);
+	}
+
+	outline.setOutlineColor(sf::Color::Yellow);
+	for (const std::unique_ptr<WorldItem> &item : items_) {
+		const sf::FloatRect bounds = item->getBounds();
+		outline.setPosition(bounds.position);
+		outline.setSize(bounds.size);
 		window.draw(outline);
 	}
 }

@@ -25,9 +25,9 @@ void DescendingState::onEnter(Player &p)
 
 PlayerState *DescendingState::update(float dt, Player &p)
 {
-	if (p.isAgainstLeftWall && p.inputLeft)
+	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
 		return &p.states.wallSlide;
-	if (p.isAgainstRightWall && p.inputRight)
+	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())
 		return &p.states.wallSlide;
 	return this;
 }

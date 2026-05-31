@@ -5,6 +5,7 @@
 #include "../base_entity.h"
 #include "abilities/hat_ability.h"
 #include "abilities/melee_attack.h"
+#include "inventory.h"
 #include "states/ascending_state.h"
 #include "states/descending_state.h"
 #include "states/idle_state.h"
@@ -71,6 +72,13 @@ class Player : public BaseEntity {
 
 	[[nodiscard]] bool isInvulnerable() const noexcept override { return iframes > 0.f; }
 
+	void heal(int amount) noexcept { health.heal(amount); }
+
+	[[nodiscard]] Inventory       &inventory() noexcept;
+	[[nodiscard]] const Inventory &inventory() const noexcept;
+
+	void useHotbarSlot(int slot);
+
 	[[nodiscard]] std::optional<Hitbox> getMeleeHitbox() const noexcept
 	{
 		return meleeAttack.getHitbox(position, getDirection());
@@ -93,6 +101,7 @@ class Player : public BaseEntity {
 
 	MeleeAttack meleeAttack;
 	HatAbility hatAbility;
+	Inventory inventory_;
 
 	States states;
 

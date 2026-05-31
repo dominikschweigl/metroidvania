@@ -4,6 +4,22 @@
 #include "entities/player/states/landing_state.h"
 #include "entities/player/states/pre_jump_state.h"
 #include "entities/player/states/wall_slide_state.h"
+#include "items/chewing_gum_item.h"
+#include "items/hat_item.h"
+#include "world/world.h"
+#include <vector>
+
+namespace {
+
+World makeEmptyWorld()
+{
+	std::vector<std::vector<int>> grid(5, std::vector<int>(10, 0));
+	World world;
+	world.loadFromGrid(grid);
+	return world;
+}
+
+} // namespace
 
 // Grants test-only access to Player private members via the friend relationship
 // declared in player.h. Define it here so no game code depends on it.
@@ -188,6 +204,7 @@ TEST_CASE("AscendingState transitions")
 
 	SECTION("transitions to wallSlide when pressing into left wall")
 	{
+		p.inventory().addItem(std::make_unique<ChewingGumItem>());
 		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
 		PlayerTestAccess::setAgainstLeftWall(p, true);
 		PlayerTestAccess::setInputLeft(p, true);
@@ -196,6 +213,7 @@ TEST_CASE("AscendingState transitions")
 
 	SECTION("transitions to wallSlide when pressing into right wall")
 	{
+		p.inventory().addItem(std::make_unique<ChewingGumItem>());
 		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
 		PlayerTestAccess::setAgainstRightWall(p, true);
 		PlayerTestAccess::setInputRight(p, true);
@@ -207,6 +225,22 @@ TEST_CASE("AscendingState transitions")
 		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
 		PlayerTestAccess::setAgainstLeftWall(p, true);
 		PlayerTestAccess::setInputLeft(p, false);
+		REQUIRE(states.ascending.update(0.1f, p) == &states.ascending);
+	}
+
+	SECTION("does not transition to wallSlide on left wall without gum")
+	{
+		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.ascending.update(0.1f, p) == &states.ascending);
+	}
+
+	SECTION("does not transition to wallSlide on right wall without gum")
+	{
+		PlayerTestAccess::setVelocity(p, {0.f, -(Player::PEAK_THRESHOLD + 1.f)});
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		PlayerTestAccess::setInputRight(p, true);
 		REQUIRE(states.ascending.update(0.1f, p) == &states.ascending);
 	}
 }
@@ -283,6 +317,7 @@ TEST_CASE("LandingState transitions")
 TEST_CASE("PeakState transitions to wallSlide when pressing into a wall")
 {
 	Player p;
+	p.inventory().addItem(std::make_unique<ChewingGumItem>());
 	auto &states = PlayerTestAccess::getStates(p);
 	states.peak.onEnter(p);
 
@@ -304,6 +339,7 @@ TEST_CASE("PeakState transitions to wallSlide when pressing into a wall")
 TEST_CASE("DescendingState transitions to wallSlide when pressing into a wall")
 {
 	Player p;
+	p.inventory().addItem(std::make_unique<ChewingGumItem>());
 	auto &states = PlayerTestAccess::getStates(p);
 	states.descending.onEnter(p);
 
@@ -402,5 +438,71 @@ TEST_CASE("WallSlideState transitions")
 		PlayerTestAccess::setVelocity(p, originalVelocity);
 		states.wallSlide.onEnter(p);
 		REQUIRE(PlayerTestAccess::getVelocity(p).y < originalVelocity.y);
+	}
+}
+
+// ─── Wall slide gating: no gum ────────────────────────────────────────────────
+
+TEST_CASE("PeakState does not transition to wallSlide without gum")
+{
+	Player p;
+	auto &states = PlayerTestAccess::getStates(p);
+	states.peak.onEnter(p);
+
+	SECTION("stays in peak on left wall without gum")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.peak.update(0.1f, p) == &states.peak);
+	}
+
+	SECTION("stays in peak on right wall without gum")
+	{
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		PlayerTestAccess::setInputRight(p, true);
+		REQUIRE(states.peak.update(0.1f, p) == &states.peak);
+	}
+}
+
+TEST_CASE("DescendingState does not transition to wallSlide without gum")
+{
+	Player p;
+	auto &states = PlayerTestAccess::getStates(p);
+	states.descending.onEnter(p);
+
+	SECTION("stays descending on left wall without gum")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		PlayerTestAccess::setInputLeft(p, true);
+		REQUIRE(states.descending.update(0.1f, p) == &states.descending);
+	}
+
+	SECTION("stays descending on right wall without gum")
+	{
+		PlayerTestAccess::setAgainstRightWall(p, true);
+		PlayerTestAccess::setInputRight(p, true);
+		REQUIRE(states.descending.update(0.1f, p) == &states.descending);
+	}
+}
+
+// ─── Hat throw gating ─────────────────────────────────────────────────────────
+
+TEST_CASE("Player: hat throw is gated by hat in inventory")
+{
+	World world = makeEmptyWorld();
+
+	SECTION("hat throw activates when hat is equipped")
+	{
+		Player p;
+		p.inventory().addItem(std::make_unique<HatItem>());
+		p.update(0.1f, world, false, true);
+		REQUIRE(p.isAttackActive());
+	}
+
+	SECTION("hat throw does not activate without hat equipped")
+	{
+		Player p;
+		p.update(0.1f, world, false, true);
+		REQUIRE(!p.isAttackActive());
 	}
 }

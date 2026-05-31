@@ -17,9 +17,9 @@ void AscendingState::onEnter(Player &p)
 
 PlayerState *AscendingState::update(float dt, Player &p)
 {
-	if (p.isAgainstLeftWall && p.inputLeft)
+	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
 		return &p.states.wallSlide;
-	if (p.isAgainstRightWall && p.inputRight)
+	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())
 		return &p.states.wallSlide;
 	if (p.velocity.y >= -Player::PEAK_THRESHOLD)
 		return &p.states.peak;

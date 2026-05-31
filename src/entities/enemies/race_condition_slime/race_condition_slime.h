@@ -85,6 +85,8 @@ class RaceConditionSlime : public BaseEnemy {
 	float getTeleportTimer() const { return teleportTimer; }
 	void setTeleportTimer(float v) { teleportTimer = v; }
 
+	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
+
 	// Set current animation state. Manages sprite and texture updates.
 	void setAnimation(SlimeAnimation anim, int frame);
 

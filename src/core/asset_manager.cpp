@@ -1,5 +1,6 @@
 #include "asset_manager.h"
 #include <format>
+#include <span>
 #include <stdexcept>
 #include <string_view>
 
@@ -18,6 +19,41 @@ const sf::Texture &AssetManager::getTexture(const TextureAsset asset)
 	}
 	iterator->second.setSmooth(false);
 	return iterator->second;
+}
+
+const sf::Font &AssetManager::getFont(const FontAsset asset)
+{
+	const auto [iterator, isInserted] = fonts.try_emplace(asset);
+	if (isInserted) {
+		bool loaded = false;
+		for (const char *path : fontCandidates(asset)) {
+			if (iterator->second.openFromFile(path)) { loaded = true; break; }
+		}
+		if (!loaded) {
+			fonts.erase(iterator);
+			throw std::runtime_error(std::format("AssetManager: no usable font found for FontAsset {}", static_cast<int>(asset)));
+		}
+	}
+	return iterator->second;
+}
+
+std::span<const char *const> AssetManager::fontCandidates(const FontAsset asset)
+{
+	switch (asset) {
+	case UI_FONT: {
+		static constexpr std::array<const char *, 7> candidates = {
+		    "C:\\Windows\\Fonts\\arial.ttf",
+		    "C:\\Windows\\Fonts\\segoeui.ttf",
+		    "C:\\Windows\\Fonts\\calibri.ttf",
+		    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
+		    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+		    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
+		    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+		};
+		return candidates;
+	}
+	}
+	throw std::logic_error("fontCandidates: missing FontAsset entry");
 }
 
 std::string_view AssetManager::texturePath(const TextureAsset asset)
@@ -79,6 +115,12 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/tiles/top2.png";
 	case MAIN_MENU_BACKGROUND:
 		return "assets/images/menus/main_menu_background.jpeg";
+	case ITEM_HAT:
+		return "assets/images/items/hat.png";
+	case ITEM_CHEWING_GUM:
+		return "assets/images/items/chewing_gum.png";
+	case ITEM_HEALING_POTION:
+		return "assets/images/items/healing_potion.png";
 	}
 
 	throw std::logic_error("texturePath: missing TextureAsset path entry");

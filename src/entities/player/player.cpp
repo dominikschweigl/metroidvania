@@ -7,11 +7,19 @@ namespace {
 constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
 } // namespace
 
+Inventory &Player::inventory() noexcept { return inventory_; }
+const Inventory &Player::inventory() const noexcept { return inventory_; }
+
+void Player::useHotbarSlot(const int slot)
+{
+	inventory_.interact({SlotKind::Hotbar, slot}, *this);
+}
+
 Player::Player()
     : BaseEntity(PLAYER_SPAWN, static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE), MAX_HEALTH,
                  Team::Player),
       lowerBodySprite(states.idle.idle_lower_texture),
-      headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD_HAT)),
+      headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD)),
       upperBodySprite(states.idle.idle_upper_texture), currentState(&states.idle)
 {
 	setDirection(Direction::Left);
@@ -42,7 +50,7 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 	if (attackTriggered && currentState->canAttack() && !hatAbility.isThrowActive())
 		meleeAttack.trigger();
 
-	if (hatThrowTriggered && currentState->canAttack() && hatAbility.canThrow() && !isAttackActive())
+	if (hatThrowTriggered && currentState->canAttack() && inventory_.hasHat() && hatAbility.canThrow() && !isAttackActive())
 		hatAbility.trigger();
 
 	meleeAttack.update(deltaTime);
@@ -94,8 +102,8 @@ void Player::updateAnimation(float dt)
 	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset(*this);
 	upperBodySprite.setPosition(position + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
 
-	const bool hatAbsent = !hatAbility.isHatOnHead();
-	headSprite.setTexture(AssetManager::getInstance().getTexture(hatAbsent ? PLAYER_HEAD : PLAYER_HEAD_HAT));
+	const bool hatOnHead = inventory_.hasHat() && hatAbility.isHatOnHead();
+	headSprite.setTexture(AssetManager::getInstance().getTexture(hatOnHead ? PLAYER_HEAD_HAT : PLAYER_HEAD));
 	headSprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
 	const sf::Vector2f headOffset = currentState->getHeadOffset(*this);
 	headSprite.setPosition(position + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
