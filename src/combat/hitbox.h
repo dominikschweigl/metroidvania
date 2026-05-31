@@ -8,9 +8,9 @@ class BaseEntity;
 
 enum class Team : std::uint8_t { Player, Enemy };
 
-// An active damage-dealing rectangle for one frame. `sourceId` identifies the
-// attack instance (e.g. a single melee swing or hat throw) so the central
-// CombatSystem can deduplicate hits across frames.
+// Damage dealing rectangle.
+// sourceId identifies the attack instance so the central
+// CombatSystem applies damage only once across frames.
 struct Hitbox {
 	sf::FloatRect bounds;
 	int damage;
@@ -18,10 +18,8 @@ struct Hitbox {
 	std::uint32_t sourceId;
 };
 
-// A damage-receiving rectangle.
-// the CombatSystem uses the health address as the entities identity.
-// `owner` is an optional callback target - when set, CombatSystem notifies it
-// after damage so the entity can react (hurt flash, knockback).
+// Damage receiving rectangle.
+// CombatSystem notifies target via *health about damage.
 struct Hurtbox {
 	sf::FloatRect bounds;
 	Team team;
@@ -36,9 +34,8 @@ struct Hurtbox {
 	return hit.bounds.findIntersection(hurt.bounds).has_value();
 }
 
-// New attack instances receive increasing ids to be distinguishable.
-// Attacks capture one on activation and reuse it across frames
-// so the CombatSystem can deduplicate hits per attack.
+// New attacks receive increasing ids to be identifiable by
+// combat manager between frames in order to apply damage only once.
 [[nodiscard]] inline std::uint32_t nextSourceId() noexcept
 {
 	static std::uint32_t counter = 0;

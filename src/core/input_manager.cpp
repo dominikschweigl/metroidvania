@@ -13,6 +13,13 @@ const std::array<Binding, InputManager::actionCount> InputManager::defaultBindin
     Binding{sf::Keyboard::Scancode::PageDown},
     Binding{sf::Mouse::Button::Left},
     Binding{sf::Keyboard::Scancode::F3},
+    Binding{sf::Keyboard::Scancode::E},
+    Binding{sf::Keyboard::Scancode::Q},
+    Binding{sf::Keyboard::Scancode::Num1},
+    Binding{sf::Keyboard::Scancode::Num2},
+    Binding{sf::Keyboard::Scancode::Num3},
+    Binding{sf::Keyboard::Scancode::Num4},
+    Binding{sf::Keyboard::Scancode::Num5},
 }};
 // clang-format on
 
@@ -27,6 +34,18 @@ InputManager &InputManager::getInstance()
 std::span<const InputManager::ActionMeta> InputManager::gameActions() noexcept
 {
 	return gameActionsMeta;
+}
+
+namespace {
+constexpr std::array<GameAction, 5> hotbarSlotActionsArray = {
+    GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3,
+    GameAction::UseItemSlot4, GameAction::UseItemSlot5,
+};
+}
+
+std::span<const GameAction> InputManager::hotbarSlotActions() noexcept
+{
+	return hotbarSlotActionsArray;
 }
 
 bool InputManager::matchesKey(const InputBinding &binding, const sf::Keyboard::Scancode scancode)

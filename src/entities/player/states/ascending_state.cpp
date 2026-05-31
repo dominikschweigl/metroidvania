@@ -17,19 +17,23 @@ void AscendingState::onEnter(Player &p)
 
 PlayerState *AscendingState::update(float dt, Player &p)
 {
+	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
+		return &p.states.wallSlide;
+	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())
+		return &p.states.wallSlide;
 	if (p.velocity.y >= -Player::PEAK_THRESHOLD)
 		return &p.states.peak;
 	return this;
 }
 
-sf::Vector2f AscendingState::getHeadOffset() const noexcept
+sf::Vector2f AscendingState::getHeadOffset(Player &p) const noexcept
 {
 	return HEAD_OFFSET;
 }
 
-sf::Vector2f AscendingState::getUpperBodyOffset() const noexcept
+sf::Vector2f AscendingState::getUpperBodyOffset(Player &p) const noexcept
 {
-	return UPPER_BODY_OFFSET;
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSET : UPPER_BODY_OFFSET;
 }
 
 void AscendingState::applyAnimation(float dt, Player &p)

@@ -50,8 +50,7 @@ class AudioManager {
 	void resumeMusic();
 	[[nodiscard]] MusicStatus musicStatus() const;
 
-	// Master volume scales every per-call volume passed to playSound/playMusic.
-	// Range 0..100. 0 = silent, 100 = no attenuation.
+	// Volume ranges are mapped from 0 to 100. 0 is silent, 100 is full volume.
 	void setSoundVolume(float volume);
 	void setMusicVolume(float volume);
 	[[nodiscard]] float soundVolume() const noexcept { return soundVolume_; }
@@ -70,7 +69,6 @@ class AudioManager {
 	std::unordered_map<SoundEffect, sf::SoundBuffer> soundBuffers;
 	std::array<std::optional<sf::Sound>, VOICE_POOL_SIZE> voices;
 	std::optional<sf::Music> currentMusic;
-	float lastMusicVolume_ = 100.f;
 
 	float soundVolume_ = 100.f;
 	float musicVolume_ = 100.f;

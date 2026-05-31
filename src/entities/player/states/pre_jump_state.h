@@ -14,11 +14,13 @@ class PreJumpState : public PlayerState {
 
 	static constexpr float PREJUMP_FRAME_DURATION = 0.08f;
 
-	static constexpr std::array<sf::Vector2f, 3> HEAD_OFFSETS = {sf::Vector2f{1.f, 2.f}, {1.f, 2.f}, {1.f, 2.f}};
-	static constexpr std::array<sf::Vector2f, 3> UPPER_BODY_OFFSETS = {sf::Vector2f{0.f, 0.f}, {0.f, 0.f}, {0.f, 0.f}};
+	static constexpr std::array<sf::Vector2f, 2> HEAD_OFFSETS = {sf::Vector2f{1.f, 2.f}, {1.f, 2.f}};
+	static constexpr std::array<sf::Vector2f, 2> UPPER_BODY_OFFSETS = {sf::Vector2f{0.f, 0.f}, {0.f, 0.f}};
+	static constexpr std::array<sf::Vector2f, 2> ATTACK_UPPER_BODY_OFFSETS = {sf::Vector2f{0.f, 2.f}, {0.f, 2.f}};
 
-	sf::Vector2f getHeadOffset() const noexcept override;
-	sf::Vector2f getUpperBodyOffset() const noexcept override;
+	bool canAttack() const noexcept { return true; };
+	sf::Vector2f getHeadOffset(Player &p) const noexcept override;
+	sf::Vector2f getUpperBodyOffset(Player &p) const noexcept override;
 	PlayerState *update(float dt, Player &p) override;
 	void applyAnimation(float dt, Player &p) override;
 	void onEnter(Player &p) override;

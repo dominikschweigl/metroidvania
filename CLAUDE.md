@@ -6,15 +6,13 @@
 ## Build
 ```powershell
 # Configure (first time only)
-cmake --preset default-debug   # or default-release
+cmake --preset default-release   # or default-release
 
 # Build
-cmake --build ./build/debug --target metroidvania
-cmake --build ./build/release --target metroidvania
+cmake --build ./build/release
 
 # Tests
-cmake --build ./build/debug --target metroidvania_tests
-ctest --test-dir ./build/debug
+./build/release/metroidvania_tests.exe
 ```
 
 Dependencies are managed via **vcpkg** (sfml, fmt, nlohmann-json, tinyxml2, catch2). Compiler: MinGW/GCC x64.

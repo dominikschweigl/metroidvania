@@ -2,6 +2,22 @@
 
 namespace EntityPhysics {
 
+bool isWallOnLeft(const sf::Vector2f position, const float width, const float height, const World &world)
+{
+	const float probeX = position.x - width / 2.f - 1.f;
+	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f});
+	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f});
+	return (top.has_value() && top.value()->isSolid) || (mid.has_value() && mid.value()->isSolid);
+}
+
+bool isWallOnRight(const sf::Vector2f position, const float width, const float height, const World &world)
+{
+	const float probeX = position.x + width / 2.f + 1.f;
+	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f});
+	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f});
+	return (top.has_value() && top.value()->isSolid) || (mid.has_value() && mid.value()->isSolid);
+}
+
 static bool isSolidTile(const tson::Tile *tile)
 {
 	if (!tile)

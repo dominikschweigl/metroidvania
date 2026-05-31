@@ -7,11 +7,24 @@ namespace {
 constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
 } // namespace
 
+Inventory &Player::inventory() noexcept
+{
+	return inventory_;
+}
+const Inventory &Player::inventory() const noexcept
+{
+	return inventory_;
+}
+
+void Player::useHotbarSlot(const int slot)
+{
+	inventory_.interact({SlotKind::Hotbar, slot}, *this);
+}
+
 Player::Player()
     : BaseEntity(PLAYER_SPAWN, static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE), MAX_HEALTH,
                  Team::Player),
-      lowerBodySprite(states.idle.idle_lower_texture),
-      headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD_HAT)),
+      lowerBodySprite(states.idle.idle_lower_texture), headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD)),
       upperBodySprite(states.idle.idle_upper_texture), currentState(&states.idle)
 {
 	setDirection(Direction::Left);
@@ -42,7 +55,8 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 	if (attackTriggered && currentState->canAttack() && !hatAbility.isThrowActive())
 		meleeAttack.trigger();
 
-	if (hatThrowTriggered && currentState->canAttack() && hatAbility.canThrow() && !isAttackActive())
+	if (hatThrowTriggered && currentState->canAttack() && inventory_.hasHat() && hatAbility.canThrow()
+	    && !isAttackActive())
 		hatAbility.trigger();
 
 	meleeAttack.update(deltaTime);
@@ -91,13 +105,13 @@ void Player::updateAnimation(float dt)
 	lowerBodySprite.setScale(scale);
 	upperBodySprite.setScale(scale);
 
-	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset();
+	const sf::Vector2f upperOffset = currentState->getUpperBodyOffset(*this);
 	upperBodySprite.setPosition(position + sf::Vector2f{upperOffset.x * scale.x, upperOffset.y});
 
-	const bool hatAbsent = !hatAbility.isHatOnHead();
-	headSprite.setTexture(AssetManager::getInstance().getTexture(hatAbsent ? PLAYER_HEAD : PLAYER_HEAD_HAT));
+	const bool hatOnHead = inventory_.hasHat() && hatAbility.isHatOnHead();
+	headSprite.setTexture(AssetManager::getInstance().getTexture(hatOnHead ? PLAYER_HEAD_HAT : PLAYER_HEAD));
 	headSprite.setTextureRect(sf::IntRect({0, 0}, {FRAME_SIZE, FRAME_SIZE}));
-	const sf::Vector2f headOffset = currentState->getHeadOffset();
+	const sf::Vector2f headOffset = currentState->getHeadOffset(*this);
 	headSprite.setPosition(position + sf::Vector2f{headOffset.x * scale.x, headOffset.y});
 	headSprite.setScale(scale);
 
@@ -114,25 +128,33 @@ void Player::handleMovement(float deltaTime, const World &world)
 {
 	InputManager &input = InputManager::getInstance();
 	inputJump = input.isHeld(GameAction::Jump);
+	inputLeft = input.isHeld(GameAction::MoveLeft);
+	inputRight = input.isHeld(GameAction::MoveRight);
 
-	// Knockback temporarily runs velocity.
+	// Knockback temporarily overrides velocity.
 	if (!isKnockedBack()) {
-		velocity.x = 0.f;
-		isSprinting = input.isHeld(GameAction::Sprint);
-		const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
+		if (wallJumpTimer > 0.f) {
+			wallJumpTimer -= deltaTime;
+		} else {
+			velocity.x = 0.f;
+			isSprinting = input.isHeld(GameAction::Sprint);
+			const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
 
-		if (input.isHeld(GameAction::MoveLeft)) {
-			velocity.x = -speed;
-			setDirection(Direction::Left);
-		}
-		if (input.isHeld(GameAction::MoveRight)) {
-			velocity.x = speed;
-			setDirection(Direction::Right);
+			if (inputLeft) {
+				velocity.x = -speed;
+				setDirection(Direction::Left);
+			}
+			if (inputRight) {
+				velocity.x = speed;
+				setDirection(Direction::Right);
+			}
 		}
 	}
 
 	const bool wasOnGround = isOnGround;
 	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, gravity, width, height, world);
+	isAgainstLeftWall = EntityPhysics::isWallOnLeft(position, width, height, world);
+	isAgainstRightWall = EntityPhysics::isWallOnRight(position, width, height, world);
 	if (!wasOnGround && isOnGround)
 		transitionTo(states.landing);
 }

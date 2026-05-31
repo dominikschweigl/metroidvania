@@ -7,6 +7,16 @@ DescendingState::DescendingState()
 {
 }
 
+sf::Vector2f DescendingState::getHeadOffset(Player & /*p*/) const noexcept
+{
+	return HEAD_OFFSET;
+}
+
+sf::Vector2f DescendingState::getUpperBodyOffset(Player &p) const noexcept
+{
+	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSET : UPPER_BODY_OFFSET;
+}
+
 void DescendingState::onEnter(Player &p)
 {
 	currentFrame = 0;
@@ -15,6 +25,10 @@ void DescendingState::onEnter(Player &p)
 
 PlayerState *DescendingState::update(float dt, Player &p)
 {
+	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
+		return &p.states.wallSlide;
+	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())
+		return &p.states.wallSlide;
 	return this;
 }
 

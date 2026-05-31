@@ -17,6 +17,13 @@ enum class GameAction {
 	ZoomOut,
 	AttackMelee,
 	ToggleDebugHitboxes,
+	OpenInventory,
+	UseItem,
+	UseItemSlot1,
+	UseItemSlot2,
+	UseItemSlot3,
+	UseItemSlot4,
+	UseItemSlot5,
 };
 enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown, NavigateLeft, NavigateRight };
 
@@ -65,6 +72,7 @@ class InputManager {
 
 	[[nodiscard]] std::string inputName(GameAction action) const;
 	[[nodiscard]] static std::span<const ActionMeta> gameActions() noexcept;
+	[[nodiscard]] static std::span<const GameAction> hotbarSlotActions() noexcept;
 
   private:
 	InputManager();
@@ -79,6 +87,13 @@ class InputManager {
 	    {GameAction::ZoomOut, "Zoom Out"},
 	    {GameAction::AttackMelee, "Attack (Melee)"},
 	    {GameAction::ToggleDebugHitboxes, "Toggle Debug Hitboxes"},
+	    {GameAction::OpenInventory, "Open Inventory"},
+	    {GameAction::UseItem, "Use Item"},
+	    {GameAction::UseItemSlot1, "Use Item Slot 1"},
+	    {GameAction::UseItemSlot2, "Use Item Slot 2"},
+	    {GameAction::UseItemSlot3, "Use Item Slot 3"},
+	    {GameAction::UseItemSlot4, "Use Item Slot 4"},
+	    {GameAction::UseItemSlot5, "Use Item Slot 5"},
 	});
 	static constexpr auto menuBindings = std::to_array<Binding>({
 	    Binding{sf::Keyboard::Scancode::Escape},

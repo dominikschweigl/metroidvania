@@ -8,6 +8,10 @@ namespace EntityPhysics {
 // Checks if solid ground exists directly below the given bounds
 bool isGroundBelow(sf::FloatRect bounds, const World &world);
 
+// Checks if a solid wall exists directly to the left/right of the entity
+bool isWallOnLeft(sf::Vector2f position, float width, float height, const World &world);
+bool isWallOnRight(sf::Vector2f position, float width, float height, const World &world);
+
 // Applies gravity acceleration and updates isOnGround flag.
 // Modifies velY and isOnGround by reference.
 void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::FloatRect bounds, const World &world);

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "../../combat/hitbox.h"
+#include "../../items/item.h"
 #include "../base_entity.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <vector>
 
 class EnemyState;
 class World;
@@ -27,6 +29,9 @@ class BaseEnemy : public BaseEntity {
 
 	// Active damage rectangle for this frame, otherwise nullopt.
 	[[nodiscard]] virtual std::optional<Hitbox> getHitbox() noexcept { return std::nullopt; }
+
+	// Returns items to drop when this enemy dies. Override per enemy to configure drops.
+	[[nodiscard]] virtual std::vector<std::unique_ptr<Item>> rollDrops() { return {}; }
 
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 

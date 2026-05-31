@@ -25,8 +25,10 @@ set(GAME_SOURCES
     src/ui/vertical_list.cpp
     src/ui/panel.cpp
     src/ui/health_bar.cpp
+    src/ui/hotbar_hud.cpp
     src/scenes/menu_scene.cpp
     src/scenes/game_scene.cpp
+    src/scenes/inventory_scene.cpp
     src/world/world.cpp
     src/combat/combat_system.cpp
     src/entities/base_entity.cpp
@@ -38,6 +40,12 @@ set(GAME_SOURCES
     src/entities/enemies/race_condition_slime/states/windup_state.cpp
     src/entities/enemies/race_condition_slime/states/attack_state.cpp
     src/entities/enemies/race_condition_slime/states/recover_state.cpp
+    src/items/item_registry.cpp
+    src/items/healing_potion_item.cpp
+    src/items/hat_item.cpp
+    src/items/chewing_gum_item.cpp
+    src/items/world_item.cpp
+    src/entities/player/inventory.cpp
     src/entities/player/player.cpp
     src/entities/player/abilities/melee_attack.cpp
     src/entities/player/abilities/hat_ability.cpp
@@ -50,6 +58,7 @@ set(GAME_SOURCES
     src/entities/player/states/peak_state.cpp
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
+    src/entities/player/states/wall_slide_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -69,6 +78,7 @@ add_executable(metroidvania_tests
     tests/unit/combat_system_tests.cpp
     tests/unit/player_combat_tests.cpp
     tests/unit/melee_attack_tests.cpp
+    tests/unit/inventory_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)

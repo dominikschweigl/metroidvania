@@ -1,25 +1,10 @@
 #include "menu_scene.h"
+#include "../core/asset_manager.h"
 #include "../core/input_manager.h"
 #include "../ui/button.h"
 #include "../ui/vertical_list.h"
 #include <algorithm>
-#include <array>
-#include <iostream>
 #include <utility>
-
-namespace {
-const std::array<const char *, 7> kFontCandidates = {
-    // Windows
-    "C:\\Windows\\Fonts\\arial.ttf",
-    "C:\\Windows\\Fonts\\segoeui.ttf",
-    "C:\\Windows\\Fonts\\calibri.ttf",
-    // Linux
-    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
-    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-};
-} // namespace
 
 MenuScene::MenuScene(sf::Vector2u windowSize, Config config) : config_(std::move(config)), windowSize_(windowSize)
 {
@@ -34,22 +19,9 @@ MenuScene::MenuScene(sf::Vector2u windowSize, Config config) : config_(std::move
 		}
 	}
 
-	if (!loadFont()) {
-		std::cerr << "MenuScene: no usable font found; menu will not render text.\n";
-		return;
-	}
-	theme_.emplace(Theme{font_});
+	theme_.emplace(Theme{AssetManager::getInstance().getFont(UI_FONT)});
 	buildPanel();
 	layoutForSize(windowSize);
-}
-
-bool MenuScene::loadFont()
-{
-	for (const char *path : kFontCandidates) {
-		if (font_.openFromFile(path))
-			return true;
-	}
-	return false;
 }
 
 MenuScene::ContentFactory MenuScene::buttonList(std::vector<ButtonSpec> buttons)
