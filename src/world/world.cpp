@@ -21,6 +21,8 @@ void World::loadTilesets(tson::Map &map)
 			if (imagePath.empty())
 				continue;
 
+			imagePath = fs::absolute("data/maps/tilesets/" + imagePath.string());
+
 			// Load into AssetManager and cache by GID
 			auto texture = std::make_shared<sf::Texture>();
 			if (!texture->loadFromFile(imagePath.string())) {
@@ -145,7 +147,7 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 		for (int y = top; y <= bottom; ++y) {
 			for (int x = left; x <= right; ++x) {
 				tson::Tile *tile = layer->getTileData(x, y);
-				if (tile && !tile->getObjectgroup().getObjects().empty())
+				if (tile)
 					return true;
 			}
 		}
@@ -204,13 +206,10 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 			for (int x = left; x <= right; ++x) {
 				tson::Tile *tile = layer->getTileData(x, y);
 				if (!tile) {
-					// std::cout << "Tile at (" << x << ", " << y << ") is null\n";
 					continue;
 				}
 
 				auto it = tileTextures.find(tile->getGid());
-				// std::cout << "Drawing tile at (" << x << ", " << y << ") with GID " << tile->getGid()
-				//   << (it != tileTextures.end() ? " [texture found]" : " [no texture]") << "\n";
 
 				sf::RectangleShape shape({float(TILE_SIZE), float(TILE_SIZE)});
 				shape.setPosition({float(x * TILE_SIZE), float(y * TILE_SIZE)});

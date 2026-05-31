@@ -61,12 +61,13 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 	sf::FloatRect future({pos.x - width / 2.f, futureY - height}, {width, height});
 
 	if (world.isSolidAtRect(future)) {
-		int tileY = static_cast<int>(futureY / World::TILE_SIZE);
 		if (deltaY > 0.f) {
 			isOnGround = true;
-			futureY = float(tileY * World::TILE_SIZE) - 1;
+			int tileY = static_cast<int>(futureY / World::TILE_SIZE);
+			futureY = float(tileY * World::TILE_SIZE);
 		} else if (deltaY < 0.f) {
-			futureY = float((tileY + 1) * World::TILE_SIZE);
+			int tileY = static_cast<int>((futureY - height) / World::TILE_SIZE);
+			futureY = float((tileY + 1) * World::TILE_SIZE) + height;
 		}
 		velY = 0.f;
 	}
