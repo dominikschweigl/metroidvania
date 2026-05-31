@@ -27,11 +27,15 @@ const sf::Font &AssetManager::getFont(const FontAsset asset)
 	if (isInserted) {
 		bool loaded = false;
 		for (const char *path : fontCandidates(asset)) {
-			if (iterator->second.openFromFile(path)) { loaded = true; break; }
+			if (iterator->second.openFromFile(path)) {
+				loaded = true;
+				break;
+			}
 		}
 		if (!loaded) {
 			fonts.erase(iterator);
-			throw std::runtime_error(std::format("AssetManager: no usable font found for FontAsset {}", static_cast<int>(asset)));
+			throw std::runtime_error(
+			    std::format("AssetManager: no usable font found for FontAsset {}", static_cast<int>(asset)));
 		}
 	}
 	return iterator->second;

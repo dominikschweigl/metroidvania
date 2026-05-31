@@ -21,13 +21,13 @@ class Item {
 	virtual void activate(Player &player, Inventory &inventory, SlotRef ownSlot) = 0;
 
 	[[nodiscard]] virtual std::optional<SlotKind> equipmentSlot() const noexcept = 0;
-	[[nodiscard]] virtual ItemInfo                info()          const noexcept = 0;
-	[[nodiscard]] virtual TextureAsset            textureAsset()  const noexcept = 0;
+	[[nodiscard]] virtual ItemInfo info() const noexcept = 0;
+	[[nodiscard]] virtual TextureAsset textureAsset() const noexcept = 0;
 
-	Item(const Item &)            = delete;
+	Item(const Item &) = delete;
 	Item &operator=(const Item &) = delete;
-	Item(Item &&)                 = delete;
-	Item &operator=(Item &&)      = delete;
+	Item(Item &&) = delete;
+	Item &operator=(Item &&) = delete;
 
   protected:
 	Item() = default;

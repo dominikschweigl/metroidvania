@@ -74,7 +74,7 @@ class Player : public BaseEntity {
 
 	void heal(int amount) noexcept { health.heal(amount); }
 
-	[[nodiscard]] Inventory       &inventory() noexcept;
+	[[nodiscard]] Inventory &inventory() noexcept;
 	[[nodiscard]] const Inventory &inventory() const noexcept;
 
 	void useHotbarSlot(int slot);

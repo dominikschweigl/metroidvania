@@ -5,9 +5,9 @@
 
 std::span<const std::reference_wrapper<const Item>> registeredItems()
 {
-    static const HatItem hat;
-    static const ChewingGumItem gum;
-    static const HealingPotionItem potion;
-    static const std::reference_wrapper<const Item> items[] = {hat, gum, potion};
-    return items;
+	static const HatItem hat;
+	static const ChewingGumItem gum;
+	static const HealingPotionItem potion;
+	static const std::reference_wrapper<const Item> items[] = {hat, gum, potion};
+	return items;
 }

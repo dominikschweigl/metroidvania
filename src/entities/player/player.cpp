@@ -7,8 +7,14 @@ namespace {
 constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
 } // namespace
 
-Inventory &Player::inventory() noexcept { return inventory_; }
-const Inventory &Player::inventory() const noexcept { return inventory_; }
+Inventory &Player::inventory() noexcept
+{
+	return inventory_;
+}
+const Inventory &Player::inventory() const noexcept
+{
+	return inventory_;
+}
 
 void Player::useHotbarSlot(const int slot)
 {
@@ -18,8 +24,7 @@ void Player::useHotbarSlot(const int slot)
 Player::Player()
     : BaseEntity(PLAYER_SPAWN, static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE), MAX_HEALTH,
                  Team::Player),
-      lowerBodySprite(states.idle.idle_lower_texture),
-      headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD)),
+      lowerBodySprite(states.idle.idle_lower_texture), headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD)),
       upperBodySprite(states.idle.idle_upper_texture), currentState(&states.idle)
 {
 	setDirection(Direction::Left);
@@ -50,7 +55,8 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 	if (attackTriggered && currentState->canAttack() && !hatAbility.isThrowActive())
 		meleeAttack.trigger();
 
-	if (hatThrowTriggered && currentState->canAttack() && inventory_.hasHat() && hatAbility.canThrow() && !isAttackActive())
+	if (hatThrowTriggered && currentState->canAttack() && inventory_.hasHat() && hatAbility.canThrow()
+	    && !isAttackActive())
 		hatAbility.trigger();
 
 	meleeAttack.update(deltaTime);

@@ -5,10 +5,8 @@
 #include <numbers>
 
 WorldItem::WorldItem(const sf::Vector2f spawnPos, std::unique_ptr<Item> item)
-    : item_(std::move(item)),
-      position_(spawnPos),
-      texture_(AssetManager::getInstance().getTexture(item_->textureAsset())),
-      sprite_(texture_)
+    : item_(std::move(item)), position_(spawnPos),
+      texture_(AssetManager::getInstance().getTexture(item_->textureAsset())), sprite_(texture_)
 {
 	sprite_.setOrigin({WIDTH / 2.f, HEIGHT});
 }
