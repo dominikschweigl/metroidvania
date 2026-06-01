@@ -493,14 +493,10 @@ TEST_CASE("Full combat flow: idle -> chase -> windup -> attack -> recover")
 
 	// 5. Recover: Chase if player is still close.
 	s.update(RaceConditionSlime::RECOVER_DUR + 0.01f, w, melee);
-	std::cout << "Recover state: " << &states.recover << std::endl;
-	std::cout << "Idle state: " << &states.idle << std::endl;
 	float dist = std::abs(melee.x - s.getPosition().x);
 	if (dist < RaceConditionSlime::DETECT_RANGE) {
-		std::cout << "Player is within detect range" << std::endl;
 		REQUIRE(s.getState() == &states.chase);
 	} else {
-		std::cout << "Player is beyond detect range" << std::endl;
 		REQUIRE(s.getState() == &states.idle);
 	}
 }
