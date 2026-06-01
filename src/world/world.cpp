@@ -148,9 +148,9 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 	const Room &room = rooms.at(currentRoomId);
 
 	const int left = static_cast<int>(rect.position.x / TILE_SIZE);
-	const int right = static_cast<int>((rect.position.x + rect.size.x - 0.001f) / TILE_SIZE);
+	const int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
 	const int top = static_cast<int>(rect.position.y / TILE_SIZE);
-	const int bottom = static_cast<int>((rect.position.y + rect.size.y - 0.001f) / TILE_SIZE);
+	const int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
 
 	if (room.map) {
 		tson::Layer *layer = room.map->getLayer("Solid");
