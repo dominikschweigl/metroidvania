@@ -66,6 +66,13 @@ set(GAME_SOURCES
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
     src/entities/player/states/wall_slide_state.cpp
+    src/entities/enemies/bosses/transistor_boss/transistor_boss.cpp
+    src/entities/enemies/bosses/transistor_boss/electric_ball.cpp
+    src/entities/enemies/bosses/transistor_boss/states/roaming_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/shoot_attack_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/charge_attack_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/recover_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
