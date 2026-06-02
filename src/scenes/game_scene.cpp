@@ -20,8 +20,8 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadRoom(enemies_, items_, "start_room", "data/maps/start_room.tmj");
-	world_.loadRoom(enemies_, items_, "boss_room", "data/maps/boss_room.tmj");
+	world_.loadRoom("start_room", "data/maps/start_room.tmj");
+	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
 	world_.setCurrentRoom("start_room");
 
 	// enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
@@ -78,34 +78,34 @@ void GameScene::update(float deltaTime)
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
 	// Update all alive enemies; collect drops before removing dead ones.
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition());
-	for (auto &enemy : enemies_) {
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (!enemy->isAlive()) {
-			for (std::unique_ptr<Item> &drop : enemy->rollDrops())
-				items_.push_back(std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop)));
+			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
+				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
+				world_.getCurrentRoom()->appendItem(droppedItem);
+			}
 			combat_.clearVictim(&enemy->health);
 		}
 	}
-	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
-	               enemies_.end());
 
 	// Update world items and check for player pickup.
-	for (auto &item : items_)
+	for (auto &item : world_.getCurrentRoom()->items_)
 		item->update(deltaTime, world_);
-	for (std::unique_ptr<WorldItem> &worldItem : items_) {
+	for (const std::unique_ptr<WorldItem> &worldItem : world_.getCurrentRoom()->items_) {
 		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
 		if (collected)
 			player_.inventory().addItem(std::move(collected));
 	}
-	items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
-	             items_.end());
+
+	world_.update(deltaTime, player_.getBounds());
 
 	hitboxes_.clear();
 	hurtboxes_.clear();
 	player_.collectHitboxes(hitboxes_);
 	player_.collectHurtboxes(hurtboxes_);
-	for (auto &enemy : enemies_) {
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		enemy->collectHitboxes(hitboxes_);
 		enemy->collectHurtboxes(hurtboxes_);
 	}
@@ -114,7 +114,7 @@ void GameScene::update(float deltaTime)
 
 	std::vector<std::uint32_t> endedSourceIds;
 	player_.drainEndedSourceIds(endedSourceIds);
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->drainEndedSourceIds(endedSourceIds);
 	for (const std::uint32_t id : endedSourceIds)
 		combat_.clearSource(id);
@@ -142,10 +142,10 @@ void GameScene::draw(sf::RenderWindow &window)
 	window.setView(view_);
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
-	for (auto &item : items_)
+	for (auto &item : world_.getCurrentRoom()->items_)
 		item->draw(window);
 	player_.draw(window);
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->draw(window);
 
 	if (showDebugHitboxes_)
@@ -176,7 +176,7 @@ void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
 	}
 
 	outline.setOutlineColor(sf::Color::Yellow);
-	for (const std::unique_ptr<WorldItem> &item : items_) {
+	for (const std::unique_ptr<WorldItem> &item : world_.getCurrentRoom()->items_) {
 		const sf::FloatRect bounds = item->getBounds();
 		outline.setPosition(bounds.position);
 		outline.setSize(bounds.size);

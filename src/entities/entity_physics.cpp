@@ -37,14 +37,14 @@ float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height
 {
 	float deltaX = velX * dt;
 	float futureX = pos.x + deltaX;
-	sf::FloatRect future({futureX, pos.y}, {width, height});
+	sf::FloatRect future({futureX - width / 2.f, pos.y - height}, {width, height - 1.f});
 
 	if (world.isSolidAtRect(future)) {
 		velX = 0.f;
 		// snap to tile boundary using grid position directly
-		int tileX = static_cast<int>(futureX / World::TILE_SIZE);
+		int tileX = static_cast<int>(future.position.x / World::TILE_SIZE);
 		if (deltaX >= 0.f)
-			return float(tileX * World::TILE_SIZE) - width / 2.f - 1.f;
+			return float((tileX + 1) * World::TILE_SIZE) - width / 2.f;
 		return float((tileX + 1) * World::TILE_SIZE) + width / 2.f;
 	}
 	return futureX;

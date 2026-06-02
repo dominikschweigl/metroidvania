@@ -3,9 +3,7 @@
 #include "../combat/hitbox.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
-#include "../entities/enemies/base_enemy.h"
 #include "../entities/player/player.h"
-#include "../items/world_item.h"
 #include "../ui/health_bar.h"
 #include "../ui/hotbar_hud.h"
 #include "../world/world.h"
@@ -32,8 +30,6 @@ class GameScene : public Scene {
 	sf::View view_;
 	World world_;
 	Player player_;
-	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
-	std::vector<std::unique_ptr<WorldItem>> items_;
 	CombatSystem combat_;
 	HealthBar healthBar_;
 	HotbarHUD hotbarHud_;

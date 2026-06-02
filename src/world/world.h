@@ -20,12 +20,11 @@ class World {
 	World &operator=(const World &) = delete;
 
 	// New room-based methods
-	void loadRoom(std::vector<std::unique_ptr<BaseEnemy>> &enemies, std::vector<std::unique_ptr<WorldItem>> &items,
-	              const std::string &roomId, const std::string &tmjFile);
+	void loadRoom(const std::string &roomId, const std::string &tmjFile);
 	void setCurrentRoom(const std::string &roomId);
 	const std::string &getCurrentRoomId() const { return currentRoomId; }
-	const Room *getCurrentRoom() const;
-	[[nodiscard]] float getWorldHeight() const;
+	Room *getCurrentRoom();
+	[[nodiscard]] float getWorldHeight();
 
 	void loadTileset();
 	void loadTilesets(tson::Map &map);
@@ -39,6 +38,8 @@ class World {
 
 	// Render all visible tiles
 	void draw(sf::RenderWindow &window, const sf::View &view) const;
+
+	void update(float deltaTime, sf::FloatRect playerBounds);
 
 	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
 	{

@@ -1,4 +1,6 @@
 #pragma once
+#include "../entities/enemies/base_enemy.h"
+#include "../items/world_item.h"
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <optional>
@@ -21,11 +23,16 @@ struct Room {
 	std::vector<sf::Vector2f> raceConditionSpawns;
 	std::vector<Door> doors;
 
+	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
+	std::vector<std::unique_ptr<WorldItem>> items_;
+
 	Room() = default;
 	Room(Room &&) = default;
 	Room &operator=(Room &&) = default;
 	Room(const Room &) = default;
 	Room &operator=(const Room &) = default;
+
+	void appendItem(std::unique_ptr<WorldItem> &newItem) { items_.push_back(std::move(newItem)); }
 
 	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds) const
 	{
@@ -35,5 +42,13 @@ struct Room {
 			}
 		}
 		return "";
+	}
+
+	void update(float deltaTime, const World &world)
+	{
+		enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
+		               enemies_.end());
+		items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
+		             items_.end());
 	}
 };

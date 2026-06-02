@@ -39,8 +39,7 @@ void World::loadTilesets(tson::Map &map)
 	}
 }
 
-void World::loadRoom(std::vector<std::unique_ptr<BaseEnemy>> &enemies, std::vector<std::unique_ptr<WorldItem>> &items,
-                     const std::string &roomId, const std::string &file)
+void World::loadRoom(const std::string &roomId, const std::string &file)
 {
 	tson::Tileson t;
 	auto map = t.parse(fs::path(file));
@@ -74,16 +73,16 @@ void World::loadRoom(std::vector<std::unique_ptr<BaseEnemy>> &enemies, std::vect
 				}
 				room.doors.push_back(door);
 			} else if (name == "RaceConditionEnemy") {
-				enemies.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
+				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "ChewingGumItem") {
-				items.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
-				                                            std::make_unique<ChewingGumItem>()));
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<ChewingGumItem>()));
 			} else if (name == "HatItem") {
-				items.push_back(
+				room.items_.push_back(
 				    std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)}, std::make_unique<HatItem>()));
 			} else if (name == "HealingPotionItem") {
-				items.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
-				                                            std::make_unique<HealingPotionItem>()));
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<HealingPotionItem>()));
 			}
 		}
 	}
@@ -105,7 +104,7 @@ void World::setCurrentRoom(const std::string &roomId)
 	}
 }
 
-const Room *World::getCurrentRoom() const
+Room *World::getCurrentRoom()
 {
 	if (currentRoomId.empty() || rooms.find(currentRoomId) == rooms.end()) {
 		return nullptr;
@@ -113,9 +112,9 @@ const Room *World::getCurrentRoom() const
 	return &rooms.at(currentRoomId);
 }
 
-float World::getWorldHeight() const
+float World::getWorldHeight()
 {
-	const Room *room = getCurrentRoom();
+	Room *room = getCurrentRoom();
 	if (room == nullptr) {
 		return 0.f;
 	}
@@ -242,4 +241,17 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 		shape.setFillColor(sf::Color(0, 255, 255, 128));
 		window.draw(shape);
 	}
+}
+
+void World::update(float deltaTime, sf::FloatRect playerBounds)
+{
+	if (currentRoomId.empty())
+		return;
+	Room &room = rooms.at(currentRoomId);
+
+	// for (auto &enemy : room.enemies_)
+	// 	enemy->update(deltaTime, *this, playerBounds.position);
+	// for (auto &item : room.items_)
+	// 	item->update(deltaTime, *this);
+	room.update(deltaTime, *this);
 }
