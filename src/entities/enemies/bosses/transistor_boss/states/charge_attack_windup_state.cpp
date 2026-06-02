@@ -1,4 +1,5 @@
 #include "charge_attack_windup_state.h"
+#include "../../../../../core/audio_manager.h"
 #include "../transistor_boss.h"
 
 namespace transistor_boss {
@@ -41,6 +42,8 @@ void ChargeAttackWindupState::onEnter(BaseEnemy &enemy)
 	transistor_boss.setAuraPhase(TransistorBoss::AuraPhase::Windup);
 	currentFrame = 0;
 	frameTimer = 0.f;
+
+	AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP);
 }
 
 void ChargeAttackWindupState::onExit(BaseEnemy &enemy)

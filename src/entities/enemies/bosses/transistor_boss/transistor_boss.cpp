@@ -1,4 +1,5 @@
 #include "transistor_boss.h"
+#include "../../../../core/audio_manager.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -181,6 +182,7 @@ void TransistorBoss::spawnElectricBall(const sf::Vector2f targetPos)
 		aim = {(direction == Direction::Right) ? 1.f : -1.f, 0.f};
 
 	electricBalls.emplace_back(origin, aim);
+	AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_SHOOT_ATTACK);
 }
 
 void TransistorBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)

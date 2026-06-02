@@ -1,4 +1,5 @@
 #include "roaming_state.h"
+#include "../../../../../core/audio_manager.h"
 #include "../../../../entity_physics.h"
 #include "../transistor_boss.h"
 
@@ -60,10 +61,17 @@ void RoamingState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 	constexpr int FRAME_COUNT = 16;
 	constexpr float FRAME_DURATION = 0.1f;
 
+	// Footfalls land on every leg movement of the walk cycle.
+	constexpr int STEP_FRAME_INTERVAL = 3;
+
 	frameTimer += deltaTime;
 	if (frameTimer >= FRAME_DURATION) {
 		frameTimer -= FRAME_DURATION;
 		currentFrame = (currentFrame + 1) % FRAME_COUNT;
+
+		if (currentFrame % STEP_FRAME_INTERVAL == 0) {
+			AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_STEP);
+		}
 	}
 
 	transistor_boss.setAnimation(TransistorBoss::TransistorBossAnimation::Roaming, currentFrame);
