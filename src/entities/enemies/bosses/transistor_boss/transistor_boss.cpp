@@ -1,6 +1,7 @@
 #include "transistor_boss.h"
 #include "../../../../core/audio_manager.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 
@@ -52,13 +53,17 @@ void TransistorBoss::draw(sf::RenderWindow &window)
 
 void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
 {
-	// Pulse the electricity so the warning area reads as "live" rather than static.
-	constexpr float PULSE_SPEED = 9.f;
-	const float pulse = 0.5f + 0.5f * std::sin(auraTimer * PULSE_SPEED);
 
-	// Each palette runs outer -> mid -> inner (core) so the glow reads as a
-	// multi-tone radial gradient, not a flat disc. Cold electric blue while the
-	// boss is charging up (telegraph), hot orange once it is actively damaging.
+	constexpr float PIXEL = 4.f;
+
+	// Stepped (digital) pulse so the electricity flickers in discrete tiers
+	// rather than fading smoothly — reads as "powered circuitry", not a soft glow.
+	constexpr float PULSE_SPEED = 9.f;
+	const float pulse = std::round((0.5f + 0.5f * std::sin(auraTimer * PULSE_SPEED)) * 4.f) / 4.f;
+
+	// Each palette runs outer -> mid -> inner (core) for a multi-tone radial
+	// look. Cold electric blue while charging up (telegraph), hot orange once it
+	// is actively damaging.
 	struct AuraPalette {
 		sf::Color outer;
 		sf::Color mid;
@@ -73,26 +78,50 @@ void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
 	const sf::Vector2f center{position.x, position.y - height / 2.f};
 	const float maxRadius = CHARGE_AURA_RADIUS * (1.f + 0.06f * pulse);
 
-	// 1) Layered glow: large faint outer rings fading into a bright hot core.
-	constexpr int GLOW_LAYERS = 7;
-	for (int layer = 0; layer < GLOW_LAYERS; ++layer) {
-		const float t = static_cast<float>(layer) / (GLOW_LAYERS - 1); // 0 = edge, 1 = core
-		const float radius = maxRadius * (1.f - 0.6f * t);
+	// All cells go into one batch. Each cell is a PIXEL-sized quad (two triangles).
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
 
-		sf::Color color = (t < 0.5f) ? lerpColor(palette.outer, palette.mid, t * 2.f)
-		                             : lerpColor(palette.mid, palette.inner, (t - 0.5f) * 2.f);
-		color.a = static_cast<std::uint8_t>((25.f + 150.f * t) * (0.7f + 0.3f * pulse));
+	// Snap a local offset to the pixel grid so bolts and core align with the glow.
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
 
-		sf::CircleShape glow(radius);
-		glow.setPointCount(48);
-		glow.setOrigin({radius, radius});
-		glow.setPosition(center);
-		glow.setFillColor(color);
-		window.draw(glow);
+	// 1) Chunky radial glow: walk the local pixel grid and tint each cell by its
+	// distance from the center, quantized into a few hard bands (no gradient).
+	constexpr int GLOW_BANDS = 5;
+	const int cellRange = static_cast<int>(maxRadius / PIXEL) + 1;
+	for (int gridX = -cellRange; gridX <= cellRange; ++gridX) {
+		for (int gridY = -cellRange; gridY <= cellRange; ++gridY) {
+			const float offsetX = gridX * PIXEL;
+			const float offsetY = gridY * PIXEL;
+			const float dist = std::hypot(offsetX, offsetY);
+			if (dist > maxRadius)
+				continue;
+
+			const float t = 1.f - dist / maxRadius; // 0 = edge, 1 = core
+			const float band =
+			    std::min(1.f, std::floor(t * GLOW_BANDS) / (GLOW_BANDS - 1)); // hard tiers
+			sf::Color color = (band < 0.5f) ? lerpColor(palette.outer, palette.mid, band * 2.f)
+			                                : lerpColor(palette.mid, palette.inner, (band - 0.5f) * 2.f);
+			color.a = static_cast<std::uint8_t>((28.f + 95.f * band) * (0.7f + 0.3f * pulse));
+			addCell(center.x + offsetX, center.y + offsetY, color);
+		}
 	}
 
-	// 2) Crackling lightning bolts radiating outward, jittered over time so they
-	// flicker and fork like real electricity.
+	// 2) Chunky lightning bolts: sample a jittered radial line, snap each sample
+	// to the grid, then fill a staircase of cells between samples so the bolt
+	// reads as a connected blocky arc rather than dotted points.
 	constexpr int BOLTS = 9;
 	constexpr int SEGMENTS = 7;
 	const float rotation = auraTimer * 0.7f;
@@ -103,7 +132,7 @@ void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
 	for (int bolt = 0; bolt < BOLTS; ++bolt) {
 		const float baseAngle = (static_cast<float>(bolt) / BOLTS) * 2.f * AURA_PI + rotation;
 
-		sf::VertexArray strip(sf::PrimitiveType::LineStrip, SEGMENTS + 1);
+		std::array<sf::Vector2f, SEGMENTS + 1> points;
 		for (int segment = 0; segment <= SEGMENTS; ++segment) {
 			const float u = static_cast<float>(segment) / SEGMENTS; // 0 at core, 1 at tip
 			const float radius = innerRadius + (outerRadius - innerRadius) * u;
@@ -112,25 +141,38 @@ void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
 			const float wobble =
 			    hashNoise(static_cast<float>(bolt) * 7.31f + static_cast<float>(segment), flicker) - 0.5f;
 			const float angle = baseAngle + wobble * 0.9f * u;
+			points[segment] = {snap(std::cos(angle) * radius), snap(std::sin(angle) * radius)};
+		}
+
+		for (int segment = 0; segment < SEGMENTS; ++segment) {
+			const float u = static_cast<float>(segment) / SEGMENTS;
+			const sf::Vector2f from = points[segment];
+			const sf::Vector2f to = points[segment + 1];
+			const int steps =
+			    std::max(1, static_cast<int>(std::max(std::abs(to.x - from.x), std::abs(to.y - from.y)) / PIXEL));
 
 			sf::Color color = palette.bolt;
 			color.a = static_cast<std::uint8_t>(255.f * (1.f - 0.7f * u) * (0.55f + 0.45f * pulse));
-			strip[segment].position = {center.x + std::cos(angle) * radius, center.y + std::sin(angle) * radius};
-			strip[segment].color = color;
+			for (int step = 0; step <= steps; ++step) {
+				const float f = static_cast<float>(step) / steps;
+				const float cellX = snap(from.x + (to.x - from.x) * f);
+				const float cellY = snap(from.y + (to.y - from.y) * f);
+				addCell(center.x + cellX, center.y + cellY, color);
+			}
 		}
-		window.draw(strip);
 	}
 
-	// 3) Bright hot core to anchor the whole effect.
-	const float coreRadius = maxRadius * 0.18f;
-	sf::CircleShape core(coreRadius);
-	core.setPointCount(24);
-	core.setOrigin({coreRadius, coreRadius});
-	core.setPosition(center);
+	// 3) Bright hot core: a small snapped cluster of cells to anchor the effect.
+	const float coreRadius = maxRadius * 0.13f;
+	const int coreRange = static_cast<int>(coreRadius / PIXEL);
 	sf::Color coreColor = palette.inner;
-	coreColor.a = static_cast<std::uint8_t>(180.f + 60.f * pulse);
-	core.setFillColor(coreColor);
-	window.draw(core);
+	coreColor.a = static_cast<std::uint8_t>(std::min(190.f, 120.f + 55.f * pulse));
+	for (int gridX = -coreRange; gridX <= coreRange; ++gridX)
+		for (int gridY = -coreRange; gridY <= coreRange; ++gridY)
+			if (std::hypot(gridX * PIXEL, gridY * PIXEL) <= coreRadius)
+				addCell(center.x + gridX * PIXEL, center.y + gridY * PIXEL, coreColor);
+
+	window.draw(cells);
 }
 
 void TransistorBoss::onHit(const Hitbox & /*hit*/) noexcept

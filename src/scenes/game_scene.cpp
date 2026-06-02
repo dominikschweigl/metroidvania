@@ -1,7 +1,7 @@
 #include "game_scene.h"
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
-#include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
 #include "../items/damage_potion_item.h"
@@ -20,7 +20,7 @@
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
 {
-	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+	AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
 
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
@@ -31,8 +31,7 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
 	world_.setCurrentRoom("start_room");
 
-	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
-	enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
+	enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
 
 	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
 	items_.push_back(
@@ -95,7 +94,7 @@ void GameScene::update(float deltaTime)
 
 	// Update all alive enemies; collect drops before removing dead ones.
 	for (auto &enemy : enemies_)
-		enemy->update(deltaTime, world_, player_.getPosition());
+		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
 	for (auto &enemy : enemies_) {
 		if (!enemy->isAlive()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops())
