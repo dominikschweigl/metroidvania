@@ -50,4 +50,10 @@ class BaseEnemy : public BaseEntity {
 	EnemyState *currentState = nullptr;
 
 	sf::FloatRect lastPlayerBounds;
+
+	// Most recent context passed to update(), cached so onPreUpdate() (which only
+	// receives deltaTime) can drive sub-entities through their own update().
+	// Pointer because there is no world yet before the first update() call.
+	const World *lastWorld = nullptr;
+	sf::Vector2f lastPlayerPos;
 };

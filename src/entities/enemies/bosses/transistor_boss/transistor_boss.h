@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../../projectiles/electric_ball.h"
 #include "../../base_enemy.h"
-#include "electric_ball.h"
 
 #include "states/charge_attack_state.h"
 #include "states/charge_attack_windup_state.h"
@@ -97,7 +97,7 @@ class TransistorBoss : public BaseEnemy {
 	AuraPhase auraPhase = AuraPhase::None;
 	float auraTimer = 0.f;
 
-	std::vector<transistor_boss::ElectricBall> electricBalls;
+	std::vector<projectiles::ElectricBall> electricBalls;
 	std::vector<std::uint32_t> endedBallSourceIds;
 	std::uint32_t chargeSourceId = 0;
 };

@@ -47,7 +47,7 @@ void TransistorBoss::draw(sf::RenderWindow &window)
 	sprite.setColor(isHurtFlashing() ? sf::Color{255, 80, 80} : sf::Color::White);
 	window.draw(sprite);
 
-	for (const transistor_boss::ElectricBall &ball : electricBalls)
+	for (const projectiles::ElectricBall &ball : electricBalls)
 		ball.draw(window);
 }
 
@@ -187,7 +187,7 @@ void TransistorBoss::onPreUpdate(float deltaTime)
 	auraTimer += deltaTime;
 
 	const sf::FloatRect playerBounds = lastPlayerBounds;
-	std::erase_if(electricBalls, [this, deltaTime, playerBounds](transistor_boss::ElectricBall &ball) {
+	std::erase_if(electricBalls, [this, deltaTime, playerBounds](projectiles::ElectricBall &ball) {
 		if (ball.hasHitPlayer()) {
 			endedBallSourceIds.push_back(ball.getSourceId());
 			return true;
@@ -230,7 +230,7 @@ void TransistorBoss::spawnElectricBall(const sf::Vector2f targetPos)
 void TransistorBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
 	BaseEnemy::collectHitboxes(hitboxes);
-	for (const transistor_boss::ElectricBall &ball : electricBalls)
+	for (const projectiles::ElectricBall &ball : electricBalls)
 		hitboxes.push_back(ball.getHitbox());
 }
 

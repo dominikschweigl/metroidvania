@@ -7,6 +7,8 @@ void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerP
 	tickHurtTimers(deltaTime);
 
 	lastPlayerBounds = playerBounds;
+	lastWorld = &world;
+	lastPlayerPos = playerPos;
 
 	// Let concrete enemies tick their per-frame timers first.
 	onPreUpdate(deltaTime);

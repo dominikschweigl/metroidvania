@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace transistor_boss {
+namespace projectiles {
 namespace {
 constexpr float BALL_PI = 3.14159265f;
 
@@ -24,8 +24,9 @@ constexpr float BALL_PI = 3.14159265f;
 }
 } // namespace
 
-ElectricBall::ElectricBall(const sf::Vector2f startPos, const sf::Vector2f direction)
-    : position(startPos), velocity(direction * SPEED)
+ElectricBall::ElectricBall(const sf::Vector2f startPos, const sf::Vector2f direction, const float speed,
+                           const float radius)
+    : position(startPos), velocity(direction * speed), radius(radius)
 {
 }
 
@@ -38,7 +39,7 @@ bool ElectricBall::update(const float deltaTime)
 
 sf::FloatRect ElectricBall::getBounds() const noexcept
 {
-	return {{position.x - RADIUS, position.y - RADIUS}, {2.f * RADIUS, 2.f * RADIUS}};
+	return {{position.x - radius, position.y - radius}, {2.f * radius, 2.f * radius}};
 }
 
 void ElectricBall::draw(sf::RenderWindow &window) const
@@ -57,7 +58,7 @@ void ElectricBall::draw(sf::RenderWindow &window) const
 	const sf::Color core{235, 250, 255};
 	const sf::Color sparkColor{200, 240, 255};
 
-	const float maxRadius = RADIUS * 1.9f * (1.f + 0.05f * pulse);
+	const float maxRadius = radius * 1.9f * (1.f + 0.05f * pulse);
 
 	sf::VertexArray cells(sf::PrimitiveType::Triangles);
 	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
@@ -102,7 +103,7 @@ void ElectricBall::draw(sf::RenderWindow &window) const
 	const float innerRadius = maxRadius * 0.2f;
 	for (int spark = 0; spark < SPARKS; ++spark) {
 		const float angle = flickerNoise(static_cast<float>(spark), flicker) * 2.f * BALL_PI;
-		const float length = RADIUS * (1.4f + 0.8f * flickerNoise(static_cast<float>(spark) + 0.5f, flicker));
+		const float length = radius * (1.4f + 0.8f * flickerNoise(static_cast<float>(spark) + 0.5f, flicker));
 
 		const sf::Vector2f from{snap(std::cos(angle) * innerRadius), snap(std::sin(angle) * innerRadius)};
 		const sf::Vector2f to{snap(std::cos(angle) * (innerRadius + length)),
@@ -123,4 +124,4 @@ void ElectricBall::draw(sf::RenderWindow &window) const
 	window.draw(cells);
 }
 
-} // namespace transistor_boss
+} // namespace projectiles

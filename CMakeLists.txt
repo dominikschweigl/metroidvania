@@ -66,8 +66,13 @@ set(GAME_SOURCES
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
     src/entities/player/states/wall_slide_state.cpp
+    src/entities/projectiles/electric_ball.cpp
+    src/entities/enemies/capacitor/capacitor.cpp
+    src/entities/enemies/capacitor/states/hover_state.cpp
+    src/entities/enemies/capacitor/states/shoot_state.cpp
+    src/entities/enemies/capacitor/states/flee_state.cpp
+    src/entities/enemies/capacitor/states/swoop_state.cpp
     src/entities/enemies/bosses/transistor_boss/transistor_boss.cpp
-    src/entities/enemies/bosses/transistor_boss/electric_ball.cpp
     src/entities/enemies/bosses/transistor_boss/states/roaming_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/shoot_attack_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.cpp
@@ -83,6 +88,7 @@ add_executable(metroidvania_tests
     tests/unit/base_entity_tests.cpp
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
+    tests/unit/capacitor_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp

@@ -1,19 +1,20 @@
 #pragma once
 
-#include "../../../../combat/hitbox.h"
+#include "../../combat/hitbox.h"
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 
-namespace transistor_boss {
+namespace projectiles {
 
 class ElectricBall {
   public:
-	static constexpr float SPEED = 240.f;
-	static constexpr float RADIUS = 9.f;
+	static constexpr float DEFAULT_SPEED = 240.f;
+	static constexpr float DEFAULT_RADIUS = 9.f;
 	static constexpr float LIFETIME = 2.5f;
 	static constexpr int DAMAGE = 1;
 
-	ElectricBall(sf::Vector2f startPos, sf::Vector2f direction);
+	ElectricBall(sf::Vector2f startPos, sf::Vector2f direction, float speed = DEFAULT_SPEED,
+	             float radius = DEFAULT_RADIUS);
 
 	[[nodiscard]] bool update(float deltaTime);
 	void draw(sf::RenderWindow &window) const;
@@ -28,9 +29,10 @@ class ElectricBall {
   private:
 	sf::Vector2f position;
 	sf::Vector2f velocity;
+	float radius;
 	float age = 0.f;
 	bool hitPlayer = false;
 	std::uint32_t sourceId = nextSourceId();
 };
 
-} // namespace transistor_boss
+} // namespace projectiles
