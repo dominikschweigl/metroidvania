@@ -4,34 +4,10 @@
 #include "combat/hitbox.h"
 #include "entities/base_entity.h"
 #include "entities/player/player.h"
-#include "world/world.h"
+#include "world_test_helpers.h"
 #include <type_traits>
 
 static_assert(std::is_base_of_v<BaseEntity, Player>, "Player must inherit from BaseEntity");
-
-namespace {
-
-World makeEmptyWorld()
-{
-	std::vector<std::vector<int>> g(5, std::vector<int>(10, 0));
-	World w;
-	w.loadFromGrid(g);
-	return w;
-}
-
-World makeFlooredWorldForPlayer()
-{
-	// Player spawns at (15*32, 0). Build a wide world with a floor row directly beneath
-	// so the player stays in idle (canAttack=true) after the first update tick.
-	std::vector<std::vector<int>> g(20, std::vector<int>(40, 0));
-	for (int x = 0; x < 40; ++x)
-		g[1][x] = 1;
-	World w;
-	w.loadFromGrid(g);
-	return w;
-}
-
-} // namespace
 
 TEST_CASE("Player: starts with full health (5/5) and is alive")
 {

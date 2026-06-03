@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../../combat/hitbox.h"
+#include "../../effects/effect.h"
 #include "../base_entity.h"
 #include "abilities/hat_ability.h"
 #include "abilities/melee_attack.h"
@@ -73,16 +74,18 @@ class Player : public BaseEntity {
 	[[nodiscard]] bool isInvulnerable() const noexcept override { return iframes > 0.f; }
 
 	void heal(int amount) noexcept { health.heal(amount); }
+	void takeDamage(int amount) noexcept override;
+	void triggerIframes() noexcept { iframes = IFRAME_DURATION; }
+
+	void addEffect(Effect effect);
+	[[nodiscard]] const std::vector<Effect> &activeEffects() const noexcept;
 
 	[[nodiscard]] Inventory &inventory() noexcept;
 	[[nodiscard]] const Inventory &inventory() const noexcept;
 
 	void useHotbarSlot(int slot);
 
-	[[nodiscard]] std::optional<Hitbox> getMeleeHitbox() const noexcept
-	{
-		return meleeAttack.getHitbox(position, getDirection());
-	}
+	[[nodiscard]] std::optional<Hitbox> getMeleeHitbox() const noexcept;
 
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
@@ -98,6 +101,13 @@ class Player : public BaseEntity {
 
 	float iframes = 0.f;
 	int previousHealth = MAX_HEALTH;
+
+	std::vector<Effect> activeEffects_;
+
+	[[nodiscard]] float speedMultiplier() const noexcept;
+	[[nodiscard]] float jumpMultiplier() const noexcept;
+	[[nodiscard]] float damageMultiplier() const noexcept;
+	[[nodiscard]] float damageResistance() const noexcept;
 
 	MeleeAttack meleeAttack;
 	HatAbility hatAbility;

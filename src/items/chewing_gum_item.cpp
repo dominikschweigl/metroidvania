@@ -5,3 +5,8 @@ void ChewingGumItem::activate(Player & /*player*/, Inventory &inventory, const S
 {
 	inventory.moveToEquipmentSlot(ownSlot);
 }
+
+ItemInfo ChewingGumItem::info() const
+{
+	return {"Sticky Chewing Gum", "Clings to any surface.", "Enables wall slide"};
+}

@@ -8,7 +8,7 @@ class Player;
 
 class Inventory {
   public:
-	static constexpr int EQUIPMENT_SIZE = 2;
+	static constexpr int EQUIPMENT_SIZE = 3;
 	static constexpr int GRID_SIZE = 24;
 	static constexpr int HOTBAR_SIZE = 5;
 
@@ -22,6 +22,7 @@ class Inventory {
 
 	std::unique_ptr<Item> hatSlot;
 	std::unique_ptr<Item> gumSlot;
+	std::unique_ptr<Item> backupSlot;
 	std::array<std::unique_ptr<Item>, GRID_SIZE> grid;
 	std::array<std::unique_ptr<Item>, HOTBAR_SIZE> hotbar;
 
@@ -34,6 +35,7 @@ class Inventory {
 
 	[[nodiscard]] bool hasHat() const noexcept { return hatSlot != nullptr; }
 	[[nodiscard]] bool hasGum() const noexcept { return gumSlot != nullptr; }
+	[[nodiscard]] bool hasBackup() const noexcept { return backupSlot != nullptr; }
 
 	[[nodiscard]] bool hasItem(SlotRef slot) const noexcept;
 
@@ -61,6 +63,7 @@ class Inventory {
 	static constexpr std::array<SlotRef, EQUIPMENT_SIZE> EQUIPMENT_SLOTS_ = {
 	    SlotRef{SlotKind::Hat, 0},
 	    SlotRef{SlotKind::Gum, 0},
+	    SlotRef{SlotKind::Backup, 0},
 	};
 	static constexpr std::array<SlotRef, GRID_SIZE> GRID_SLOTS_ = [] {
 		std::array<SlotRef, GRID_SIZE> slots{};
