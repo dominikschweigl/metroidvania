@@ -9,6 +9,11 @@ EnemyState *RoamingState::update(float deltaTime, BaseEnemy &enemy, const World 
 {
 	auto &transistor_boss = static_cast<TransistorBoss &>(enemy);
 
+	// Second stage starts at half health
+	// Summons minions after short transition period.
+	if (!transistor_boss.isStage2Triggered() && transistor_boss.health.current <= TransistorBoss::STAGE2_HP)
+		return &transistor_boss.states.stage2Recover;
+
 	moveTimer += deltaTime;
 
 	float deltaX = playerPos.x - transistor_boss.getPosition().x;
@@ -61,8 +66,8 @@ void RoamingState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 	constexpr int FRAME_COUNT = 16;
 	constexpr float FRAME_DURATION = 0.1f;
 
-	// Footfalls land on every leg movement of the walk cycle.
-	constexpr int STEP_FRAME_INTERVAL = 3;
+	// Only play step audio on given interval.
+	constexpr int STEP_FRAME_INTERVAL = 4;
 
 	frameTimer += deltaTime;
 	if (frameTimer >= FRAME_DURATION) {

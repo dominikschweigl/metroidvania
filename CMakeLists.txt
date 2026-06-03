@@ -78,6 +78,8 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/charge_attack_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/recover_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/stage2_recover_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/summon_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -89,6 +91,7 @@ add_executable(metroidvania_tests
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
     tests/unit/capacitor_tests.cpp
+    tests/unit/transistor_boss_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp

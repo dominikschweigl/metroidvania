@@ -38,17 +38,29 @@ TransistorBoss::TransistorBoss(sf::Vector2f spawnPos)
 
 void TransistorBoss::draw(sf::RenderWindow &window)
 {
+	// Beams sit behind the boss and minions.
+	const sf::Vector2f beamCore{position.x, position.y - height / 2.f};
+	for (const std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+		drawBeam(window, beamCore, cap->getCenter());
+
 	if (auraPhase != AuraPhase::None) {
 		drawChargeAura(window);
 	}
 
 	sprite.setPosition(position);
 	sprite.setScale({direction == Direction::Right ? 1.f : -1.f, 1.f});
-	sprite.setColor(isHurtFlashing() ? sf::Color{255, 80, 80} : sf::Color::White);
+	// Shielded cyan tint telegraphs the invincible stage-two recover; hurt flash wins.
+	const sf::Color tint = isHurtFlashing() ? sf::Color{255, 80, 80}
+	                       : invincible     ? sf::Color{150, 220, 255}
+	                                        : sf::Color::White;
+	sprite.setColor(tint);
 	window.draw(sprite);
 
 	for (const projectiles::ElectricBall &ball : electricBalls)
 		ball.draw(window);
+
+	for (const std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+		cap->draw(window);
 }
 
 void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
@@ -109,9 +121,8 @@ void TransistorBoss::drawChargeAura(sf::RenderWindow &window) const
 			if (dist > maxRadius)
 				continue;
 
-			const float t = 1.f - dist / maxRadius; // 0 = edge, 1 = core
-			const float band =
-			    std::min(1.f, std::floor(t * GLOW_BANDS) / (GLOW_BANDS - 1)); // hard tiers
+			const float t = 1.f - dist / maxRadius;
+			const float band = std::min(1.f, std::floor(t * GLOW_BANDS) / (GLOW_BANDS - 1));
 			sf::Color color = (band < 0.5f) ? lerpColor(palette.outer, palette.mid, band * 2.f)
 			                                : lerpColor(palette.mid, palette.inner, (band - 0.5f) * 2.f);
 			color.a = static_cast<std::uint8_t>((28.f + 95.f * band) * (0.7f + 0.3f * pulse));
@@ -200,6 +211,32 @@ void TransistorBoss::onPreUpdate(float deltaTime)
 			ball.markHitPlayer();
 		return false;
 	});
+
+	if (!bondedCapacitors.empty()) {
+		for (std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+			cap->update(deltaTime, *lastWorld, lastPlayerPos, lastPlayerBounds);
+
+		std::erase_if(bondedCapacitors, [this](const std::unique_ptr<Capacitor> &cap) {
+			if (!cap->isAlive()) {
+				cap->drainEndedSourceIds(endedBallSourceIds);
+				return true;
+			}
+			return false;
+		});
+	}
+
+	if (!bondedCapacitors.empty()) {
+		beamTickTimer += deltaTime;
+		if (beamSourceId == 0 || beamTickTimer >= BEAM_TICK) {
+			if (beamSourceId != 0)
+				endedBallSourceIds.push_back(beamSourceId);
+			beamSourceId = nextSourceId();
+			beamTickTimer = 0.f;
+		}
+	} else if (beamSourceId != 0) {
+		endedBallSourceIds.push_back(beamSourceId);
+		beamSourceId = 0;
+	}
 }
 
 std::optional<Hitbox> TransistorBoss::getHitbox() noexcept
@@ -227,17 +264,121 @@ void TransistorBoss::spawnElectricBall(const sf::Vector2f targetPos)
 	AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_SHOOT_ATTACK);
 }
 
+void TransistorBoss::spawnBondedCapacitors()
+{
+	stage2Triggered = true;
+	const sf::Vector2f core{position.x, position.y - height / 2.f};
+	const std::array<sf::Vector2f, CAPACITOR_COUNT> offsets = {sf::Vector2f{-90.f, -70.f}, sf::Vector2f{0.f, -130.f},
+	                                                           sf::Vector2f{90.f, -70.f}};
+	for (const sf::Vector2f offset : offsets)
+		bondedCapacitors.push_back(std::make_unique<Capacitor>(core + offset));
+}
+
+void TransistorBoss::drawBeam(sf::RenderWindow &window, const sf::Vector2f from, const sf::Vector2f to) const
+{
+	constexpr float PIXEL = 4.f;
+	constexpr int SEGMENTS = 16;
+
+	const sf::Vector2f delta = to - from;
+	const float length = std::hypot(delta.x, delta.y);
+	if (length < 1.f)
+		return;
+
+	// Unit perpendicular, used to jitter the bolt sideways and to flank it with glow.
+	const sf::Vector2f normal{-delta.y / length, delta.x / length};
+	const float flicker = std::floor(auraTimer * 20.f); // re-rolls bolt shape
+
+	const sf::Color glow{90, 170, 255};
+	const sf::Color hot{235, 250, 255};
+
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
+
+	// Walk the segment, jittering each joint sideways (zero at the ends), and fill a
+	// staircase of cells between joints so the beam reads as one connected blocky bolt.
+	sf::Vector2f previous = from;
+	for (int segment = 1; segment <= SEGMENTS; ++segment) {
+		const float t = static_cast<float>(segment) / SEGMENTS;
+		const float taper = std::sin(t * AURA_PI); // 0 at both ends, 1 mid-span
+		const float wobble = (hashNoise(static_cast<float>(segment), flicker) - 0.5f) * 16.f * taper;
+		const sf::Vector2f point = from + delta * t + normal * wobble;
+
+		const sf::Vector2f start{snap(previous.x), snap(previous.y)};
+		const sf::Vector2f end{snap(point.x), snap(point.y)};
+		const int steps =
+		    std::max(1, static_cast<int>(std::max(std::abs(end.x - start.x), std::abs(end.y - start.y)) / PIXEL));
+		for (int step = 0; step <= steps; ++step) {
+			const float f = static_cast<float>(step) / steps;
+			const float cellX = snap(start.x + (end.x - start.x) * f);
+			const float cellY = snap(start.y + (end.y - start.y) * f);
+			sf::Color flank = glow;
+			flank.a = 90;
+			addCell(snap(cellX + normal.x * PIXEL), snap(cellY + normal.y * PIXEL), flank);
+			addCell(snap(cellX - normal.x * PIXEL), snap(cellY - normal.y * PIXEL), flank);
+			sf::Color coreColor = hot;
+			coreColor.a = 235;
+			addCell(cellX, cellY, coreColor);
+		}
+		previous = point;
+	}
+
+	window.draw(cells);
+}
+
 void TransistorBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
 	BaseEnemy::collectHitboxes(hitboxes);
 	for (const projectiles::ElectricBall &ball : electricBalls)
 		hitboxes.push_back(ball.getHitbox());
+	for (const std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+		cap->collectHitboxes(hitboxes);
+	collectBeamHitboxes(hitboxes);
+}
+
+void TransistorBoss::collectHurtboxes(std::vector<Hurtbox> &hurtboxes)
+{
+	BaseEntity::collectHurtboxes(hurtboxes); // the boss's own body
+	for (const std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+		cap->collectHurtboxes(hurtboxes); // so the player can destroy the minions
+}
+
+void TransistorBoss::collectBeamHitboxes(std::vector<Hitbox> &hitboxes) const
+{
+	if (beamSourceId == 0)
+		return;
+
+	const sf::Vector2f core{position.x, position.y - height / 2.f};
+	for (const std::unique_ptr<Capacitor> &cap : bondedCapacitors) {
+		const sf::Vector2f tip = cap->getCenter();
+		for (int sample = 0; sample <= BEAM_HITBOX_SAMPLES; ++sample) {
+			const float t = static_cast<float>(sample) / BEAM_HITBOX_SAMPLES;
+			const sf::Vector2f point = core + (tip - core) * t;
+			const sf::FloatRect box({point.x - BEAM_HITBOX_SIZE / 2.f, point.y - BEAM_HITBOX_SIZE / 2.f},
+			                        {BEAM_HITBOX_SIZE, BEAM_HITBOX_SIZE});
+			hitboxes.push_back(Hitbox{box, BEAM_DAMAGE, Team::Enemy, beamSourceId});
+		}
+	}
 }
 
 void TransistorBoss::drainEndedSourceIds(std::vector<std::uint32_t> &out)
 {
 	out.insert(out.end(), endedBallSourceIds.begin(), endedBallSourceIds.end());
 	endedBallSourceIds.clear();
+	for (std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+		cap->drainEndedSourceIds(out);
 }
 
 void TransistorBoss::setAnimation(TransistorBossAnimation anim, int frame)
