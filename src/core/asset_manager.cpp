@@ -125,6 +125,18 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/items/chewing_gum.png";
 	case ITEM_HEALING_POTION:
 		return "assets/images/items/healing_potion.png";
+	case ITEM_JUMP_POTION:
+		return "assets/images/items/jump_boost_potion.png";
+	case ITEM_SPEED_POTION:
+		return "assets/images/items/speed_potion.png";
+	case ITEM_RESISTANCE_POTION:
+		return "assets/images/items/resistance_potion.png";
+	case ITEM_DAMAGE_POTION:
+		return "assets/images/items/damage_potion.png";
+	case ITEM_USB_KEY:
+		return "assets/images/items/keys/damaged_usb_key.png";
+	case ITEM_BACKUP_DISK:
+		return "assets/images/items/floppy_disk/floppy_disk_blackwhite.png";
 	}
 
 	throw std::logic_error("texturePath: missing TextureAsset path entry");

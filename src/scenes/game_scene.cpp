@@ -2,9 +2,15 @@
 #include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
+#include "../items/damage_potion_item.h"
 #include "../items/hat_item.h"
 #include "../items/healing_potion_item.h"
+#include "../items/jump_potion_item.h"
+#include "../items/resistance_potion_item.h"
+#include "../items/speed_potion_item.h"
+#include "../items/usb_key_item.h"
 #include "inventory_scene.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
@@ -33,6 +39,17 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
 	items_.push_back(
 	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{35 * 32.f, 8 * 32.f}, std::make_unique<JumpPotionItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 8 * 32.f}, std::make_unique<SpeedPotionItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 8 * 32.f}, std::make_unique<DamagePotionItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 8 * 32.f}, std::make_unique<ResistancePotionItem>()));
+	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 28 * 32.f}, std::make_unique<UsbKeyItem>()));
+	items_.push_back(
+	    std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 18 * 32.f}, std::make_unique<BackupDiskItem>()));
 
 	view_.setCenter(player_.getPosition());
 }
@@ -121,6 +138,13 @@ void GameScene::update(float deltaTime)
 	hotbarHud_.update(deltaTime);
 	resetPlayerIfOutOfBounds();
 
+	// Backup Disk revive: intercept death before the game-over check
+	if (!player_.isAlive() && player_.inventory().hasBackup()) {
+		player_.heal(1);
+		player_.inventory().clearSlot({SlotKind::Backup, 0});
+		player_.triggerIframes();
+	}
+
 	// Check for player death
 	if (!player_.isAlive()) {
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
@@ -150,8 +174,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	if (showDebugHitboxes_)
 		drawDebugHitboxes(window);
 
-	healthBar_.draw(window, player_.health);
-	hotbarHud_.draw(window, player_.inventory());
+	healthBar_.draw(window, player_.health, player_.inventory().hasBackup());
+	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects());
 }
 
 void GameScene::drawDebugHitboxes(sf::RenderWindow &window)

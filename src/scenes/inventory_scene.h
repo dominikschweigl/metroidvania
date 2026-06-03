@@ -1,10 +1,12 @@
 #pragma once
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
+#include "../effects/effect.h"
 #include "../entities/player/inventory.h"
 #include "../items/slot_ref.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <vector>
 
 class Player;
 
@@ -25,6 +27,7 @@ class InventoryScene : public Scene {
 		sf::Vector2f mousePos;
 	};
 
+	[[nodiscard]] sf::View buildUiView(const sf::RenderWindow &window) const noexcept;
 	[[nodiscard]] sf::Vector2f slotScreenPos(SlotRef slot) const noexcept;
 	[[nodiscard]] sf::FloatRect slotBounds(SlotRef slot) const noexcept;
 	[[nodiscard]] std::optional<SlotRef> slotAtPoint(sf::Vector2f point) const noexcept;
@@ -35,8 +38,11 @@ class InventoryScene : public Scene {
 	void drawAllSlots(sf::RenderTarget &target) const;
 	void drawInfoCard(sf::RenderTarget &target, SlotRef slot) const;
 	void drawDraggedItem(sf::RenderTarget &target) const;
+	void drawActiveEffects(sf::RenderTarget &target, const std::vector<Effect> &effects) const;
 	void drawText(sf::RenderTarget &target, const std::string &text, sf::Vector2f pos, unsigned int charSize,
 	              sf::Color color) const;
+	float drawWrappedText(sf::RenderTarget &target, const std::string &text, sf::Vector2f pos, unsigned int charSize,
+	                      sf::Color color, float maxWidth) const;
 
 	Player &player_;
 	SceneStack &stack_;
@@ -58,6 +64,14 @@ class InventoryScene : public Scene {
 	static constexpr float HAT_SLOT_Y = 120.f;
 	// GUM_SLOT_Y chosen so gum-slot bottom (288+48=336) = grid bottom (GRID_ROWS=4, 120+216=336)
 	static constexpr float GUM_SLOT_Y = 288.f;
+	static constexpr float BACKUP_SLOT_Y = (HAT_SLOT_Y + GUM_SLOT_Y) / 2.f;
+
+	// Active effects side panel (to the right of the main panel)
+	static constexpr float EFFECTS_PANEL_GAP = 12.f;
+	static constexpr float EFFECTS_PANEL_W = 220.f;
+	static constexpr float MIN_CANVAS_W = PANEL_W + 2.f * (EFFECTS_PANEL_GAP + EFFECTS_PANEL_W) + 40.f;
+	static constexpr float EFFECTS_CARD_H = 48.f;
+	static constexpr float EFFECTS_CARD_ICON_SIZE = 32.f;
 	// Preview box spans the same top/bottom as the perm slots
 	static constexpr float PREVIEW_BOX_H = GUM_SLOT_Y + SLOT_SIZE - HAT_SLOT_Y;
 	// Character feet centered vertically in the preview box (PLAYER_FRAME_SIZE=32)

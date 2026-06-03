@@ -3,6 +3,7 @@
 #include "../core/input_manager.h"
 #include "../entities/player/inventory.h"
 #include "../entities/player/player.h"
+#include <cmath>
 
 namespace {
 constexpr sf::Color PANEL_BG{15, 15, 25, 220};
@@ -30,6 +31,16 @@ InventoryScene::InventoryScene(Player &player, SceneStack &stack, const sf::Vect
 	panelY_ = (static_cast<float>(windowSize.y) - PANEL_H) / 2.f;
 }
 
+// --- View ---
+
+sf::View InventoryScene::buildUiView(const sf::RenderWindow &window) const noexcept
+{
+	const float actualW = static_cast<float>(window.getSize().x);
+	const float actualH = static_cast<float>(window.getSize().y);
+	const float scale = std::min(1.f, actualW / MIN_CANVAS_W);
+	return sf::View(sf::FloatRect({0.f, 0.f}, {actualW / scale, actualH / scale}));
+}
+
 // --- Layout ---
 
 sf::Vector2f InventoryScene::slotScreenPos(const SlotRef slot) const noexcept
@@ -39,6 +50,8 @@ sf::Vector2f InventoryScene::slotScreenPos(const SlotRef slot) const noexcept
 		return {panelX_ + PERM_SLOT_X, panelY_ + HAT_SLOT_Y};
 	case SlotKind::Gum:
 		return {panelX_ + PERM_SLOT_X, panelY_ + GUM_SLOT_Y};
+	case SlotKind::Backup:
+		return {panelX_ + PERM_SLOT_X, panelY_ + BACKUP_SLOT_Y};
 	case SlotKind::Grid: {
 		const int col = slot.index % GRID_COLS;
 		const int row = slot.index / GRID_COLS;
@@ -71,9 +84,9 @@ std::optional<SlotRef> InventoryScene::slotAtPoint(const sf::Vector2f point) con
 void InventoryScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 {
 	Inventory &inv = player_.inventory();
-	const sf::View defaultView = window.getDefaultView();
+	const sf::View uiView = buildUiView(window);
 
-	auto toViewCoords = [&](sf::Vector2i pixelPos) { return window.mapPixelToCoords(pixelPos, defaultView); };
+	auto toViewCoords = [&](sf::Vector2i pixelPos) { return window.mapPixelToCoords(pixelPos, uiView); };
 
 	if (const auto *moved = event.getIf<sf::Event::MouseMoved>()) {
 		const sf::Vector2f mousePos = toViewCoords(moved->position);
@@ -134,6 +147,47 @@ void InventoryScene::drawText(sf::RenderTarget &target, const std::string &text,
 	target.draw(label);
 }
 
+float InventoryScene::drawWrappedText(sf::RenderTarget &target, const std::string &text, const sf::Vector2f pos,
+                                      const unsigned int charSize, const sf::Color color, const float maxWidth) const
+{
+	const sf::Font &font = AssetManager::getInstance().getFont(UI_FONT);
+	const float lineHeight = static_cast<float>(charSize) * 1.4f;
+
+	std::string currentLine;
+	std::string currentWord;
+	float currentY = pos.y;
+
+	auto flushWord = [&]() {
+		if (currentWord.empty())
+			return;
+		std::string testLine = currentLine.empty() ? currentWord : currentLine + " " + currentWord;
+		sf::Text test(font, testLine, charSize);
+		if (!currentLine.empty() && test.getLocalBounds().size.x > maxWidth) {
+			drawText(target, currentLine, {pos.x, currentY}, charSize, color);
+			currentLine = currentWord;
+			currentY += lineHeight;
+		} else {
+			currentLine = testLine;
+		}
+		currentWord.clear();
+	};
+
+	for (const char ch : text) {
+		if (ch == ' ' || ch == '\n')
+			flushWord();
+		else
+			currentWord += ch;
+	}
+	flushWord();
+
+	if (!currentLine.empty()) {
+		drawText(target, currentLine, {pos.x, currentY}, charSize, color);
+		currentY += lineHeight;
+	}
+
+	return currentY;
+}
+
 void InventoryScene::drawBackground(sf::RenderTarget &target) const
 {
 	sf::RectangleShape panel({PANEL_W, PANEL_H});
@@ -145,6 +199,7 @@ void InventoryScene::drawBackground(sf::RenderTarget &target) const
 
 	drawText(target, "INVENTORY", {panelX_ + 16.f, panelY_ + 12.f}, 24, TEXT_TITLE);
 	drawText(target, "Hat", {panelX_ + PERM_SLOT_X, panelY_ + HAT_SLOT_Y - 20.f}, 13, TEXT_BODY);
+	drawText(target, "Backup", {panelX_ + PERM_SLOT_X, panelY_ + BACKUP_SLOT_Y - 20.f}, 13, TEXT_BODY);
 	drawText(target, "Gum", {panelX_ + PERM_SLOT_X, panelY_ + GUM_SLOT_Y - 20.f}, 13, TEXT_BODY);
 	drawText(target, "Items", {panelX_ + GRID_START_X, panelY_ + GRID_START_Y - 20.f}, 13, TEXT_BODY);
 	drawText(target, "Hotbar", {panelX_ + HOTBAR_START_X, panelY_ + HOTBAR_Y - 20.f}, 13, TEXT_BODY);
@@ -195,7 +250,13 @@ void InventoryScene::drawSlot(sf::RenderTarget &target, const SlotRef slot, cons
                               const bool isDragSource) const
 {
 	const sf::Vector2f pos = slotScreenPos(slot);
-	const bool isPerm = (slot.kind == SlotKind::Hat || slot.kind == SlotKind::Gum);
+	bool isPerm = false;
+	for (const SlotRef &equipSlot : Inventory::equipmentSlots()) {
+		if (equipSlot.kind == slot.kind) {
+			isPerm = true;
+			break;
+		}
+	}
 
 	sf::RectangleShape shape({SLOT_SIZE, SLOT_SIZE});
 	shape.setPosition(pos);
@@ -260,7 +321,8 @@ void InventoryScene::drawInfoCard(sf::RenderTarget &target, const SlotRef slot) 
 	target.draw(card);
 
 	drawText(target, std::string(info.name), {cardX + CARD_PAD, cardY + CARD_PAD}, 14, TEXT_TITLE);
-	drawText(target, std::string(info.description), {cardX + CARD_PAD, cardY + CARD_PAD + LINE_H_LG}, 12, TEXT_BODY);
+	drawWrappedText(target, std::string(info.description), {cardX + CARD_PAD, cardY + CARD_PAD + LINE_H_LG}, 12,
+	                TEXT_BODY, CARD_W - 2.f * CARD_PAD);
 
 	// Divider
 	sf::RectangleShape divider({CARD_W - 2.f * CARD_PAD, 1.f});
@@ -289,10 +351,65 @@ void InventoryScene::drawDraggedItem(sf::RenderTarget &target) const
 	target.draw(sprite);
 }
 
+void InventoryScene::drawActiveEffects(sf::RenderTarget &target, const std::vector<Effect> &effects) const
+{
+	const float sideX = panelX_ + PANEL_W + EFFECTS_PANEL_GAP;
+	const float sideY = panelY_;
+
+	sf::RectangleShape sidePanel({EFFECTS_PANEL_W, PANEL_H});
+	sidePanel.setPosition({sideX, sideY});
+	sidePanel.setFillColor(PANEL_BG);
+	sidePanel.setOutlineColor(PANEL_BORDER);
+	sidePanel.setOutlineThickness(OUTLINE_THICK);
+	target.draw(sidePanel);
+
+	constexpr float TITLE_PAD = 12.f;
+	constexpr float TITLE_H = 22.f;
+	drawText(target, "Active Effects", {sideX + TITLE_PAD, sideY + TITLE_PAD}, 14, TEXT_TITLE);
+
+	constexpr float CARDS_START_Y = TITLE_PAD + TITLE_H + 8.f;
+	constexpr float CARD_PAD = 8.f;
+	constexpr float CARD_W = EFFECTS_PANEL_W - 2.f * CARD_PAD;
+
+	if (effects.empty()) {
+		drawText(target, "None", {sideX + CARD_PAD, sideY + CARDS_START_Y}, 12, sf::Color{100, 100, 120, 200});
+		return;
+	}
+
+	for (int i = 0; i < static_cast<int>(effects.size()); ++i) {
+		const Effect &effect = effects[i];
+		const float cardY = sideY + CARDS_START_Y + static_cast<float>(i) * (EFFECTS_CARD_H + CARD_PAD);
+
+		sf::RectangleShape card({CARD_W, EFFECTS_CARD_H});
+		card.setPosition({sideX + CARD_PAD, cardY});
+		card.setFillColor(CARD_BG);
+		card.setOutlineColor(CARD_BORDER);
+		card.setOutlineThickness(OUTLINE_THICK);
+		target.draw(card);
+
+		// Icon (16x16, left side, vertically centred)
+		const sf::Texture &tex = AssetManager::getInstance().getTexture(effect.icon());
+		sf::Sprite sprite(tex);
+		const sf::Vector2u texSize = tex.getSize();
+		sprite.setScale({EFFECTS_CARD_ICON_SIZE / static_cast<float>(texSize.x),
+		                 EFFECTS_CARD_ICON_SIZE / static_cast<float>(texSize.y)});
+		sprite.setPosition({sideX + CARD_PAD + (EFFECTS_CARD_H - EFFECTS_CARD_ICON_SIZE) / 2.f,
+		                    cardY + (EFFECTS_CARD_H - EFFECTS_CARD_ICON_SIZE) / 2.f});
+		target.draw(sprite);
+
+		// Text to the right of the icon
+		const float textX = sideX + CARD_PAD + EFFECTS_CARD_H + 4.f;
+		drawText(target, std::string(effect.name()), {textX, cardY + 6.f}, 13, TEXT_TITLE);
+
+		const int remainingSeconds = static_cast<int>(std::ceil(effect.remainingDuration));
+		drawText(target, std::to_string(remainingSeconds) + " s remaining", {textX, cardY + 26.f}, 11, TEXT_BODY);
+	}
+}
+
 void InventoryScene::draw(sf::RenderWindow &window)
 {
 	const sf::View previousView = window.getView();
-	window.setView(window.getDefaultView());
+	window.setView(buildUiView(window));
 
 	// Recompute panel origin from the view that's actually used for rendering
 	// so that drawing positions and mouse hit-testing always share the same space.
@@ -308,6 +425,8 @@ void InventoryScene::draw(sf::RenderWindow &window)
 		drawInfoCard(window, *hovered_);
 
 	drawDraggedItem(window);
+	if (!player_.activeEffects().empty())
+		drawActiveEffects(window, player_.activeEffects());
 
 	window.setView(previousView);
 }

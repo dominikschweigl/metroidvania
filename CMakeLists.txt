@@ -40,10 +40,17 @@ set(GAME_SOURCES
     src/entities/enemies/race_condition_slime/states/windup_state.cpp
     src/entities/enemies/race_condition_slime/states/attack_state.cpp
     src/entities/enemies/race_condition_slime/states/recover_state.cpp
+    src/effects/effect.cpp
     src/items/item_registry.cpp
     src/items/healing_potion_item.cpp
     src/items/hat_item.cpp
     src/items/chewing_gum_item.cpp
+    src/items/jump_potion_item.cpp
+    src/items/speed_potion_item.cpp
+    src/items/resistance_potion_item.cpp
+    src/items/damage_potion_item.cpp
+    src/items/usb_key_item.cpp
+    src/items/backup_disk_item.cpp
     src/items/world_item.cpp
     src/entities/player/inventory.cpp
     src/entities/player/player.cpp
@@ -78,6 +85,7 @@ add_executable(metroidvania_tests
     tests/unit/player_combat_tests.cpp
     tests/unit/melee_attack_tests.cpp
     tests/unit/inventory_tests.cpp
+    tests/unit/effect_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_link_libraries(metroidvania_tests PRIVATE Catch2::Catch2WithMain fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
