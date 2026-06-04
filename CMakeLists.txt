@@ -80,6 +80,7 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/transistor_boss/states/recover_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/stage2_recover_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/summon_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/death_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})

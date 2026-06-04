@@ -190,6 +190,8 @@ std::string_view AudioManager::soundPath(const SoundEffect sfx)
 		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_shoot_attack.wav";
 	case SoundEffect::TRANSISTOR_BOSS_STEP:
 		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_step.wav";
+	case SoundEffect::TRANSISTOR_BOSS_EXPLOSION:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_explosion.wav";
 	}
 	throw std::logic_error("soundPath: missing SoundEffect path entry");
 }
@@ -205,6 +207,8 @@ std::string_view AudioManager::musicPath(const MusicTrack track)
 		return "./assets/audio/music/game_over_theme.ogg";
 	case MusicTrack::AREA_1_BOSS_THEME:
 		return "./assets/audio/music/area_1_boss_theme.ogg";
+	case MusicTrack::TRANSISTOR_BOSS_VICTORY:
+		return "./assets/audio/music/transistor_boss_victory.ogg";
 	}
 	throw std::logic_error("musicPath: missing MusicTrack path entry");
 }

@@ -30,7 +30,8 @@ TransistorBoss::TransistorBoss(sf::Vector2f spawnPos)
       roamingTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_ROAMING)),
       chargeAttackWindupTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP)),
       chargeAttackTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_CHARGE_ATTACK)),
-      recoverTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_RECOVER)), sprite(roamingTexture)
+      recoverTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_RECOVER)),
+      deathTexture(AssetManager::getInstance().getTexture(TRANSISTOR_BOSS_DEATH)), sprite(roamingTexture)
 {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	currentState = &states.roaming;
@@ -48,11 +49,14 @@ void TransistorBoss::draw(sf::RenderWindow &window)
 	}
 
 	sprite.setPosition(position);
-	sprite.setScale({direction == Direction::Right ? 1.f : -1.f, 1.f});
+	const Direction facing = dying ? deathFacing : direction;
+	sprite.setScale({facing == Direction::Right ? 1.f : -1.f, 1.f});
 	// Shielded cyan tint telegraphs the invincible stage-two recover; hurt flash wins.
-	const sf::Color tint = isHurtFlashing() ? sf::Color{255, 80, 80}
-	                       : invincible     ? sf::Color{150, 220, 255}
-	                                        : sf::Color::White;
+	// While dying the explosion renders in its natural colors despite invincibility.
+	const sf::Color tint = dying              ? sf::Color::White
+	                       : isHurtFlashing() ? sf::Color{255, 80, 80}
+	                       : invincible       ? sf::Color{150, 220, 255}
+	                                          : sf::Color::White;
 	sprite.setColor(tint);
 	window.draw(sprite);
 
@@ -193,6 +197,33 @@ void TransistorBoss::onHit(const Hitbox & /*hit*/) noexcept
 
 void TransistorBoss::onPreUpdate(float deltaTime)
 {
+	// Defeat: drop every active threat, and switch to death state.
+	if (!dying && health.current <= 0) {
+		dying = true;
+		deathFacing = direction;
+
+		for (const projectiles::ElectricBall &ball : electricBalls)
+			endedBallSourceIds.push_back(ball.getSourceId());
+		electricBalls.clear();
+
+		for (std::unique_ptr<Capacitor> &cap : bondedCapacitors)
+			cap->drainEndedSourceIds(endedBallSourceIds);
+		bondedCapacitors.clear();
+
+		if (beamSourceId != 0) {
+			endedBallSourceIds.push_back(beamSourceId);
+			beamSourceId = 0;
+		}
+
+		currentState->onExit(*this);
+		currentState = &states.death;
+		currentState->onEnter(*this);
+		return;
+	}
+
+	if (dying)
+		return;
+
 	shootAttackCooldown = std::max(0.f, shootAttackCooldown - deltaTime);
 	chargeAttackCooldown = std::max(0.f, chargeAttackCooldown - deltaTime);
 	auraTimer += deltaTime;
@@ -395,6 +426,9 @@ void TransistorBoss::setAnimation(TransistorBossAnimation anim, int frame)
 		break;
 	case TransistorBossAnimation::Recover:
 		sprite.setTexture(recoverTexture);
+		break;
+	case TransistorBossAnimation::Death:
+		sprite.setTexture(deathTexture);
 		break;
 	}
 	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));

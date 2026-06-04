@@ -6,6 +6,7 @@
 
 #include "states/charge_attack_state.h"
 #include "states/charge_attack_windup_state.h"
+#include "states/death_state.h"
 #include "states/recover_state.h"
 #include "states/roaming_state.h"
 #include "states/shoot_attack_state.h"
@@ -17,7 +18,7 @@
 
 class TransistorBoss : public BaseEnemy {
   public:
-	enum class TransistorBossAnimation { Roaming, ChargeAttackWindup, ChargeAttack, Recover };
+	enum class TransistorBossAnimation { Roaming, ChargeAttackWindup, ChargeAttack, Recover, Death };
 
 	enum class AuraPhase { None, Windup, Damage };
 
@@ -25,7 +26,7 @@ class TransistorBoss : public BaseEnemy {
 	static constexpr float ENTITY_HEIGHT = 120.f;
 	static constexpr int FRAME_SIZE = 128;
 
-	static constexpr int BOSS_HEALTH = 30;
+	static constexpr int BOSS_HEALTH = 10;
 
 	static constexpr float MOVE_SPEED = 50.f;
 
@@ -64,6 +65,7 @@ class TransistorBoss : public BaseEnemy {
 		transistor_boss::RecoverState recover;
 		transistor_boss::Stage2RecoverState stage2Recover;
 		transistor_boss::SummonState summon;
+		transistor_boss::DeathState death;
 	};
 	States states;
 
@@ -102,6 +104,10 @@ class TransistorBoss : public BaseEnemy {
 	void setInvincible(bool value) noexcept { invincible = value; }
 	[[nodiscard]] bool isInvulnerable() const noexcept override { return invincible; }
 
+	// The boss is never auto-removed: once defeated it plays the death animation
+	// and stays visible on its last frame, so it must report as alive throughout.
+	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
+
   protected:
 	void onPreUpdate(float deltaTime) override;
 
@@ -114,6 +120,7 @@ class TransistorBoss : public BaseEnemy {
 	const sf::Texture &chargeAttackWindupTexture;
 	const sf::Texture &chargeAttackTexture;
 	const sf::Texture &recoverTexture;
+	const sf::Texture &deathTexture;
 	sf::Sprite sprite;
 
 	float shootAttackCooldown = 0.f;
@@ -129,6 +136,10 @@ class TransistorBoss : public BaseEnemy {
 	std::vector<std::unique_ptr<Capacitor>> bondedCapacitors;
 	bool stage2Triggered = false;
 	bool invincible = false;
+	bool dying = false;
+	// Facing locked at the moment of death so the detailed defeat sprites don't
+	// flip when the player walks past during the (lengthy) death sequence.
+	Direction deathFacing = Direction::Right;
 	float beamTickTimer = 0.f;
 	std::uint32_t beamSourceId = 0;
 };

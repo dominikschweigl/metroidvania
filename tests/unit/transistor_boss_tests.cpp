@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "core/audio_manager.h"
 #include "entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "entities/enemies/capacitor/capacitor.h"
 #include "world/world.h"
@@ -166,6 +167,34 @@ TEST_CASE("TransistorBoss summons the second stage only once")
 
 	// Still at half health, but the second stage must not re-trigger.
 	REQUIRE(boss.states.roaming.update(0.016f, boss, w, farPlayer(boss)) == &boss.states.roaming);
+}
+
+TEST_CASE("TransistorBoss enters its death state and is never removed once defeated")
+{
+	World w = makeWorld();
+	TransistorBoss boss(bossSpawn());
+
+	// Summon the stage-two minions so we can confirm they are cleared on death.
+	boss.states.summon.onEnter(boss);
+	REQUIRE(boss.bondedCapacitorCount() == static_cast<std::size_t>(TransistorBoss::CAPACITOR_COUNT));
+
+	boss.takeDamage(TransistorBoss::BOSS_HEALTH);
+	REQUIRE_FALSE(boss.health.isAlive());
+
+	// The next frame the boss detects the defeat and switches to the death state.
+	boss.update(0.016f, w, farPlayer(boss), {});
+
+	REQUIRE(boss.getState() == &boss.states.death);
+	REQUIRE(boss.isAlive());        // stays in the scene to show its death animation
+	REQUIRE(boss.isInvulnerable()); // can no longer be hit
+	REQUIRE(boss.bondedCapacitorCount() == 0u);
+
+	for (int frame = 0; frame < 80; ++frame)
+		boss.update(0.2f, w, farPlayer(boss), {});
+
+	REQUIRE(boss.getState() == &boss.states.death);
+	REQUIRE(boss.isAlive());
+	REQUIRE(AudioManager::getInstance().musicStatus() == MusicStatus::Playing);
 }
 
 TEST_CASE("TransistorBoss exposes its bonded capacitors as destroyable targets")
