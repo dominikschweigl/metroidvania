@@ -147,7 +147,7 @@ TEST_CASE("Capacitor dives in after several shots so it can be punished")
 	// The first few shots end in a flee - still hard to hit.
 	for (int i = 0; i < Capacitor::SWOOP_AFTER_SHOTS - 1; ++i)
 		c.spawnShot(player);
-	REQUIRE_FALSE(c.shouldSwoop());
+	REQUIRE(!c.shouldSwoop());
 
 	// The threshold-reaching shot makes the shoot state end in a swoop, not a flee.
 	c.states.shoot.onEnter(c);
