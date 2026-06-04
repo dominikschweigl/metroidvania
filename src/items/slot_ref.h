@@ -1,6 +1,6 @@
 #pragma once
 
-enum class SlotKind { Hat, Gum, Grid, Hotbar };
+enum class SlotKind { Hat, Gum, Backup, Grid, Hotbar };
 
 struct SlotRef {
 	SlotKind kind;

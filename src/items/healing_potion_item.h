@@ -11,8 +11,8 @@ class HealingPotionItem : public Item {
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return std::nullopt; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_HEALING_POTION; }
 
-	[[nodiscard]] ItemInfo info() const noexcept override
-	{
-		return {"Health Potion", "A warm, glowing liquid.", "Restores 2 HP"};
-	}
+	[[nodiscard]] ItemInfo info() const override;
+
+  private:
+	static constexpr int HEAL_AMOUNT = 2;
 };

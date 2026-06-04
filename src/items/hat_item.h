@@ -11,8 +11,5 @@ class HatItem : public Item {
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return SlotKind::Hat; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_HAT; }
 
-	[[nodiscard]] ItemInfo info() const noexcept override
-	{
-		return {"The Debugger's Hat", "A sentient hat that loves being thrown.", "Enables hat throw"};
-	}
+	[[nodiscard]] ItemInfo info() const override;
 };

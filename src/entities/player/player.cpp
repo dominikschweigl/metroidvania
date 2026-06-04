@@ -2,6 +2,12 @@
 #include "../../core/input_manager.h"
 #include "../entity_physics.h"
 #include <algorithm>
+#include <random>
+#include <vector>
+
+namespace {
+std::mt19937 rng{std::random_device{}()};
+} // namespace
 
 namespace {
 constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
@@ -46,6 +52,11 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 		iframes = IFRAME_DURATION;
 	previousHealth = health.current;
 
+	std::erase_if(activeEffects_, [deltaTime](Effect &effect) {
+		effect.remainingDuration -= deltaTime;
+		return effect.remainingDuration <= 0.f;
+	});
+
 	handleMovement(deltaTime, world);
 
 	PlayerState *next = currentState->update(deltaTime, *this);
@@ -75,12 +86,83 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 	updateAnimation(deltaTime);
 }
 
+std::optional<Hitbox> Player::getMeleeHitbox() const noexcept
+{
+	std::optional<Hitbox> hitbox = meleeAttack.getHitbox(position, getDirection());
+	if (hitbox)
+		hitbox->damage = static_cast<int>(static_cast<float>(hitbox->damage) * damageMultiplier());
+	return hitbox;
+}
+
 void Player::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
-	if (const auto melee = getMeleeHitbox())
+	if (const std::optional<Hitbox> melee = getMeleeHitbox())
 		hitboxes.push_back(*melee);
 	if (hasHatThrown())
 		hitboxes.push_back(getThrownHat().getHitbox());
+}
+
+void Player::addEffect(Effect effect)
+{
+	for (Effect &existing : activeEffects_) {
+		if (existing.effectId() == effect.effectId()) {
+			existing.remainingDuration = effect.totalDuration;
+			return;
+		}
+	}
+	activeEffects_.push_back(effect);
+}
+
+const std::vector<Effect> &Player::activeEffects() const noexcept
+{
+	return activeEffects_;
+}
+
+float Player::speedMultiplier() const noexcept
+{
+	float result = 1.f;
+	for (const Effect &effect : activeEffects_)
+		result *= effect.speedMultiplier();
+	return result;
+}
+
+float Player::jumpMultiplier() const noexcept
+{
+	float result = 1.f;
+	for (const Effect &effect : activeEffects_)
+		result *= effect.jumpMultiplier();
+	return result;
+}
+
+float Player::damageMultiplier() const noexcept
+{
+	float result = 1.f;
+	for (const Effect &effect : activeEffects_)
+		result *= effect.damageMultiplier();
+	return result;
+}
+
+float Player::damageResistance() const noexcept
+{
+	float result = 0.f;
+	for (const Effect &effect : activeEffects_)
+		result = std::max(result, effect.damageResistance());
+	return result;
+}
+
+void Player::takeDamage(const int amount) noexcept
+{
+	const float resistance = damageResistance();
+	if (resistance <= 0.f) {
+		health.damage(amount);
+		return;
+	}
+	const float reducedDamage = static_cast<float>(amount) * (1.f - resistance);
+	const int guaranteedDamage = static_cast<int>(reducedDamage);
+	const float fraction = reducedDamage - static_cast<float>(guaranteedDamage);
+	std::uniform_real_distribution<float> dist{0.f, 1.f};
+	const int extraDamage = (fraction > 0.f && dist(rng) < fraction) ? 1 : 0;
+	health.damage(guaranteedDamage + extraDamage);
 }
 
 void Player::drainEndedSourceIds(std::vector<std::uint32_t> &out)
@@ -138,7 +220,7 @@ void Player::handleMovement(float deltaTime, const World &world)
 		} else {
 			velocity.x = 0.f;
 			isSprinting = input.isHeld(GameAction::Sprint);
-			const float speed = isSprinting ? RUNNING_SPEED : WALKING_SPEED;
+			const float speed = (isSprinting ? RUNNING_SPEED : WALKING_SPEED) * speedMultiplier();
 
 			if (inputLeft) {
 				velocity.x = -speed;

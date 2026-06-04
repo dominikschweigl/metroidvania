@@ -20,9 +20,12 @@ void CombatSystem::resolve(std::span<const Hitbox> hitboxes, std::span<const Hur
 			if (!inserted)
 				continue;
 
-			hurt.health->damage(hit.damage);
-			if (hurt.owner != nullptr)
+			if (hurt.owner != nullptr) {
+				hurt.owner->takeDamage(hit.damage);
 				hurt.owner->onHit(hit);
+			} else {
+				hurt.health->damage(hit.damage);
+			}
 		}
 	}
 }

@@ -19,10 +19,12 @@ class HealthBar {
 	HealthBar &operator=(HealthBar &&) = delete;
 
 	// Draws the health bar in screen-space using the window's default view.
-	void draw(sf::RenderWindow &window, const Health &health);
+	// Pass diskEquipped=true to show the Backup Disk badge to the right of the pips.
+	void draw(sf::RenderWindow &window, const Health &health, bool diskEquipped = false);
 
   private:
 	void rebuildPips(int count);
+	void drawBackupDiskBadge(sf::RenderWindow &window, int pipCount) const;
 
 	std::vector<sf::ConvexShape> pips;
 };

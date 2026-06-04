@@ -40,10 +40,17 @@ set(GAME_SOURCES
     src/entities/enemies/race_condition_slime/states/windup_state.cpp
     src/entities/enemies/race_condition_slime/states/attack_state.cpp
     src/entities/enemies/race_condition_slime/states/recover_state.cpp
+    src/effects/effect.cpp
     src/items/item_registry.cpp
     src/items/healing_potion_item.cpp
     src/items/hat_item.cpp
     src/items/chewing_gum_item.cpp
+    src/items/jump_potion_item.cpp
+    src/items/speed_potion_item.cpp
+    src/items/resistance_potion_item.cpp
+    src/items/damage_potion_item.cpp
+    src/items/usb_key_item.cpp
+    src/items/backup_disk_item.cpp
     src/items/world_item.cpp
     src/entities/player/inventory.cpp
     src/entities/player/player.cpp
@@ -59,6 +66,22 @@ set(GAME_SOURCES
     src/entities/player/states/descending_state.cpp
     src/entities/player/states/landing_state.cpp
     src/entities/player/states/wall_slide_state.cpp
+    src/entities/projectiles/electric_ball.cpp
+    src/entities/enemies/capacitor/capacitor.cpp
+    src/entities/enemies/capacitor/states/hover_state.cpp
+    src/entities/enemies/capacitor/states/shoot_state.cpp
+    src/entities/enemies/capacitor/states/flee_state.cpp
+    src/entities/enemies/capacitor/states/swoop_state.cpp
+    src/entities/enemies/bosses/transistor_boss/transistor_boss.cpp
+    src/entities/enemies/bosses/transistor_boss/transistor_boss_renderer.cpp
+    src/entities/enemies/bosses/transistor_boss/states/roaming_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/shoot_attack_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/charge_attack_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/recover_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/stage2_recover_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/summon_state.cpp
+    src/entities/enemies/bosses/transistor_boss/states/death_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -70,6 +93,8 @@ add_executable(metroidvania_tests
     tests/unit/base_entity_tests.cpp
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
+    tests/unit/capacitor_tests.cpp
+    tests/unit/transistor_boss_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp
@@ -79,6 +104,7 @@ add_executable(metroidvania_tests
     tests/unit/player_combat_tests.cpp
     tests/unit/melee_attack_tests.cpp
     tests/unit/inventory_tests.cpp
+    tests/unit/effect_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)

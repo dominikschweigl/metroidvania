@@ -5,3 +5,8 @@ void HatItem::activate(Player & /*player*/, Inventory &inventory, const SlotRef 
 {
 	inventory.moveToEquipmentSlot(ownSlot);
 }
+
+ItemInfo HatItem::info() const
+{
+	return {"The Debugger's Hat", "A sentient hat that loves being thrown.", "Enables hat throw"};
+}

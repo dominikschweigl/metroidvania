@@ -9,7 +9,7 @@ AscendingState::AscendingState()
 
 void AscendingState::onEnter(Player &p)
 {
-	p.velocity.y = -Player::JUMP_SPEED;
+	p.velocity.y = -Player::JUMP_SPEED * p.jumpMultiplier();
 	p.isOnGround = false;
 	currentFrame = 0;
 	frameTimer = 0.f;

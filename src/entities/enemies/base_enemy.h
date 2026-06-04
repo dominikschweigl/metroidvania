@@ -14,7 +14,7 @@ class World;
 class BaseEnemy : public BaseEntity {
   public:
 	// Template method: runs the state machine, applies gravity and collisions.
-	void update(float deltaTime, const World &world, sf::Vector2f playerPos);
+	void update(float deltaTime, const World &world, sf::Vector2f playerPos, sf::FloatRect playerBounds = {});
 
 	// Hook called at the top of update(). Override to tick enemy-specific timers.
 	virtual void onPreUpdate(float /*deltaTime*/) {}
@@ -36,8 +36,8 @@ class BaseEnemy : public BaseEntity {
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 
   protected:
-	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight)
-	    : BaseEntity(spawnPos, entityWidth, entityHeight, MAX_HEALTH, Team::Enemy)
+	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH)
+	    : BaseEntity(spawnPos, entityWidth, entityHeight, maxHealth, Team::Enemy)
 	{
 	}
 
@@ -48,4 +48,12 @@ class BaseEnemy : public BaseEntity {
 
 	// State machine pointer. Derived class must assign an initial state
 	EnemyState *currentState = nullptr;
+
+	sf::FloatRect lastPlayerBounds;
+
+	// Most recent context passed to update(), cached so onPreUpdate() (which only
+	// receives deltaTime) can drive sub-entities through their own update().
+	// Pointer because there is no world yet before the first update() call.
+	const World *lastWorld = nullptr;
+	sf::Vector2f lastPlayerPos;
 };

@@ -5,8 +5,10 @@
 bool Inventory::isValidInSlot(const Item &item, const SlotKind slotKind) noexcept
 {
 	const std::optional<SlotKind> equipment = item.equipmentSlot();
-	if (slotKind == SlotKind::Hat || slotKind == SlotKind::Gum)
-		return equipment.has_value() && *equipment == slotKind;
+	for (const SlotRef &s : EQUIPMENT_SLOTS_) {
+		if (s.kind == slotKind)
+			return equipment.has_value() && *equipment == slotKind;
+	}
 	return true;
 }
 
@@ -17,6 +19,8 @@ std::unique_ptr<Item> &Inventory::slotRef(const SlotRef slot)
 		return hatSlot;
 	case SlotKind::Gum:
 		return gumSlot;
+	case SlotKind::Backup:
+		return backupSlot;
 	case SlotKind::Grid:
 		return grid[slot.index];
 	case SlotKind::Hotbar:
@@ -32,6 +36,8 @@ const std::unique_ptr<Item> &Inventory::slotRef(const SlotRef slot) const
 		return hatSlot;
 	case SlotKind::Gum:
 		return gumSlot;
+	case SlotKind::Backup:
+		return backupSlot;
 	case SlotKind::Grid:
 		return grid[slot.index];
 	case SlotKind::Hotbar:
