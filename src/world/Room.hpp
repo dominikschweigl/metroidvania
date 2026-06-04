@@ -11,6 +11,7 @@
 
 struct Door {
 	std::string targetRoomId;
+	int targetSpawnIdx;
 	sf::FloatRect bounds;
 };
 
@@ -25,15 +26,16 @@ struct Room {
 	std::shared_ptr<tson::Map> map;
 	std::vector<std::vector<bool>> solidGrid; // used when map is null
 
-	sf::Vector2f playerSpawn{};
+	std::vector<sf::Vector2f> playerSpawns;
 	Direction playerSpawnDirection = Direction::Right;
-	std::vector<sf::Vector2f> raceConditionSpawns;
 	std::vector<Door> doors;
 
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	std::vector<std::unique_ptr<WorldItem>> items_;
 
 	std::vector<ImageLayer> backgroundLayers;
+
+	bool needsToClearAllEnemies = false;
 
 	Room() = default;
 	Room(Room &&) = default;
@@ -43,14 +45,14 @@ struct Room {
 
 	void appendItem(std::unique_ptr<WorldItem> &newItem) { items_.push_back(std::move(newItem)); }
 
-	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds) const
+	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds) const
 	{
 		for (const Door &door : doors) {
 			if (door.bounds.findIntersection(entityBounds)) {
-				return door.targetRoomId;
+				return std::make_optional(std::make_pair(door.targetRoomId, door.targetSpawnIdx));
 			}
 		}
-		return "";
+		return std::nullopt;
 	}
 
 	void update(float deltaTime, const World &world)
@@ -59,5 +61,18 @@ struct Room {
 		               enemies_.end());
 		items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
 		             items_.end());
+	}
+
+	bool isAllowedLeaving()
+	{
+		if (!needsToClearAllEnemies)
+			return true;
+
+		for (const auto &enemy : enemies_) {
+			if (enemy->isAlive()) {
+				return false;
+			}
+		}
+		return true;
 	}
 };

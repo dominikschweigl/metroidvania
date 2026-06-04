@@ -1,5 +1,4 @@
 #include "game_scene.h"
-#include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../items/backup_disk_item.h"
@@ -20,14 +19,13 @@
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
 {
-	AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
 
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
 	world_.loadRoom("start_room", "data/maps/start_room.tmj");
-	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
 	world_.loadRoom("1", "data/maps/1.tmj");
 	world_.loadRoom("2", "data/maps/2.tmj");
 	world_.loadRoom("3", "data/maps/3.tmj");
@@ -36,29 +34,9 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	world_.loadRoom("6", "data/maps/6.tmj");
 	world_.loadRoom("7", "data/maps/7.tmj");
 	world_.loadRoom("8", "data/maps/8.tmj");
-	world_.loadRoom("9", "data/maps/9.tmj");
-	world_.loadRoom("10", "data/maps/10.tmj");
 	world_.setCurrentRoom("start_room");
 
-	enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
-
-	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{35 * 32.f, 8 * 32.f}, std::make_unique<JumpPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 8 * 32.f}, std::make_unique<SpeedPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 8 * 32.f}, std::make_unique<DamagePotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 8 * 32.f}, std::make_unique<ResistancePotionItem>()));
-	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 28 * 32.f}, std::make_unique<UsbKeyItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 18 * 32.f}, std::make_unique<BackupDiskItem>()));
-
+	player_.setPosition(world_.getCurrentRoom()->playerSpawns[0]);
 	view_.setCenter(player_.getPosition());
 }
 
@@ -99,14 +77,12 @@ void GameScene::update(float deltaTime)
 	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
 	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
 
-	// world_.updateCurrentRoom(deltaTime, &player_, attackTriggered, hatThrowTriggered);
-
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
 	// Update all alive enemies; collect drops before removing dead ones.
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
-	for (auto &enemy : enemies_) {
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (!enemy->isAlive()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
 				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
@@ -160,9 +136,16 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
 	}
 
-	std::string touchingDoorTargetRoom = world_.getTouchingDoorTargetRoom(player_.getBounds());
-	if (!touchingDoorTargetRoom.empty()) {
-		world_.setCurrentRoom(touchingDoorTargetRoom);
+	std::optional<std::pair<std::string, int>> touchingDoorTargetRoom =
+	    world_.getTouchingDoorTargetRoom(player_.getBounds());
+	if (touchingDoorTargetRoom && world_.getCurrentRoom()->isAllowedLeaving()) {
+		world_.setCurrentRoom(touchingDoorTargetRoom.value().first);
+		player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoorTargetRoom.value().second]);
+		if (world_.getCurrentRoomId() == "boss_room") {
+			AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+		} else {
+			AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+		}
 	}
 
 	view_.setCenter(player_.getPosition());

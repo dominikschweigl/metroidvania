@@ -41,7 +41,7 @@ class World {
 
 	void update(float deltaTime, sf::FloatRect playerBounds);
 
-	std::string getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
+	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
 	{
 		return getCurrentRoom()->getTouchingDoorTargetRoom(entityBounds);
 	}

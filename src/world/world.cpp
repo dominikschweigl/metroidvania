@@ -1,8 +1,17 @@
 #include "world.h"
+#include "../core/audio_manager.h"
+#include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
+#include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
+#include "../items/damage_potion_item.h"
 #include "../items/hat_item.h"
 #include "../items/healing_potion_item.h"
+#include "../items/jump_potion_item.h"
+#include "../items/resistance_potion_item.h"
+#include "../items/speed_potion_item.h"
+#include "../items/usb_key_item.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -52,6 +61,8 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	Room room;
 	room.width = map->getSize().x;
 	room.height = map->getSize().y;
+	room.needsToClearAllEnemies =
+	    map->getProp("needsToClearAllEnemies") ? map->get<bool>("needsToClearAllEnemies") : false;
 
 	// --- Load textures ---
 	loadTilesets(*map);
@@ -63,7 +74,7 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			const std::string &name = obj.getName();
 
 			if (name == "PlayerSpawn") {
-				room.playerSpawn = {float(p.x), float(p.y)};
+				room.playerSpawns.push_back({float(p.x), float(p.y)});
 				std::string direction = obj.get<std::string>("dir");
 				if (direction == "left") {
 					room.playerSpawnDirection = Direction::Left;
@@ -73,13 +84,15 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			} else if (name == "Door") {
 				Door door;
 				door.bounds = sf::FloatRect({float(p.x), float(p.y)}, {float(obj.getSize().x), float(obj.getSize().y)});
-				tson::Property *targetRoomProp = obj.getProp("targetRoomId");
-				if (targetRoomProp) {
-					door.targetRoomId = targetRoomProp->getValue<std::string>();
-				}
+				door.targetRoomId = obj.getProp("targetRoomId") ? obj.get<std::string>("targetRoomId") : "";
+				door.targetSpawnIdx = obj.getProp("targetSpawnIdx") ? obj.get<int>("targetSpawnIdx") : 0;
 				room.doors.push_back(door);
 			} else if (name == "RaceConditionEnemy") {
 				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "TransistorBoss") {
+				room.enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "Capacitor") {
+				room.enemies_.push_back(std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "ChewingGumItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<ChewingGumItem>()));
@@ -89,6 +102,24 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			} else if (name == "HealingPotionItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<HealingPotionItem>()));
+			} else if (name == "JumpPotionItem") {
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<JumpPotionItem>()));
+			} else if (name == "ResistancePotionItem") {
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<ResistancePotionItem>()));
+			} else if (name == "SpeedPotionItem") {
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<SpeedPotionItem>()));
+			} else if (name == "DamagePotionItem") {
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<DamagePotionItem>()));
+			} else if (name == "UsbKeyItem") {
+				room.items_.push_back(
+				    std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)}, std::make_unique<UsbKeyItem>()));
+			} else if (name == "BackupDiskItem") {
+				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                  std::make_unique<BackupDiskItem>()));
 			}
 		}
 	}
