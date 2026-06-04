@@ -47,6 +47,19 @@ void AudioManager::playSound(const SoundEffect sfx, const float volume)
 	++droppedSoundCount;
 }
 
+void AudioManager::stopSound(const SoundEffect sfx)
+{
+	const auto iterator = soundBuffers.find(sfx);
+	if (iterator == soundBuffers.end())
+		return;
+
+	const sf::SoundBuffer *const buffer = &iterator->second;
+	for (auto &voice : voices) {
+		if (voice.has_value() && &voice->getBuffer() == buffer)
+			voice->stop();
+	}
+}
+
 void AudioManager::pauseAllSounds()
 {
 	for (auto &voice : voices) {

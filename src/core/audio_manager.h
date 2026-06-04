@@ -44,6 +44,7 @@ class AudioManager {
 	AudioManager &operator=(AudioManager &&) = delete;
 
 	void playSound(SoundEffect sfx, float volume = 100.f);
+	void stopSound(SoundEffect sfx);
 	void pauseAllSounds();
 	void resumeAllSounds();
 	void stopAllSounds();
