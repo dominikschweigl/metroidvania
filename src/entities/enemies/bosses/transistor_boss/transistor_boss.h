@@ -27,7 +27,7 @@ class TransistorBoss : public BaseEnemy {
 	static constexpr float ENTITY_WIDTH = 120.f;
 	static constexpr float ENTITY_HEIGHT = 120.f;
 
-	static constexpr int BOSS_HEALTH = 10;
+	static constexpr int BOSS_HEALTH = 30;
 
 	static constexpr float MOVE_SPEED = 50.f;
 
