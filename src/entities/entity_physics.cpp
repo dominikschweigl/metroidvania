@@ -35,7 +35,7 @@ void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::Fl
 
 float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height, float dt, const World &world)
 {
-	float deltaX = velX * dt;
+	double deltaX = velX * dt;
 	float futureX = pos.x + deltaX;
 	sf::FloatRect future({futureX - width / 2.f, pos.y - height}, {width, height - 1.f});
 
@@ -44,7 +44,7 @@ float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height
 		// snap to tile boundary using grid position directly
 		int tileX = static_cast<int>(future.position.x / World::TILE_SIZE);
 		if (deltaX >= 0.f)
-			return float((tileX + 1) * World::TILE_SIZE) - width / 2.f;
+			return float((tileX + 1) * World::TILE_SIZE) - width / 2.f - 1.f;
 		return float((tileX + 1) * World::TILE_SIZE) + width / 2.f;
 	}
 	return futureX;
@@ -74,13 +74,13 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &velocity, bool &isOnGround, float gravity,
                       float width, float height, const World &world)
 {
-	applyGravity(velocity.y, isOnGround, deltaTime, gravity,
-	             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
-	static constexpr float step = 0.01f;
+	static constexpr float step = 0.0001f;
 	float counter = 0.f;
 	while (counter < deltaTime) {
 		position.x = resolveHorizontal(position, velocity.x, width, height, step, world);
 		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, step, world);
+		applyGravity(velocity.y, isOnGround, step, gravity,
+		             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
 		counter += step;
 	}
 }

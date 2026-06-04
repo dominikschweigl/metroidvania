@@ -57,13 +57,19 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	loadTilesets(*map);
 
 	// --- Parse objects ---
-	if (tson::Layer *objLayer = map->getLayer("Object Layer 1")) {
+	if (tson::Layer *objLayer = map->getLayer("Object Layer")) {
 		for (auto &obj : objLayer->getObjects()) {
 			const tson::Vector2i p = obj.getPosition();
 			const std::string &name = obj.getName();
 
-			if (name == "Player") {
+			if (name == "PlayerSpawn") {
 				room.playerSpawn = {float(p.x), float(p.y)};
+				std::string direction = obj.get<std::string>("dir");
+				if (direction == "left") {
+					room.playerSpawnDirection = Direction::Left;
+				} else if (direction == "right") {
+					room.playerSpawnDirection = Direction::Right;
+				}
 			} else if (name == "Door") {
 				Door door;
 				door.bounds = sf::FloatRect({float(p.x), float(p.y)}, {float(obj.getSize().x), float(obj.getSize().y)});
@@ -87,12 +93,25 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 		}
 	}
 
+	for (auto &layer : map->getLayers()) {
+		if (layer.getType() != tson::LayerType::ImageLayer)
+			continue;
+
+		auto texture = std::make_shared<sf::Texture>();
+
+		auto path = fs::weakly_canonical(fs::absolute("maps/tilesets/" + layer.getImage()));
+
+		if (texture->loadFromFile(path.string(), true)) {
+
+			room.backgroundLayers.push_back({texture, {float(layer.getOffset().x), float(layer.getOffset().y)}});
+		}
+	}
+
 	room.map = std::move(map); // move last, after all parsing is done
+	rooms[roomId] = std::move(room);
 
 	if (currentRoomId.empty())
 		setCurrentRoom(roomId);
-
-	rooms[roomId] = std::move(room);
 }
 
 void World::setCurrentRoom(const std::string &roomId)
@@ -202,6 +221,14 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 
 	const sf::Vector2f center = view.getCenter();
 	const sf::Vector2f size = view.getSize();
+
+	for (const auto &img : room.backgroundLayers) {
+		sf::Sprite sprite(*img.texture);
+		// Does not work correctly
+		// sprite.setPosition(sf::Vector2f(img.position.x + center.x * (1.f - img.parallax.x),
+		//                                 img.position.y + center.y * (1.f - img.parallax.y)));
+		window.draw(sprite);
+	}
 
 	const int left = static_cast<int>((center.x - size.x * 0.5f) / TILE_SIZE);
 	const int right = static_cast<int>((center.x + size.x * 0.5f) / TILE_SIZE);

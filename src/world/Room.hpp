@@ -14,17 +14,26 @@ struct Door {
 	sf::FloatRect bounds;
 };
 
+struct ImageLayer {
+	std::shared_ptr<sf::Texture> texture;
+	tson::Vector2f position;
+	tson::Vector2f parallax;
+};
+
 struct Room {
 	int width{}, height{};
 	std::shared_ptr<tson::Map> map;
 	std::vector<std::vector<bool>> solidGrid; // used when map is null
 
 	sf::Vector2f playerSpawn{};
+	Direction playerSpawnDirection = Direction::Right;
 	std::vector<sf::Vector2f> raceConditionSpawns;
 	std::vector<Door> doors;
 
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	std::vector<std::unique_ptr<WorldItem>> items_;
+
+	std::vector<ImageLayer> backgroundLayers;
 
 	Room() = default;
 	Room(Room &&) = default;

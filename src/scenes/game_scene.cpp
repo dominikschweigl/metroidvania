@@ -22,7 +22,20 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 
 	world_.loadRoom("start_room", "data/maps/start_room.tmj");
 	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
+	world_.loadRoom("1", "data/maps/1.tmj");
+	world_.loadRoom("2", "data/maps/2.tmj");
+	world_.loadRoom("3", "data/maps/3.tmj");
+	world_.loadRoom("4", "data/maps/4.tmj");
+	world_.loadRoom("5", "data/maps/5.tmj");
+	world_.loadRoom("6", "data/maps/6.tmj");
+	world_.loadRoom("7", "data/maps/7.tmj");
+	world_.loadRoom("8", "data/maps/8.tmj");
+	world_.loadRoom("9", "data/maps/9.tmj");
+	world_.loadRoom("10", "data/maps/10.tmj");
 	world_.setCurrentRoom("start_room");
+
+	player_.setPosition(world_.getCurrentRoom()->playerSpawn);
+	player_.setDirection(world_.getCurrentRoom()->playerSpawnDirection);
 
 	// enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{25 * 32.f, 18 * 32.f}));
 	// enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
