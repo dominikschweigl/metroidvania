@@ -57,7 +57,12 @@ void TransistorBossRenderer::setAnimation(Animation anim, int frame)
 		sprite.setTexture(deathTexture);
 		break;
 	}
-	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
+	// Sheets are laid out as grids (kept under 1024px software-GL texture cap),
+	// so row/column navigation is needed.
+	const int framesPerRow = static_cast<int>(sprite.getTexture().getSize().x) / FRAME_SIZE;
+	const int column = frame % framesPerRow;
+	const int row = frame / framesPerRow;
+	sprite.setTextureRect(sf::IntRect({column * FRAME_SIZE, row * FRAME_SIZE}, {FRAME_SIZE, FRAME_SIZE}));
 }
 
 void TransistorBossRenderer::drawSprite(sf::RenderWindow &window, const sf::Vector2f position, const float scaleX,
