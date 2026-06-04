@@ -73,6 +73,7 @@ set(GAME_SOURCES
     src/entities/enemies/capacitor/states/flee_state.cpp
     src/entities/enemies/capacitor/states/swoop_state.cpp
     src/entities/enemies/bosses/transistor_boss/transistor_boss.cpp
+    src/entities/enemies/bosses/transistor_boss/transistor_boss_renderer.cpp
     src/entities/enemies/bosses/transistor_boss/states/roaming_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/shoot_attack_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.cpp

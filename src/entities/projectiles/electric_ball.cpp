@@ -42,6 +42,7 @@ sf::FloatRect ElectricBall::getBounds() const noexcept
 	return {{position.x - radius, position.y - radius}, {2.f * radius, 2.f * radius}};
 }
 
+// Draws the animated projectile. Is generated via SFML since no nice sprite could be found.
 void ElectricBall::draw(sf::RenderWindow &window) const
 {
 

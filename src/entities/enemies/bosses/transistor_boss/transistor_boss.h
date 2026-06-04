@@ -4,6 +4,8 @@
 #include "../../base_enemy.h"
 #include "../../capacitor/capacitor.h"
 
+#include "transistor_boss_renderer.h"
+
 #include "states/charge_attack_state.h"
 #include "states/charge_attack_windup_state.h"
 #include "states/death_state.h"
@@ -18,13 +20,12 @@
 
 class TransistorBoss : public BaseEnemy {
   public:
-	enum class TransistorBossAnimation { Roaming, ChargeAttackWindup, ChargeAttack, Recover, Death };
+	using TransistorBossAnimation = transistor_boss::TransistorBossRenderer::Animation;
 
 	enum class AuraPhase { None, Windup, Damage };
 
 	static constexpr float ENTITY_WIDTH = 120.f;
 	static constexpr float ENTITY_HEIGHT = 120.f;
-	static constexpr int FRAME_SIZE = 128;
 
 	static constexpr int BOSS_HEALTH = 10;
 
@@ -112,16 +113,9 @@ class TransistorBoss : public BaseEnemy {
 	void onPreUpdate(float deltaTime) override;
 
   private:
-	void drawChargeAura(sf::RenderWindow &window) const;
-	void drawBeam(sf::RenderWindow &window, sf::Vector2f from, sf::Vector2f to) const;
 	void collectBeamHitboxes(std::vector<Hitbox> &hitboxes) const;
 
-	const sf::Texture &roamingTexture;
-	const sf::Texture &chargeAttackWindupTexture;
-	const sf::Texture &chargeAttackTexture;
-	const sf::Texture &recoverTexture;
-	const sf::Texture &deathTexture;
-	sf::Sprite sprite;
+	transistor_boss::TransistorBossRenderer renderer;
 
 	float shootAttackCooldown = 0.f;
 	float chargeAttackCooldown = 0.f;
@@ -137,8 +131,8 @@ class TransistorBoss : public BaseEnemy {
 	bool stage2Triggered = false;
 	bool invincible = false;
 	bool dying = false;
-	// Facing locked at the moment of death so the detailed defeat sprites don't
-	// flip when the player walks past during the (lengthy) death sequence.
+	// Facing locked at the moment of death so the defeat sprites do not
+	// follow the player he walks past the defeated boss.
 	Direction deathFacing = Direction::Right;
 	float beamTickTimer = 0.f;
 	std::uint32_t beamSourceId = 0;
