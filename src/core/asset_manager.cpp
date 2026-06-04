@@ -105,6 +105,18 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/race_condition/attack.png";
 	case SLIME_RECOVER:
 		return "./assets/images/enemies/race_condition/recover.png";
+	case CAPACITOR_HOVER:
+		return "./assets/images/enemies/capacitor/capacitor_hover.png";
+	case TRANSISTOR_BOSS_ROAMING:
+		return "./assets/images/enemies/bosses/transistor_boss/roaming.png";
+	case TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP:
+		return "./assets/images/enemies/bosses/transistor_boss/charge_attack_windup.png";
+	case TRANSISTOR_BOSS_CHARGE_ATTACK:
+		return "./assets/images/enemies/bosses/transistor_boss/charge_attack.png";
+	case TRANSISTOR_BOSS_RECOVER:
+		return "./assets/images/enemies/bosses/transistor_boss/recover.png";
+	case TRANSISTOR_BOSS_DEATH:
+		return "./assets/images/enemies/bosses/transistor_boss/death_animation.png";
 	case TILE_BLACK:
 		return "assets/images/tiles/black.png";
 	case TILE_LEFT_EDGE:

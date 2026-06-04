@@ -47,6 +47,19 @@ void AudioManager::playSound(const SoundEffect sfx, const float volume)
 	++droppedSoundCount;
 }
 
+void AudioManager::stopSound(const SoundEffect sfx)
+{
+	const auto iterator = soundBuffers.find(sfx);
+	if (iterator == soundBuffers.end())
+		return;
+
+	const sf::SoundBuffer *const buffer = &iterator->second;
+	for (auto &voice : voices) {
+		if (voice.has_value() && &voice->getBuffer() == buffer)
+			voice->stop();
+	}
+}
+
 void AudioManager::pauseAllSounds()
 {
 	for (auto &voice : voices) {
@@ -169,6 +182,16 @@ std::string_view AudioManager::soundPath(const SoundEffect sfx)
 		return "./assets/audio/entities/race_condition_slime/race_condition_slime_jump.wav";
 	case SoundEffect::SLIME_MOVE:
 		return "./assets/audio/entities/race_condition_slime/race_condition_slime_move.wav";
+	case SoundEffect::TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_charge_attack_windup.wav";
+	case SoundEffect::TRANSISTOR_BOSS_CHARGE_ATTACK:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_charge_attack.wav";
+	case SoundEffect::TRANSISTOR_BOSS_SHOOT_ATTACK:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_shoot_attack.wav";
+	case SoundEffect::TRANSISTOR_BOSS_STEP:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_step.wav";
+	case SoundEffect::TRANSISTOR_BOSS_EXPLOSION:
+		return "./assets/audio/entities/bosses/transistor_boss/transistor_boss_explosion.wav";
 	}
 	throw std::logic_error("soundPath: missing SoundEffect path entry");
 }
@@ -182,6 +205,10 @@ std::string_view AudioManager::musicPath(const MusicTrack track)
 		return "./assets/audio/music/game_theme.ogg";
 	case MusicTrack::GAME_OVER_THEME:
 		return "./assets/audio/music/game_over_theme.ogg";
+	case MusicTrack::AREA_1_BOSS_THEME:
+		return "./assets/audio/music/area_1_boss_theme.ogg";
+	case MusicTrack::TRANSISTOR_BOSS_VICTORY:
+		return "./assets/audio/music/transistor_boss_victory.ogg";
 	}
 	throw std::logic_error("musicPath: missing MusicTrack path entry");
 }

@@ -37,7 +37,7 @@ class BaseEntity {
 
 	[[nodiscard]] virtual sf::FloatRect getBounds() const;
 
-	[[nodiscard]] bool isAlive() const noexcept { return health.isAlive(); }
+	[[nodiscard]] virtual bool isAlive() const noexcept { return health.isAlive(); }
 	virtual void takeDamage(int amount) noexcept { health.damage(amount); }
 
 	// Override to mark the entity as currently invulnerable to incoming damage.

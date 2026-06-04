@@ -64,13 +64,17 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 
 	sf::FloatRect future({bounds.position.x, futureY - height}, {width, height});
 	if (world.isSolidAtRect(future)) {
-		auto tile = world.getTileAtCoordinate(future.position);
-		if (tile.has_value()) {
-			if (deltaY > 0.f) {
-				futureY = tile.value()->position.y + World::TILE_SIZE;
+		if (deltaY > 0.f) {
+			const auto groundTile = world.getTileAtCoordinate({future.position.x, futureY});
+			if (groundTile.has_value()) {
+				futureY = groundTile.value()->position.y;
 				isOnGround = true;
-			} else if (deltaY < 0.f) {
-				futureY = tile.value()->position.y + World::TILE_SIZE + height;
+			}
+		} else if (deltaY < 0.f) {
+			// Rising: the leading edge is the box top (future.position).
+			const auto ceilingTile = world.getTileAtCoordinate(future.position);
+			if (ceilingTile.has_value()) {
+				futureY = ceilingTile.value()->position.y + World::TILE_SIZE + height;
 			}
 		}
 		velY = 0.f;

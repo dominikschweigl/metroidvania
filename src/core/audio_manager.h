@@ -19,9 +19,14 @@ enum class SoundEffect {
 	SLIME_ATTACK,
 	SLIME_JUMP,
 	SLIME_MOVE,
+	TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP,
+	TRANSISTOR_BOSS_CHARGE_ATTACK,
+	TRANSISTOR_BOSS_SHOOT_ATTACK,
+	TRANSISTOR_BOSS_STEP,
+	TRANSISTOR_BOSS_EXPLOSION
 };
 
-enum class MusicTrack { MAIN_MENU_THEME, GAME_THEME, GAME_OVER_THEME };
+enum class MusicTrack { MAIN_MENU_THEME, GAME_THEME, GAME_OVER_THEME, AREA_1_BOSS_THEME, TRANSISTOR_BOSS_VICTORY };
 
 enum class MusicStatus {
 	Stopped,
@@ -40,6 +45,7 @@ class AudioManager {
 	AudioManager &operator=(AudioManager &&) = delete;
 
 	void playSound(SoundEffect sfx, float volume = 100.f);
+	void stopSound(SoundEffect sfx);
 	void pauseAllSounds();
 	void resumeAllSounds();
 	void stopAllSounds();

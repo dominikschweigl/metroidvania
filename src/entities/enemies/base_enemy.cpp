@@ -2,9 +2,13 @@
 #include "../entity_physics.h"
 #include "enemy_state.h"
 
-void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerPos)
+void BaseEnemy::update(float deltaTime, const World &world, sf::Vector2f playerPos, sf::FloatRect playerBounds)
 {
 	tickHurtTimers(deltaTime);
+
+	lastPlayerBounds = playerBounds;
+	lastWorld = &world;
+	lastPlayerPos = playerPos;
 
 	// Let concrete enemies tick their per-frame timers first.
 	onPreUpdate(deltaTime);
