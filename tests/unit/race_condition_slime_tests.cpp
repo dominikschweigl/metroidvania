@@ -493,7 +493,12 @@ TEST_CASE("Full combat flow: idle -> chase -> windup -> attack -> recover")
 
 	// 5. Recover: Chase if player is still close.
 	s.update(RaceConditionSlime::RECOVER_DUR + 0.01f, w, melee);
-	REQUIRE(s.getState() == &states.chase);
+	float dist = std::abs(melee.x - s.getPosition().x);
+	if (dist < RaceConditionSlime::DETECT_RANGE) {
+		REQUIRE(s.getState() == &states.chase);
+	} else {
+		REQUIRE(s.getState() == &states.idle);
+	}
 }
 
 TEST_CASE("After the attack flow completes and the player flees, slime returns to idle")

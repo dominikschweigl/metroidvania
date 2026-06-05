@@ -1,5 +1,4 @@
 #include "game_scene.h"
-#include "../core/audio_manager.h"
 #include "../core/input_manager.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../items/backup_disk_item.h"
@@ -20,36 +19,24 @@
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
 {
-	AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
 
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadTileset();
 	world_.loadRoom("start_room", "data/maps/start_room.tmj");
-	world_.loadRoom("boss_room", "data/maps/boss_room.tmj");
+	world_.loadRoom("1", "data/maps/1.tmj");
+	world_.loadRoom("2", "data/maps/2.tmj");
+	world_.loadRoom("3", "data/maps/3.tmj");
+	world_.loadRoom("4", "data/maps/4.tmj");
+	world_.loadRoom("5", "data/maps/5.tmj");
+	world_.loadRoom("6", "data/maps/6.tmj");
+	world_.loadRoom("7", "data/maps/7.tmj");
+	world_.loadRoom("8", "data/maps/8.tmj");
 	world_.setCurrentRoom("start_room");
 
-	enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{30 * 32.f, 18 * 32.f}));
-
-	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 18 * 32.f}, std::make_unique<HatItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 18 * 32.f}, std::make_unique<ChewingGumItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 18 * 32.f}, std::make_unique<HealingPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{35 * 32.f, 8 * 32.f}, std::make_unique<JumpPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{20 * 32.f, 8 * 32.f}, std::make_unique<SpeedPotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{25 * 32.f, 8 * 32.f}, std::make_unique<DamagePotionItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{30 * 32.f, 8 * 32.f}, std::make_unique<ResistancePotionItem>()));
-	items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 28 * 32.f}, std::make_unique<UsbKeyItem>()));
-	items_.push_back(
-	    std::make_unique<WorldItem>(sf::Vector2f{10 * 32.f, 18 * 32.f}, std::make_unique<BackupDiskItem>()));
-
+	player_.setPosition(world_.getCurrentRoom()->playerSpawns[0]);
 	view_.setCenter(player_.getPosition());
 }
 
@@ -93,34 +80,34 @@ void GameScene::update(float deltaTime)
 	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
 
 	// Update all alive enemies; collect drops before removing dead ones.
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
-	for (auto &enemy : enemies_) {
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (!enemy->isAlive()) {
-			for (std::unique_ptr<Item> &drop : enemy->rollDrops())
-				items_.push_back(std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop)));
+			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
+				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
+				world_.getCurrentRoom()->appendItem(droppedItem);
+			}
 			combat_.clearVictim(&enemy->health);
 		}
 	}
-	enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
-	               enemies_.end());
 
 	// Update world items and check for player pickup.
-	for (auto &item : items_)
+	for (auto &item : world_.getCurrentRoom()->items_)
 		item->update(deltaTime, world_);
-	for (std::unique_ptr<WorldItem> &worldItem : items_) {
+	for (const std::unique_ptr<WorldItem> &worldItem : world_.getCurrentRoom()->items_) {
 		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
 		if (collected)
 			player_.inventory().addItem(std::move(collected));
 	}
-	items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
-	             items_.end());
+
+	world_.update(deltaTime, player_.getBounds());
 
 	hitboxes_.clear();
 	hurtboxes_.clear();
 	player_.collectHitboxes(hitboxes_);
 	player_.collectHurtboxes(hurtboxes_);
-	for (auto &enemy : enemies_) {
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		enemy->collectHitboxes(hitboxes_);
 		enemy->collectHurtboxes(hurtboxes_);
 	}
@@ -129,7 +116,7 @@ void GameScene::update(float deltaTime)
 
 	std::vector<std::uint32_t> endedSourceIds;
 	player_.drainEndedSourceIds(endedSourceIds);
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->drainEndedSourceIds(endedSourceIds);
 	for (const std::uint32_t id : endedSourceIds)
 		combat_.clearSource(id);
@@ -149,9 +136,16 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
 	}
 
-	if (player_.getPosition().x > 18 * 32.f && player_.getPosition().x <= 19 * 32.f
-	    && player_.getPosition().y > 10 * 32.f && player_.getPosition().y <= 11 * 32.f) {
-		world_.setCurrentRoom("boss_room");
+	std::optional<std::pair<std::string, int>> touchingDoorTargetRoom =
+	    world_.getTouchingDoorTargetRoom(player_.getBounds());
+	if (touchingDoorTargetRoom && world_.getCurrentRoom()->isAllowedLeaving()) {
+		world_.setCurrentRoom(touchingDoorTargetRoom.value().first);
+		player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoorTargetRoom.value().second]);
+		if (world_.getCurrentRoomId() == "boss_room") {
+			AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+		} else {
+			AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+		}
 	}
 
 	view_.setCenter(player_.getPosition());
@@ -164,10 +158,10 @@ void GameScene::draw(sf::RenderWindow &window)
 	window.setView(view_);
 	window.clear({0, 0, 0});
 	world_.draw(window, view_);
-	for (auto &item : items_)
+	for (auto &item : world_.getCurrentRoom()->items_)
 		item->draw(window);
 	player_.draw(window);
-	for (auto &enemy : enemies_)
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->draw(window);
 
 	if (showDebugHitboxes_)
@@ -198,7 +192,7 @@ void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
 	}
 
 	outline.setOutlineColor(sf::Color::Yellow);
-	for (const std::unique_ptr<WorldItem> &item : items_) {
+	for (const std::unique_ptr<WorldItem> &item : world_.getCurrentRoom()->items_) {
 		const sf::FloatRect bounds = item->getBounds();
 		outline.setPosition(bounds.position);
 		outline.setSize(bounds.size);

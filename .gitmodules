@@ -1,0 +1,3 @@
+[submodule "external/tileson"]
+	path = external/tileson
+	url = https://github.com/SSBMTonberry/tileson.git
