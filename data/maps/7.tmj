@@ -120,6 +120,11 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"4"
+                        }, 
+                        {
+                         "name":"targetSpawnIdx",
+                         "type":"int",
+                         "value":1
                         }],
                  "rotation":0,
                  "type":"",
@@ -170,6 +175,11 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"5"
+                        }, 
+                        {
+                         "name":"targetSpawnIdx",
+                         "type":"int",
+                         "value":2
                         }],
                  "rotation":0,
                  "type":"",

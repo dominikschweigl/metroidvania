@@ -155,8 +155,21 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":46.8863636363636,
+                 "x":54.6363636363636,
                  "y":601.022727272727
+                }, 
+                {
+                 "height":0,
+                 "id":14,
+                 "name":"HatItem",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":154.666666666667,
+                 "y":582.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -165,7 +178,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":14,
+ "nextobjectid":15,
  "orientation":"orthogonal",
  "properties":[
         {
