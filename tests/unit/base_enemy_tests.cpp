@@ -205,7 +205,7 @@ TEST_CASE("BaseEnemy respects custom gravity field")
 
 		// With gravity=2000, dt=0.1, enemy should have fallen more
 		// Expected vel.y = 200.f
-		REQUIRE(abs(e.getVelocity().y - 200.f) < 0.1f);
+		REQUIRE(std::abs(e.getVelocity().y - 200.f) < 0.1f);
 	}
 
 	SECTION("Low gravity affects falling")
@@ -217,7 +217,7 @@ TEST_CASE("BaseEnemy respects custom gravity field")
 
 		// With gravity=600, dt=0.1, enemy should have fallen less
 		// Expected vel.y = 60.f
-		REQUIRE(abs(e.getVelocity().y - 60.f) < 0.1f);
+		REQUIRE(std::abs(e.getVelocity().y - 60.f) < 0.1f);
 	}
 }
 
