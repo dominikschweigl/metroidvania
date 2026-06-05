@@ -41,3 +41,13 @@ std::unique_ptr<Item> WorldItem::tryCollect(const sf::FloatRect playerBounds)
 	collected_ = true;
 	return std::move(item_);
 }
+
+json WorldItem::serialize() const
+{
+	return {{"position", {position_.x, position_.y}},
+	        {"velocity", {velocity_.x, velocity_.y}},
+	        {"hoverPhase", hoverPhase_},
+	        {"isOnGround", isOnGround_},
+	        {"collected", collected_},
+	        {"item", item_->serialize()}};
+}

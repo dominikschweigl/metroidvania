@@ -18,3 +18,12 @@ ItemInfo ResistancePotionItem::info() const
 	return {"Resistance Potion", "A thick, bitter sip that hardens your resolve.",
 	        std::to_string(resPct) + "% damage reduction for " + std::to_string(seconds) + " s"};
 }
+
+json ResistancePotionItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "ResistancePotionItem";
+
+	return j;
+}

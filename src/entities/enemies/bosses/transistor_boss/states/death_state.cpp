@@ -102,4 +102,13 @@ void DeathState::onEnter(BaseEnemy &enemy)
 	AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP);
 }
 
+json DeathState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "DeathState";
+
+	return j;
+}
+
 } // namespace transistor_boss

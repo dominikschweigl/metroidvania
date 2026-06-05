@@ -20,6 +20,7 @@ const std::array<Binding, InputManager::actionCount> InputManager::defaultBindin
     Binding{sf::Keyboard::Scancode::Num3},
     Binding{sf::Keyboard::Scancode::Num4},
     Binding{sf::Keyboard::Scancode::Num5},
+    Binding{sf::Keyboard::Scancode::F},
 }};
 // clang-format on
 

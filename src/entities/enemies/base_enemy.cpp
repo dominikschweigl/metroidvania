@@ -58,3 +58,12 @@ void BaseEnemy::collectHitboxes(std::vector<Hitbox> &hitboxes)
 	if (const auto hit = getHitbox())
 		hitboxes.push_back(*hit);
 }
+
+json BaseEnemy::serialize() const
+{
+	json j = BaseEntity::serialize();
+
+	j["state"] = currentState->serialize();
+
+	return j;
+}

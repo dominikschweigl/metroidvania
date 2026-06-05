@@ -18,3 +18,12 @@ ItemInfo DamagePotionItem::info() const
 	return {"Damage Potion", "Smells like rage. Tastes like it too.",
 	        "+" + std::to_string(damagePct) + "% damage for " + std::to_string(seconds) + " s"};
 }
+
+json DamagePotionItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "DamagePotionItem";
+
+	return j;
+}

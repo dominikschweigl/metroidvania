@@ -11,4 +11,5 @@ class UsbKeyItem : public Item {
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return std::nullopt; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_USB_KEY; }
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 };

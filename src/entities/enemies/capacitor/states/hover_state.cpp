@@ -34,4 +34,13 @@ EnemyState *HoverState::update(float deltaTime, BaseEnemy &enemy, const World &w
 
 void HoverState::updateAnimation(float /*deltaTime*/, BaseEnemy & /*enemy*/) {}
 
+json HoverState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "HoverState";
+
+	return j;
+}
+
 } // namespace capacitor

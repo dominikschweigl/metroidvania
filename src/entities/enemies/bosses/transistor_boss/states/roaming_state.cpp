@@ -96,4 +96,13 @@ void RoamingState::onExit(BaseEnemy &enemy)
 	moveTimer = 0;
 }
 
+json RoamingState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "RoamingState";
+
+	return j;
+}
+
 } // namespace transistor_boss

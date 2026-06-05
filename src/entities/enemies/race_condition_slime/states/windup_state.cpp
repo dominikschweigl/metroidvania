@@ -41,4 +41,13 @@ void WindUpState::onEnter(BaseEnemy &enemy)
 	frameTimer = 0.f;
 }
 
+json WindUpState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "WindUpState";
+
+	return j;
+}
+
 } // namespace rc_slime

@@ -28,6 +28,7 @@ class WorldItem {
 	[[nodiscard]] std::unique_ptr<Item> tryCollect(sf::FloatRect playerBounds);
 	[[nodiscard]] bool isCollected() const noexcept { return collected_; }
 	[[nodiscard]] sf::FloatRect getBounds() const noexcept;
+	virtual json serialize() const;
 
   private:
 	std::unique_ptr<Item> item_;

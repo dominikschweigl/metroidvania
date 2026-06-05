@@ -47,4 +47,12 @@ void SummonState::onExit(BaseEnemy & /*enemy*/)
 	timer = 0.f;
 }
 
+json SummonState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "SummonState";
+
+	return j;
+}
 } // namespace transistor_boss

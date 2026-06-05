@@ -136,15 +136,19 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
 	}
 
-	std::optional<std::pair<std::string, int>> touchingDoorTargetRoom =
-	    world_.getTouchingDoorTargetRoom(player_.getBounds());
-	if (touchingDoorTargetRoom && world_.getCurrentRoom()->isAllowedLeaving()) {
-		world_.setCurrentRoom(touchingDoorTargetRoom.value().first);
-		player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoorTargetRoom.value().second]);
-		if (world_.getCurrentRoomId() == "boss_room") {
-			AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
-		} else {
-			AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+	if (input.wasPressed(GameAction::Interact) && world_.getCurrentRoom()->isAllowedLeaving()) {
+		std::optional<std::pair<std::string, int>> touchingDoorTargetRoom =
+		    world_.getTouchingDoorTargetRoom(player_.getBounds());
+		if (touchingDoorTargetRoom && world_.getCurrentRoom()->isAllowedLeaving()) {
+			world_.setCurrentRoom(touchingDoorTargetRoom.value().first);
+			player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoorTargetRoom.value().second]);
+			if (world_.getCurrentRoomId() == "boss_room") {
+				AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+			} else {
+				AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+			}
+		} else if (world_.isTouchingSavepoint(player_.getBounds())) {
+			world_.saveWorldData(player_);
 		}
 	}
 

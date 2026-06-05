@@ -116,3 +116,22 @@ void Inventory::moveToEquipmentSlot(const SlotRef from)
 		return;
 	std::swap(slotRef({*equipmentSlot, 0}), srcItem);
 }
+
+json Inventory::serialize() const
+{
+	json j;
+
+	j["hatSlot"] = hatSlot ? hatSlot->serialize() : nullptr;
+	j["gumSlot"] = gumSlot ? gumSlot->serialize() : nullptr;
+	j["backupSlot"] = backupSlot ? backupSlot->serialize() : nullptr;
+
+	j["grid"] = json::array();
+	for (const auto &slot : grid)
+		j["grid"].push_back(slot ? slot->serialize() : nullptr);
+
+	j["hotbar"] = json::array();
+	for (const auto &slot : hotbar)
+		j["hotbar"].push_back(slot ? slot->serialize() : nullptr);
+
+	return j;
+}

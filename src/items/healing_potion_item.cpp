@@ -13,3 +13,12 @@ ItemInfo HealingPotionItem::info() const
 {
 	return {"Health Potion", "A warm, glowing liquid.", "Restores " + std::to_string(HEAL_AMOUNT) + " HP"};
 }
+
+json HealingPotionItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "HealingPotionItem";
+
+	return j;
+}

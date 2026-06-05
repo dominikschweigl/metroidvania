@@ -90,6 +90,8 @@ class Player : public BaseEntity {
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
+	virtual json serialize() const;
+
   private:
 	bool inputJump = false;
 	bool inputLeft = false;

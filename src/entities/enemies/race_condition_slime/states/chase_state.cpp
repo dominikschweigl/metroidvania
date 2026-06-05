@@ -59,4 +59,13 @@ void ChaseState::onEnter(BaseEnemy & /*enemy*/)
 	frameTimer = 0.f;
 }
 
+json ChaseState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "ChaseState";
+
+	return j;
+}
+
 } // namespace rc_slime

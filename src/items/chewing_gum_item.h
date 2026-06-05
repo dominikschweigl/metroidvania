@@ -12,4 +12,5 @@ class ChewingGumItem : public Item {
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_CHEWING_GUM; }
 
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 };

@@ -35,6 +35,8 @@ class BaseEnemy : public BaseEntity {
 
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 
+	json serialize() const override;
+
   protected:
 	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH)
 	    : BaseEntity(spawnPos, entityWidth, entityHeight, maxHealth, Team::Enemy)

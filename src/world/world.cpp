@@ -3,6 +3,7 @@
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/player/player.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
 #include "../items/damage_potion_item.h"
@@ -120,6 +121,29 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			} else if (name == "BackupDiskItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<BackupDiskItem>()));
+			}
+		}
+	}
+
+	tson::Layer *layer = map->getLayer("Foreground");
+
+	for (int y = 0; y < room.height; ++y) {
+		for (int x = 0; x < room.width; ++x) {
+			tson::Tile *tile = layer->getTileData(x, y);
+
+			if (!tile)
+				continue;
+
+			// identify savepoint tile somehow
+			const std::string tileType = tile->get<std::string>("type");
+			if (tileType == "SavePoint") {
+				auto &objectGroup = tile->getObjectgroup();
+
+				for (auto &obj : objectGroup.getObjects()) {
+					room.savePoints.push_back(
+					    sf::FloatRect({x * TILE_SIZE + obj.getPosition().x, y * TILE_SIZE + obj.getPosition().y},
+					                  {obj.getSize().x, obj.getSize().y}));
+				}
 			}
 		}
 	}
@@ -244,6 +268,59 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 		currentRoomId = "default";
 }
 
+// std::unique_ptr<BaseEnemy> createEnemy(const json &j)
+// {
+// 	std::string type = j.at("type");
+
+// 	if (type == "TransistorBoss")
+// 		return TransistorBoss::deserialize(j);
+
+// 	if (type == "Slime")
+// 		return RaceConditionSlime::deserialize(j);
+
+// 	throw std::runtime_error("Unknown enemy type: " + type);
+// }
+
+// Room deserialize()
+// {
+
+// 	for (const auto &ej : j["enemies"]) {
+// 		std::string type = ej.at("type");
+
+// 		BaseEnemy enemy;
+
+// 		if (type == "TransistorBoss")
+// 			enemy = TransistorBoss::deserialize(j);
+
+// 		if (type == "Slime")
+// 			enemy = RaceConditionSlime::deserialize(j);
+// 		enemies_.push_back(enemy);
+// 	}
+// }
+
+void World::saveWorldData(Player &player)
+{
+	json j;
+	try {
+		j["player"] = player.serialize();
+
+		j["rooms"] = json::array();
+		for (const auto &room : rooms) {
+			j["rooms"].push_back(room.second.serialize());
+		}
+
+		std::ofstream file("saves/world.json");
+		if (!file.is_open()) {
+			std::cerr << "Failed to open save file\n";
+			return;
+		}
+
+		file << j.dump(4);
+	} catch (const std::exception &e) {
+		std::cerr << "Serialization error: " << e.what() << "\n";
+	}
+}
+
 void World::draw(sf::RenderWindow &window, const sf::View &view) const
 {
 	if (currentRoomId.empty())
@@ -296,7 +373,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 	for (const Door &door : room.doors) {
 		sf::RectangleShape shape(door.bounds.size);
 		shape.setPosition(door.bounds.position);
-		shape.setFillColor(sf::Color(0, 255, 255, 128));
+		shape.setFillColor(sf::Color(119, 143, 129, 128));
 		window.draw(shape);
 	}
 }

@@ -2,9 +2,12 @@
 #include "../core/asset_manager.h"
 #include "slot_ref.h"
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
+
+using json = nlohmann::json;
 
 class Player;
 class Inventory;
@@ -24,6 +27,7 @@ class Item {
 	[[nodiscard]] virtual std::optional<SlotKind> equipmentSlot() const noexcept = 0;
 	[[nodiscard]] virtual ItemInfo info() const = 0;
 	[[nodiscard]] virtual TextureAsset textureAsset() const noexcept = 0;
+	virtual json serialize() const { return json{}; }
 
 	Item(const Item &) = delete;
 	Item &operator=(const Item &) = delete;

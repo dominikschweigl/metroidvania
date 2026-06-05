@@ -54,4 +54,13 @@ void ChargeAttackState::onExit(BaseEnemy &enemy)
 	damageTimer = 0;
 }
 
+json ChargeAttackState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "ChargeAttackState";
+
+	return j;
+}
+
 } // namespace transistor_boss

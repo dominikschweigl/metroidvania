@@ -108,3 +108,12 @@ void Capacitor::draw(sf::RenderWindow &window)
 	for (const projectiles::ElectricBall &shot : shots)
 		shot.draw(window);
 }
+
+json Capacitor::serialize() const
+{
+	json j = BaseEnemy::serialize();
+
+	j["type"] = "Capacitor";
+
+	return j;
+}

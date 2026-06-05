@@ -10,3 +10,12 @@ ItemInfo ChewingGumItem::info() const
 {
 	return {"Sticky Chewing Gum", "Clings to any surface.", "Enables wall slide"};
 }
+
+json ChewingGumItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "ChewingGumItem";
+
+	return j;
+}

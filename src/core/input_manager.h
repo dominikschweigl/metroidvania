@@ -24,6 +24,7 @@ enum class GameAction {
 	UseItemSlot3,
 	UseItemSlot4,
 	UseItemSlot5,
+	Interact
 };
 enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown, NavigateLeft, NavigateRight };
 
@@ -94,6 +95,7 @@ class InputManager {
 	    {GameAction::UseItemSlot3, "Use Item Slot 3"},
 	    {GameAction::UseItemSlot4, "Use Item Slot 4"},
 	    {GameAction::UseItemSlot5, "Use Item Slot 5"},
+	    {GameAction::Interact, "Interact with bounding Boxes touching the player."},
 	});
 	static constexpr auto menuBindings = std::to_array<Binding>({
 	    Binding{sf::Keyboard::Scancode::Escape},

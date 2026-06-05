@@ -47,4 +47,13 @@ void RecoverState::onExit(BaseEnemy &enemy)
 	recoverTimer = 0.f;
 }
 
+json RecoverState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "RecoverState";
+
+	return j;
+}
+
 } // namespace transistor_boss

@@ -1,5 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class BaseEnemy;
 class World;
@@ -13,6 +16,7 @@ class EnemyState {
 	virtual void updateAnimation(float deltaTime, BaseEnemy &enemy) = 0;
 	virtual void onEnter(BaseEnemy &enemy) {}
 	virtual void onExit(BaseEnemy &enemy) {}
+	virtual json serialize() const { return json{}; }
 
   protected:
 	// Shared animation tracking for state frame counting.

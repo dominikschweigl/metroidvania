@@ -12,4 +12,5 @@ class HatItem : public Item {
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_HAT; }
 
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 };

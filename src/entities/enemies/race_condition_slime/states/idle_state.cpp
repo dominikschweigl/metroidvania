@@ -46,4 +46,13 @@ void IdleState::onEnter(BaseEnemy &enemy)
 	frameTimer = 0.f;
 }
 
+json IdleState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "IdleState";
+
+	return j;
+}
+
 } // namespace rc_slime

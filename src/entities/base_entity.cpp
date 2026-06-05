@@ -44,3 +44,13 @@ void BaseEntity::onHit(const Hitbox &hit) noexcept
 	knockbackTimer = KNOCKBACK_DURATION;
 	hurtFlashTimer = HURT_FLASH_DURATION;
 }
+
+json BaseEntity::serialize() const
+{
+	return {{"position", {position.x, position.y}},
+	        {"velocity", {velocity.x, velocity.y}},
+	        {"direction", direction == Direction::Left ? "Left" : "Right"},
+	        {"isOnGround", isOnGround},
+	        {"health", health.to_json()},
+	        {"gravity", gravity}};
+}

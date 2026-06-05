@@ -158,3 +158,12 @@ bool RaceConditionSlime::isValidTeleportDest(const World &world, float newX, flo
 	}
 	return false;
 }
+
+json RaceConditionSlime::serialize() const
+{
+	json j = BaseEnemy::serialize();
+
+	j["type"] = "RaceConditionSlime";
+
+	return j;
+}

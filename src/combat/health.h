@@ -1,6 +1,8 @@
 #pragma once
-
 #include <algorithm>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 // Health struct to be used by the player and enemies.
 // Damage and heal are clamped.
@@ -23,4 +25,6 @@ struct Health {
 			return;
 		current = std::min(max, current + amount);
 	}
+
+	json to_json() const { return {{"max", max}, {"current", current}}; }
 };

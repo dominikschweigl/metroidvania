@@ -13,6 +13,7 @@ class DeathState : public EnemyState {
 	                                 sf::Vector2f playerPos) override;
 	void updateAnimation(float deltaTime, BaseEnemy &enemy) override;
 	void onEnter(BaseEnemy &enemy) override;
+	json serialize() const override;
 
   private:
 	enum class Phase { WindupFirst, Recover, WindupSecond, Explosion };

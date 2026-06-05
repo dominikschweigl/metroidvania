@@ -11,4 +11,5 @@ class JumpPotionItem : public Item {
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return std::nullopt; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_JUMP_POTION; }
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 };

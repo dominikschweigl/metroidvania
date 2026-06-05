@@ -83,6 +83,8 @@ class Capacitor : public BaseEnemy {
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
+	json serialize() const override;
+
   protected:
 	void onPreUpdate(float deltaTime) override;
 

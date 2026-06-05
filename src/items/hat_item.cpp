@@ -10,3 +10,12 @@ ItemInfo HatItem::info() const
 {
 	return {"The Debugger's Hat", "A sentient hat that loves being thrown.", "Enables hat throw"};
 }
+
+json HatItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "HatItem";
+
+	return j;
+}

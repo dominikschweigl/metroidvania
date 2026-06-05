@@ -40,4 +40,13 @@ void SwoopState::onEnter(BaseEnemy &enemy)
 	static_cast<Capacitor &>(enemy).resetSwoopCounter();
 }
 
+json SwoopState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "SwoopState";
+
+	return j;
+}
+
 } // namespace capacitor
