@@ -43,7 +43,7 @@ void World::loadTilesets(tson::Map &map)
 				continue;
 			}
 
-			auto pair = tileTextures.emplace(gid, std::cref(*texture));
+			tileTextures.emplace(gid, std::cref(*texture));
 		}
 	}
 }
