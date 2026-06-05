@@ -29,15 +29,15 @@ void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::Fl
 {
 	if (!isGroundBelow(bounds, world)) {
 		isOnGround = false;
-		velY += gravity * dt;
+		velY += gravity * (double)dt;
 	}
 }
 
 float resolveHorizontal(sf::Vector2f pos, float &velX, float width, float height, float dt, const World &world)
 {
 	double deltaX = velX * dt;
-	float futureX = pos.x + deltaX;
-	sf::FloatRect future({futureX - width / 2.f, pos.y - height}, {width, height - 1.f});
+	double futureX = pos.x + deltaX;
+	sf::FloatRect future({static_cast<float>(futureX) - width / 2.f, pos.y - height}, {width, height - 1.f});
 
 	if (world.isSolidAtRect(future)) {
 		velX = 0.f;
@@ -74,14 +74,15 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &velocity, bool &isOnGround, float gravity,
                       float width, float height, const World &world)
 {
-	static constexpr float step = 0.0001f;
+	static constexpr float step = 0.00001f;
 	float counter = 0.f;
 	while (counter < deltaTime) {
-		position.x = resolveHorizontal(position, velocity.x, width, height, step, world);
-		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, step, world);
-		applyGravity(velocity.y, isOnGround, step, gravity,
+		float s = std::min(step, deltaTime - counter);
+		position.x = resolveHorizontal(position, velocity.x, width, height, s, world);
+		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, s, world);
+		applyGravity(velocity.y, isOnGround, s, gravity,
 		             sf::FloatRect({position.x - width / 2.f, position.y - height}, {width, height}), world);
-		counter += step;
+		counter += s;
 	}
 }
 
