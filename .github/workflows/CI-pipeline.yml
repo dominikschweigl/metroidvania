@@ -1,147 +1,149 @@
 name: C++ CI Pipeline
 
 on:
-  push:
-    branches: [ main, dev ]
-  pull_request:
-    branches: [ main, dev ]
+        push:
+                branches: [main, dev]
+        pull_request:
+                branches: [main, dev]
 
 jobs:
-  build-linux:
-    name: Build & Test (Linux)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        build-linux:
+                name: Build & Test (Linux)
+                runs-on: ubuntu-latest
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
 
-      - name: Install Linux Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            ninja-build \
-            libx11-dev \
-            libxi-dev \
-            libxrandr-dev \
-            libxcursor-dev \
-            libudev-dev \
-            libgl1-mesa-dev \
-            xvfb
+                        - name: Install Linux Dependencies
+                          run: |
+                                  sudo apt-get update
+                                  sudo apt-get install -y \
+                                    build-essential \
+                                    ninja-build \
+                                    libx11-dev \
+                                    libxi-dev \
+                                    libxrandr-dev \
+                                    libxcursor-dev \
+                                    libudev-dev \
+                                    libgl1-mesa-dev \
+                                    xvfb
 
-      - name: Create vcpkg cache directory
-        run: mkdir -p ~/.cache/vcpkg
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p ~/.cache/vcpkg
 
-      - name: Restore vcpkg cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/vcpkg
-          key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-linux-
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ~/.cache/vcpkg
+                                  key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-linux-
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
 
-      - name: Configure CMake
-        run: cmake --preset vcpkg-linux
-      - name: Build Project
-        run: cmake --build --preset linux
-      - name: Run Tests (with Xvfb)
-        run: xvfb-run -a -s "-screen 0 1024x768x24" ctest --test-dir build/linux --output-on-failure
+                        - name: Configure CMake
+                          run: cmake --preset vcpkg-linux
+                        - name: Build Project
+                          run: cmake --build --preset linux
+                        - name: Run Tests (with Xvfb)
+                          run: xvfb-run -a -s "-screen 0 1024x768x24" ctest --test-dir build/linux --output-on-failure
 
-  build-windows-mingw:
-    name: Build & Test (Windows MinGW)
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+        build-windows-mingw:
+                name: Build & Test (Windows MinGW)
+                runs-on: windows-latest
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
 
-      - name: Install MSYS2 + MinGW (UCRT64)
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          install: >
-            mingw-w64-ucrt-x86_64-toolchain
-            mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-ninja
-            mingw-w64-ucrt-x86_64-pkg-config
+                        - name: Install MSYS2 + MinGW (UCRT64)
+                          uses: msys2/setup-msys2@v2
+                          with:
+                                  update: true
+                                  install: >
+                                          mingw-w64-ucrt-x86_64-toolchain
+                                          mingw-w64-ucrt-x86_64-cmake
+                                          mingw-w64-ucrt-x86_64-ninja
+                                          mingw-w64-ucrt-x86_64-pkg-config
 
-      - name: Add MSYS2 MinGW UCRT64 to PATH
-        run: echo "C:\\msys64\\ucrt64\\bin" >> $GITHUB_PATH
+                        - name: Add MSYS2 MinGW UCRT64 to PATH
+                          run: echo "C:\\msys64\\ucrt64\\bin" >> $GITHUB_PATH
 
-      - name: Create vcpkg cache directory
-        run: mkdir -p "$env:VCPKG_ROOT\installed" -ErrorAction SilentlyContinue
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p "$env:VCPKG_ROOT\installed" -ErrorAction SilentlyContinue
 
-      - name: Restore vcpkg cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_ROOT }}\installed
-          key: vcpkg-mingw-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-mingw-
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ${{ env.VCPKG_ROOT }}\installed
+                                  key: vcpkg-mingw-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-mingw-
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        env:
-          VCPKG_TARGET_TRIPLET: x64-mingw-static
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+                          env:
+                                  VCPKG_TARGET_TRIPLET: x64-mingw-static
 
-      - name: Install SFML for MinGW
-        run: vcpkg install
-      - name: Clean Build Folder
-        run: Remove-Item -Recurse -Force build/windows-mingw -ErrorAction SilentlyContinue
-      - name: Configure CMake
-        run: cmake --preset vcpkg-windows-mingw
-      - name: Build Project
-        run: cmake --build --preset windows-mingw
-      - name: Run Tests
-        run: ctest --test-dir build/windows-mingw --output-on-failure
+                        - name: Install SFML for MinGW
+                          run: vcpkg install
+                        - name: Clean Build Folder
+                          run: Remove-Item -Recurse -Force build/windows-mingw -ErrorAction SilentlyContinue
+                        - name: Configure CMake
+                          run: cmake --preset vcpkg-windows-mingw
+                        - name: Build Project
+                          run: cmake --build --preset windows-mingw
+                        - name: Run Tests
+                          run: ctest --test-dir build/windows-mingw --output-on-failure
 
-  clang-format:
-    name: Clang-Format Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install clang-format
-        run: sudo apt-get update && sudo apt-get install -y clang-format
-      - name: Check Style
-        run: |
-          find src tests -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
+        clang-format:
+                name: Clang-Format Check
+                runs-on: ubuntu-latest
+                steps:
+                        - uses: actions/checkout@v4
+                        - name: Install clang-format
+                          run: sudo apt-get update && sudo apt-get install -y clang-format
+                        - name: Check Style
+                          run: |
+                                  find src tests -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
 
-  clang-tidy:
-    name: Clang-Tidy Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            clang-tidy \
-            build-essential \
-            ninja-build \
-            libx11-dev \
-            libxi-dev \
-            libxrandr-dev \
-            libxcursor-dev \
-            libudev-dev \
-            libgl1-mesa-dev
+        clang-tidy:
+                name: Clang-Tidy Analysis
+                runs-on: ubuntu-latest
+                steps:
+                        - uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+                        - name: Install Dependencies
+                          run: |
+                                  sudo apt-get update
+                                  sudo apt-get install -y \
+                                    clang-tidy \
+                                    build-essential \
+                                    ninja-build \
+                                    libx11-dev \
+                                    libxi-dev \
+                                    libxrandr-dev \
+                                    libxcursor-dev \
+                                    libudev-dev \
+                                    libgl1-mesa-dev
 
-      - name: Create vcpkg cache directory
-        run: mkdir -p ~/.cache/vcpkg
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p ~/.cache/vcpkg
 
-      - name: Restore vcpkg cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/vcpkg
-          key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-linux-
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ~/.cache/vcpkg
+                                  key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-linux-
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
 
-      - name: Configure with Tidy
-        run: cmake --preset vcpkg-linux -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
-      - name: Build & Lint
-        run: cmake --build --preset linux
+                        - name: Configure with Tidy
+                          run: cmake --preset vcpkg-linux -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--warnings-as-errors=*"
+                        - name: Build & Lint
+                          run: cmake --build --preset linux
