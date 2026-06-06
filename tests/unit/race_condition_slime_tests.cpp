@@ -23,7 +23,7 @@ World makeOpenWorld()
 	// Floor row 15.
 	for (int x = 0; x < 40; ++x)
 		g[15][x] = 1;
-	World w;
+	World w = World("test");
 	w.loadFromGrid(g);
 	return w;
 }

@@ -147,7 +147,7 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				for (auto &obj : objectGroup.getObjects()) {
 					room.savePoints.push_back(
 					    sf::FloatRect({x * TILE_SIZE + obj.getPosition().x, y * TILE_SIZE + obj.getPosition().y},
-					                  {obj.getSize().x, obj.getSize().y}));
+					                  {(float)obj.getSize().x, (float)obj.getSize().y}));
 				}
 			}
 		}

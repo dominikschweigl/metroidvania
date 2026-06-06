@@ -14,7 +14,7 @@ namespace {
 World makeEmptyWorld()
 {
 	std::vector<std::vector<int>> grid(5, std::vector<int>(10, 0));
-	World world;
+	World world = World("test");
 	world.loadFromGrid(grid);
 	return world;
 }
