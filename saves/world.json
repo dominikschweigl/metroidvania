@@ -1,6 +1,7 @@
 {
+    "currentRoom": "start_room",
     "player": {
-        "direction": "Right",
+        "direction": "Left",
         "gravity": 1200.0,
         "health": {
             "current": 5,
@@ -9,30 +10,14 @@
         "inventory": {
             "backupSlot": null,
             "grid": [
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -62,7 +47,7 @@
         },
         "isOnGround": true,
         "position": [
-            1226.7313232421875,
+            1221.1455078125,
             288.0
         ],
         "velocity": [
@@ -93,10 +78,12 @@
                     ]
                 }
             ],
+            "id": "8",
             "items": []
         },
         {
             "enemies": [],
+            "id": "7",
             "items": [
                 {
                     "collected": false,
@@ -182,6 +169,7 @@
                     ]
                 }
             ],
+            "id": "6",
             "items": [
                 {
                     "collected": false,
@@ -203,14 +191,17 @@
         },
         {
             "enemies": [],
+            "id": "4",
             "items": []
         },
         {
             "enemies": [],
+            "id": "2",
             "items": []
         },
         {
             "enemies": [],
+            "id": "5",
             "items": []
         },
         {
@@ -258,6 +249,7 @@
                     ]
                 }
             ],
+            "id": "3",
             "items": []
         },
         {
@@ -284,10 +276,12 @@
                     ]
                 }
             ],
+            "id": "1",
             "items": []
         },
         {
             "enemies": [],
+            "id": "start_room",
             "items": []
         }
     ]

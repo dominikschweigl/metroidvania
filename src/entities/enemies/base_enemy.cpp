@@ -1,4 +1,5 @@
 #include "base_enemy.h"
+#include "../../utils/EnemyStateFactory.hpp"
 #include "../entity_physics.h"
 #include "enemy_state.h"
 
@@ -66,4 +67,13 @@ json BaseEnemy::serialize() const
 	j["state"] = currentState->serialize();
 
 	return j;
+}
+
+void BaseEnemy::deserialize(const json &j)
+{
+	BaseEntity::deserialize(j);
+
+	if (j.contains("currentState")) {
+		currentState = EnemyStateFactory::create(j["currentState"]);
+	}
 }

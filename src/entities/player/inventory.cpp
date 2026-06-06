@@ -1,4 +1,5 @@
 #include "inventory.h"
+#include "../../utils/ItemFactory.hpp"
 #include "player.h"
 #include <stdexcept>
 
@@ -134,4 +135,57 @@ json Inventory::serialize() const
 		j["hotbar"].push_back(slot ? slot->serialize() : nullptr);
 
 	return j;
+}
+
+void Inventory::deserialize(const json &j)
+{
+	// --- single slots ---
+	if (j.contains("hatSlot") && !j["hatSlot"].is_null())
+		hatSlot = ItemFactory::create(j["hatSlot"]);
+	else
+		hatSlot.reset();
+
+	if (j.contains("gumSlot") && !j["gumSlot"].is_null())
+		gumSlot = ItemFactory::create(j["gumSlot"]);
+	else
+		gumSlot.reset();
+
+	if (j.contains("backupSlot") && !j["backupSlot"].is_null())
+		backupSlot = ItemFactory::create(j["backupSlot"]);
+	else
+		backupSlot.reset();
+
+	for (auto &slot : grid)
+		slot.reset();
+	if (j.contains("grid")) {
+		size_t i = 0;
+		for (const auto &slotJson : j["grid"]) {
+			if (i >= grid.size())
+				break;
+
+			if (!slotJson.is_null())
+				grid[i] = ItemFactory::create(slotJson);
+			else
+				grid[i] = nullptr;
+
+			++i;
+		}
+	}
+
+	for (auto &slot : hotbar)
+		slot.reset();
+	if (j.contains("hotbar")) {
+		size_t i = 0;
+		for (const auto &slotJson : j["hotbar"]) {
+			if (i >= hotbar.size())
+				break;
+
+			if (!slotJson.is_null())
+				hotbar[i] = ItemFactory::create(slotJson);
+			else
+				hotbar[i] = nullptr;
+
+			++i;
+		}
+	}
 }

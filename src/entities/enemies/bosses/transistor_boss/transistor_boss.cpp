@@ -210,3 +210,12 @@ json TransistorBoss::serialize() const
 
 	return j;
 }
+
+void TransistorBoss::deserialize(const json &j)
+{
+	BaseEnemy::deserialize(j);
+
+	if (j.contains("state")) {
+		stage2Triggered = j["state"];
+	}
+}

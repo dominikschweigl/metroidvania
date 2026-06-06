@@ -81,6 +81,7 @@ class BaseEntity {
 	float gravity;
 
 	virtual json serialize() const;
+	virtual void deserialize(const json &j);
 
   protected:
 	BaseEntity(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth, Team entityTeam,

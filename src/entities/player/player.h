@@ -91,6 +91,7 @@ class Player : public BaseEntity {
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
 	virtual json serialize() const;
+	void deserialize(const json &j) override;
 
   private:
 	bool inputJump = false;

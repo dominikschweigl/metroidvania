@@ -26,5 +26,14 @@ struct Health {
 		current = std::min(max, current + amount);
 	}
 
-	json to_json() const { return {{"max", max}, {"current", current}}; }
+	json serialize() const { return {{"max", max}, {"current", current}}; }
+	void deserialize(const json &j)
+	{
+		if (j.contains("max")) {
+			max = j["max"];
+		}
+		if (j.contains("current")) {
+			current = j["current"];
+		}
+	}
 };

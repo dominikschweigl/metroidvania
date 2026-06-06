@@ -51,6 +51,35 @@ json BaseEntity::serialize() const
 	        {"velocity", {velocity.x, velocity.y}},
 	        {"direction", direction == Direction::Left ? "Left" : "Right"},
 	        {"isOnGround", isOnGround},
-	        {"health", health.to_json()},
+	        {"health", health.serialize()},
 	        {"gravity", gravity}};
+}
+
+void BaseEntity::deserialize(const json &j)
+{
+	if (j.contains("position")) {
+		position.x = j["position"][0];
+		position.y = j["position"][1];
+	}
+
+	if (j.contains("velocity")) {
+		velocity.x = j["velocity"][0];
+		velocity.y = j["velocity"][1];
+	}
+
+	if (j.contains("direction")) {
+		direction = (j["direction"] == "Left") ? Direction::Left : Direction::Right;
+	}
+
+	if (j.contains("isOnGround")) {
+		isOnGround = j["isOnGround"];
+	}
+
+	if (j.contains("health")) {
+		health.deserialize(j["health"]);
+	}
+
+	if (j.contains("gravity")) {
+		gravity = j["gravity"];
+	}
 }

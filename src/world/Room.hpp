@@ -1,6 +1,7 @@
 #pragma once
 #include "../entities/enemies/base_enemy.h"
 #include "../items/world_item.h"
+#include "../utils/EnemyFactory.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <nlohmann/json.hpp>
@@ -106,5 +107,26 @@ struct Room {
 		}
 
 		return j;
+	}
+
+	void deserialize(const json &j)
+	{
+		width = j.value("width", width);
+		height = j.value("height", height);
+
+		if (j.contains("enemies")) {
+			enemies_.clear();
+			for (const auto &e : j["enemies"]) {
+				enemies_.push_back(EnemyFactory::create(e));
+			}
+		}
+
+		if (j.contains("items")) {
+			items_.clear();
+
+			for (const auto &i : j["items"]) {
+				items_.push_back(WorldItem::deserialize(i));
+			}
+		}
 	}
 };

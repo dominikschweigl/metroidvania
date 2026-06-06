@@ -17,7 +17,8 @@
 #include <cstdint>
 #include <vector>
 
-GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneStack_(sceneStack), window_(window)
+GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
+    : sceneStack_(sceneStack), window_(window), world_(gameName)
 {
 	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
 
@@ -34,9 +35,24 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window) : sceneSt
 	world_.loadRoom("6", "data/maps/6.tmj");
 	world_.loadRoom("7", "data/maps/7.tmj");
 	world_.loadRoom("8", "data/maps/8.tmj");
-	world_.setCurrentRoom("start_room");
 
+	if (makeNewGame)
+		this->newGame(window);
+	else
+		this->loadGame(window);
+}
+
+void GameScene::newGame(sf::RenderWindow &window)
+{
 	player_.setPosition(world_.getCurrentRoom()->playerSpawns[0]);
+
+	view_.setCenter(player_.getPosition());
+}
+
+void GameScene::loadGame(sf::RenderWindow &window)
+{
+	world_.loadWorldData(player_);
+
 	view_.setCenter(player_.getPosition());
 }
 

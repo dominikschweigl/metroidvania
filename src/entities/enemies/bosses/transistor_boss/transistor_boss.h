@@ -110,6 +110,7 @@ class TransistorBoss : public BaseEnemy {
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
 	json serialize() const override;
+	void deserialize(const json &j) override;
 
   protected:
 	void onPreUpdate(float deltaTime) override;

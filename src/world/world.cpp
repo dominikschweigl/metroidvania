@@ -18,6 +18,11 @@
 #include <iostream>
 #include <tileson.hpp>
 
+World::World(const std::string worldName)
+{
+	this->worldName = worldName;
+}
+
 void World::loadTilesets(tson::Map &map)
 {
 	AssetManager &am = AssetManager::getInstance();
@@ -268,48 +273,22 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 		currentRoomId = "default";
 }
 
-// std::unique_ptr<BaseEnemy> createEnemy(const json &j)
-// {
-// 	std::string type = j.at("type");
-
-// 	if (type == "TransistorBoss")
-// 		return TransistorBoss::deserialize(j);
-
-// 	if (type == "Slime")
-// 		return RaceConditionSlime::deserialize(j);
-
-// 	throw std::runtime_error("Unknown enemy type: " + type);
-// }
-
-// Room deserialize()
-// {
-
-// 	for (const auto &ej : j["enemies"]) {
-// 		std::string type = ej.at("type");
-
-// 		BaseEnemy enemy;
-
-// 		if (type == "TransistorBoss")
-// 			enemy = TransistorBoss::deserialize(j);
-
-// 		if (type == "Slime")
-// 			enemy = RaceConditionSlime::deserialize(j);
-// 		enemies_.push_back(enemy);
-// 	}
-// }
-
 void World::saveWorldData(Player &player)
 {
 	json j;
 	try {
 		j["player"] = player.serialize();
 
+		j["currentRoom"] = getCurrentRoomId();
+
 		j["rooms"] = json::array();
 		for (const auto &room : rooms) {
-			j["rooms"].push_back(room.second.serialize());
+			json j_room = room.second.serialize();
+			j_room["id"] = room.first;
+			j["rooms"].push_back(j_room);
 		}
 
-		std::ofstream file("saves/world.json");
+		std::ofstream file("saves/" + worldName + ".json");
 		if (!file.is_open()) {
 			std::cerr << "Failed to open save file\n";
 			return;
@@ -318,6 +297,55 @@ void World::saveWorldData(Player &player)
 		file << j.dump(4);
 	} catch (const std::exception &e) {
 		std::cerr << "Serialization error: " << e.what() << "\n";
+	}
+}
+
+void World::loadWorldData(Player &player)
+{
+	std::ifstream file("saves/" + worldName + ".json");
+	if (!file.is_open()) {
+		std::cerr << "Failed to open save file\n";
+		return;
+	}
+
+	json j;
+	try {
+		file >> j;
+	} catch (const std::exception &e) {
+		std::cerr << "JSON parse error: " << e.what() << "\n";
+		return;
+	}
+
+	try {
+		if (j.contains("player")) {
+			player.deserialize(j["player"]);
+		}
+
+		if (j.contains("rooms")) {
+			for (const auto &j_room : j["rooms"]) {
+
+				std::string id = "";
+				if (j_room.contains("id"))
+					id = j_room["id"];
+
+				// If room doesn't exist yet, skip or create it
+				if (rooms.find(id) == rooms.end()) {
+					std::cerr << "Unknown room id in save: " << id << "\n";
+					continue;
+				}
+
+				Room &room = rooms[id];
+
+				room.deserialize(j_room);
+			}
+		}
+
+		if (j.contains("currentRoom")) {
+			setCurrentRoom(j["currentRoom"]);
+		}
+
+	} catch (const std::exception &e) {
+		std::cerr << "World loading error: " << e.what() << "\n";
 	}
 }
 

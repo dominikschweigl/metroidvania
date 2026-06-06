@@ -28,11 +28,12 @@ class Item {
 	[[nodiscard]] virtual ItemInfo info() const = 0;
 	[[nodiscard]] virtual TextureAsset textureAsset() const noexcept = 0;
 	virtual json serialize() const { return json{}; }
+	virtual void serialize(const json &j) const {};
 
 	Item(const Item &) = delete;
 	Item &operator=(const Item &) = delete;
-	Item(Item &&) = delete;
-	Item &operator=(Item &&) = delete;
+	Item(Item &&) = default;
+	Item &operator=(Item &&) = default;
 
   protected:
 	Item() = default;

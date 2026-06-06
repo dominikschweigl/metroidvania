@@ -272,3 +272,11 @@ json Player::serialize() const
 
 	return j;
 }
+void Player::deserialize(const json &j)
+{
+	BaseEntity::deserialize(j);
+
+	if (j.contains("inventory")) {
+		inventory_.deserialize(j["inventory"]);
+	}
+}
