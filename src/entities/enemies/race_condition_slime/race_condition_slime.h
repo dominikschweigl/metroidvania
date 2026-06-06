@@ -95,6 +95,8 @@ class RaceConditionSlime : public BaseEnemy {
 	void tryJumpTowards(float heightDiff);
 	void maybeTeleport(const World &world, sf::Vector2f playerPos);
 
+	json serialize() const override;
+
   protected:
 	// Hook called each frame before state update. Ticks internal timers.
 	void onPreUpdate(float deltaTime) override;

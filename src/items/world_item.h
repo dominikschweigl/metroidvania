@@ -18,8 +18,8 @@ class WorldItem {
 
 	WorldItem(const WorldItem &) = delete;
 	WorldItem &operator=(const WorldItem &) = delete;
-	WorldItem(WorldItem &&) = delete;
-	WorldItem &operator=(WorldItem &&) = delete;
+	WorldItem(WorldItem &&) = default;
+	WorldItem &operator=(WorldItem &&) = default;
 
 	void update(float deltaTime, const World &world);
 	void draw(sf::RenderWindow &window);
@@ -28,6 +28,8 @@ class WorldItem {
 	[[nodiscard]] std::unique_ptr<Item> tryCollect(sf::FloatRect playerBounds);
 	[[nodiscard]] bool isCollected() const noexcept { return collected_; }
 	[[nodiscard]] sf::FloatRect getBounds() const noexcept;
+	virtual json serialize() const;
+	static std::unique_ptr<WorldItem> deserialize(const json &j);
 
   private:
 	std::unique_ptr<Item> item_;

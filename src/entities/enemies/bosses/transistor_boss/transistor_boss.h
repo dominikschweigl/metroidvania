@@ -109,6 +109,9 @@ class TransistorBoss : public BaseEnemy {
 	// and stays visible on its last frame, so it must report as alive throughout.
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
+	json serialize() const override;
+	void deserialize(const json &j) override;
+
   protected:
 	void onPreUpdate(float deltaTime) override;
 

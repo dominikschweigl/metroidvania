@@ -20,7 +20,7 @@ World makeOpenWorld()
 	std::vector<std::vector<int>> g(20, std::vector<int>(40, 0));
 	for (int x = 0; x < 40; ++x)
 		g[18][x] = 1; // a floor far below
-	World w;
+	World w = World("test");
 	w.loadFromGrid(g);
 	return w;
 }

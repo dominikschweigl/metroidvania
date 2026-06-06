@@ -11,4 +11,5 @@ class BackupDiskItem : public Item {
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return SlotKind::Backup; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_BACKUP_DISK; }
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 };

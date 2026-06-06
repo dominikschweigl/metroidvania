@@ -200,3 +200,22 @@ void TransistorBoss::setAnimation(TransistorBossAnimation anim, int frame)
 {
 	renderer.setAnimation(anim, frame);
 }
+
+json TransistorBoss::serialize() const
+{
+	json j = BaseEnemy::serialize();
+
+	j["type"] = "TransistorBoss";
+	j["state"] = stage2Triggered;
+
+	return j;
+}
+
+void TransistorBoss::deserialize(const json &j)
+{
+	BaseEnemy::deserialize(j);
+
+	if (j.contains("state")) {
+		stage2Triggered = j["state"];
+	}
+}

@@ -54,6 +54,9 @@ class Inventory {
 	void clearSlot(SlotRef slot);
 	void moveToEquipmentSlot(SlotRef from);
 
+	json serialize() const;
+	void deserialize(const json &j);
+
   private:
 	[[nodiscard]] std::unique_ptr<Item> &slotRef(SlotRef slot);
 	[[nodiscard]] const std::unique_ptr<Item> &slotRef(SlotRef slot) const;

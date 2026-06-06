@@ -1,4 +1,5 @@
 #include "base_enemy.h"
+#include "../../utils/EnemyStateFactory.hpp"
 #include "../entity_physics.h"
 #include "enemy_state.h"
 
@@ -57,4 +58,22 @@ void BaseEnemy::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
 	if (const auto hit = getHitbox())
 		hitboxes.push_back(*hit);
+}
+
+json BaseEnemy::serialize() const
+{
+	json j = BaseEntity::serialize();
+
+	j["state"] = currentState->serialize();
+
+	return j;
+}
+
+void BaseEnemy::deserialize(const json &j)
+{
+	BaseEntity::deserialize(j);
+
+	if (j.contains("currentState")) {
+		currentState = EnemyStateFactory::create(j["currentState"]);
+	}
 }

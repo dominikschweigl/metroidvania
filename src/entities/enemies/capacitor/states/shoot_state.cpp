@@ -35,4 +35,13 @@ void ShootState::onExit(BaseEnemy &enemy)
 	static_cast<Capacitor &>(enemy).startShootCooldown();
 }
 
+json ShootState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "ShootState";
+
+	return j;
+}
+
 } // namespace capacitor

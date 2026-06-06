@@ -8,6 +8,7 @@ class HoverState : public EnemyState {
 	[[nodiscard]] EnemyState *update(float deltaTime, BaseEnemy &enemy, const World &world,
 	                                 sf::Vector2f playerPos) override;
 	void updateAnimation(float deltaTime, BaseEnemy &enemy) override;
+	json serialize() const override;
 };
 
 } // namespace capacitor

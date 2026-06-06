@@ -46,4 +46,13 @@ void AttackState::onExit(BaseEnemy &enemy)
 	static_cast<RaceConditionSlime &>(enemy).markAttackSourceEnded();
 }
 
+json AttackState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "AttackState";
+
+	return j;
+}
+
 } // namespace rc_slime

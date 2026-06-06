@@ -263,3 +263,20 @@ void Player::draw(sf::RenderWindow &window)
 	window.draw(upperBodySprite);
 	hatAbility.draw(window);
 }
+
+json Player::serialize() const
+{
+	json j = BaseEntity::serialize();
+
+	j["inventory"] = inventory_.serialize();
+
+	return j;
+}
+void Player::deserialize(const json &j)
+{
+	BaseEntity::deserialize(j);
+
+	if (j.contains("inventory")) {
+		inventory_.deserialize(j["inventory"]);
+	}
+}

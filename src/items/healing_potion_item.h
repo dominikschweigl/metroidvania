@@ -12,6 +12,7 @@ class HealingPotionItem : public Item {
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_HEALING_POTION; }
 
 	[[nodiscard]] ItemInfo info() const override;
+	json serialize() const override;
 
   private:
 	static constexpr int HEAL_AMOUNT = 2;

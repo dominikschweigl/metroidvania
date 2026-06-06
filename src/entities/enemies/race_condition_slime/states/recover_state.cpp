@@ -41,4 +41,13 @@ void RecoverState::onEnter(BaseEnemy & /*enemy*/)
 	frameTimer = 0.f;
 }
 
+json RecoverState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "RecoverState";
+
+	return j;
+}
+
 } // namespace rc_slime

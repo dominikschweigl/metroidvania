@@ -14,7 +14,7 @@
 // Gameplay scene. Owns the world, player, enemies and the camera view.
 class GameScene : public Scene {
   public:
-	GameScene(SceneStack &sceneStack, sf::RenderWindow &window);
+	GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame);
 
 	void handleEvent(const sf::Event &event, sf::RenderWindow &window) override;
 	void update(float deltaTime) override;
@@ -23,6 +23,9 @@ class GameScene : public Scene {
 	void resetPlayerIfOutOfBounds();
 
   private:
+	void newGame(sf::RenderWindow &window);
+	void loadGame(sf::RenderWindow &window);
+
 	void drawDebugHitboxes(sf::RenderWindow &window);
 
 	SceneStack &sceneStack_;

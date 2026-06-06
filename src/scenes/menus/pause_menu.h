@@ -26,7 +26,12 @@ inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWin
 		     resumeGameAudio();
 		     stack.pop();
 	     }},
-	    {"Load Game", {}, false},
+	    {"Load Game",
+	     [&stack, &window]() {
+		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
+			     return std::make_unique<GameScene>(stack, window, worldName, false);
+		     });
+	     }},
 	    {"Settings",
 	     [&stack, &window]() {
 		     stack.push(

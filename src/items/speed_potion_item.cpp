@@ -18,3 +18,12 @@ ItemInfo SpeedPotionItem::info() const
 	return {"Speed Potion", "A crackling liquid that buzzes under your skin.",
 	        "+" + std::to_string(speedPct) + "% speed for " + std::to_string(seconds) + " s"};
 }
+
+json SpeedPotionItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "SpeedPotionItem";
+
+	return j;
+}

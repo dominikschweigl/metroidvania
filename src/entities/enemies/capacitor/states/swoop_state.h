@@ -11,6 +11,7 @@ class SwoopState : public EnemyState {
 	                                 sf::Vector2f playerPos) override;
 	void updateAnimation(float deltaTime, BaseEnemy &enemy) override;
 	void onEnter(BaseEnemy &enemy) override;
+	json serialize() const override;
 
   private:
 	float timer = 0.f;

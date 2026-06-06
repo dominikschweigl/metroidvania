@@ -1,6 +1,7 @@
 #include "world_item.h"
 #include "../core/asset_manager.h"
 #include "../entities/entity_physics.h"
+#include "../utils/ItemFactory.hpp"
 #include <cmath>
 #include <numbers>
 
@@ -40,4 +41,47 @@ std::unique_ptr<Item> WorldItem::tryCollect(const sf::FloatRect playerBounds)
 		return nullptr;
 	collected_ = true;
 	return std::move(item_);
+}
+
+json WorldItem::serialize() const
+{
+	return {{"position", {position_.x, position_.y}},
+	        {"velocity", {velocity_.x, velocity_.y}},
+	        {"hoverPhase", hoverPhase_},
+	        {"isOnGround", isOnGround_},
+	        {"collected", collected_},
+	        {"item", item_->serialize()}};
+}
+
+std::unique_ptr<WorldItem> WorldItem::deserialize(const json &j)
+{
+	sf::Vector2f position;
+	if (j.contains("position")) {
+		position.x = j["position"][0].get<float>();
+		position.y = j["position"][1].get<float>();
+	}
+
+	std::unique_ptr<Item> item;
+	if (j.contains("item") && !j["item"].is_null()) {
+		item = ItemFactory::create(j["item"]);
+	}
+
+	std::unique_ptr<WorldItem> worldItem = std::make_unique<WorldItem>(WorldItem(position, std::move(item)));
+
+	if (j.contains("velocity")) {
+		worldItem->velocity_.x = j["velocity"][0].get<float>();
+		worldItem->velocity_.y = j["velocity"][1].get<float>();
+	}
+
+	if (j.contains("hoverPhase")) {
+		worldItem->hoverPhase_ = j["hoverPhase"].get<float>();
+	}
+	if (j.contains("isOnGround")) {
+		worldItem->isOnGround_ = j["isOnGround"].get<bool>();
+	}
+	if (j.contains("collected")) {
+		worldItem->collected_ = j["collected"].get<bool>();
+	}
+
+	return std::move(worldItem);
 }

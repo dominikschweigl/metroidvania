@@ -53,4 +53,13 @@ void ShootAttackState::onExit(BaseEnemy &enemy)
 	transistor_boss.startShootCooldown();
 }
 
+json ShootAttackState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "ShootAttackState";
+
+	return j;
+}
+
 } // namespace transistor_boss

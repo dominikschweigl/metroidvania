@@ -1,4 +1,5 @@
 { "columns":0,
+ "fillmode":"preserve-aspect-fit",
  "grid":
     {
      "height":1,
@@ -8,8 +9,8 @@
  "margin":0,
  "name":"test",
  "spacing":0,
- "tilecount":13,
- "tiledversion":"1.12.1",
+ "tilecount":23,
+ "tiledversion":"1.12.2",
  "tileheight":32,
  "tiles":[
         {
@@ -64,7 +65,37 @@
          "id":8,
          "image":"..\/..\/..\/assets\/images\/tiles\/pc.png",
          "imageheight":32,
-         "imagewidth":32
+         "imagewidth":32,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":35,
+                     "id":1,
+                     "name":"",
+                     "opacity":1,
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":38,
+                     "x":-3,
+                     "y":-3
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"SavePoint"
+                }],
+         "type":"SavePoint"
         }, 
         {
          "id":9,
@@ -87,6 +118,66 @@
         {
          "id":12,
          "image":"..\/..\/..\/assets\/images\/tiles\/server_bottom.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":13,
+         "image":"..\/..\/..\/assets\/images\/tiles\/door_bottom_left.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":14,
+         "image":"..\/..\/..\/assets\/images\/tiles\/door_top_left.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":15,
+         "image":"..\/..\/..\/assets\/images\/tiles\/connection_right.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":16,
+         "image":"..\/..\/..\/assets\/images\/tiles\/connection_left.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":17,
+         "image":"..\/..\/..\/assets\/images\/tiles\/center_tile.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":18,
+         "image":"..\/..\/..\/assets\/images\/tiles\/wall_top.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":19,
+         "image":"..\/..\/..\/assets\/images\/tiles\/wall_below_top.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":20,
+         "image":"..\/..\/..\/assets\/images\/tiles\/roof_tile.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":21,
+         "image":"..\/..\/..\/assets\/images\/tiles\/door_bottom_right.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":22,
+         "image":"..\/..\/..\/assets\/images\/tiles\/door_top_right.png",
          "imageheight":32,
          "imagewidth":32
         }],

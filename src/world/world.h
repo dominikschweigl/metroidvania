@@ -5,15 +5,21 @@
 #include "Room.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <unordered_map>
 #include <vector>
 
+using json = nlohmann::json;
+
 class World {
   public:
 	static constexpr float TILE_SIZE = 32.f;
+
+	std::string worldName = "world";
+
 	~World() = default;
-	World() = default;
+	World(const std::string worldName);
 	World(World &&) = default;
 	World &operator=(World &&) = default;
 	World(const World &) = delete;
@@ -36,6 +42,11 @@ class World {
 
 	void loadFromGrid(const std::vector<std::vector<int>> &grid);
 
+	// Save the current world state
+	void saveWorldData(Player &player);
+	// Load the last saved world state
+	void loadWorldData(Player &player);
+
 	// Render all visible tiles
 	void draw(sf::RenderWindow &window, const sf::View &view) const;
 
@@ -44,6 +55,11 @@ class World {
 	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
 	{
 		return getCurrentRoom()->getTouchingDoorTargetRoom(entityBounds);
+	}
+
+	bool isTouchingSavepoint(const sf::FloatRect &entityBounds)
+	{
+		return getCurrentRoom()->isTouchingSavepoint(entityBounds);
 	}
 
   private:

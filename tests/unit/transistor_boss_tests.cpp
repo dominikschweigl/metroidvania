@@ -17,7 +17,7 @@ World makeWorld()
 	std::vector<std::vector<int>> g(24, std::vector<int>(60, 0));
 	for (int x = 0; x < 60; ++x)
 		g[20][x] = 1; // floor
-	World w;
+	World w = World("test");
 	w.loadFromGrid(g);
 	return w;
 }

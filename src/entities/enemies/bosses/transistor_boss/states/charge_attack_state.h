@@ -12,6 +12,7 @@ class ChargeAttackState : public EnemyState {
 	void updateAnimation(float deltaTime, BaseEnemy &enemy) override;
 	void onEnter(BaseEnemy &enemy) override;
 	void onExit(BaseEnemy &enemy) override;
+	json serialize() const override;
 
   private:
 	float damageTimer = 0;

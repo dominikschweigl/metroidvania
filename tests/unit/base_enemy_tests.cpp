@@ -67,7 +67,7 @@ World makeWalledWorld()
 		g[y][0] = 1; // left wall
 		g[y][9] = 1; // right wall
 	}
-	World w;
+	World w = World("test");
 	w.loadFromGrid(g);
 	return w;
 }
@@ -76,7 +76,7 @@ World makeWalledWorld()
 World makeEmptyWorld()
 {
 	std::vector<std::vector<int>> g(5, std::vector<int>(10, 0));
-	World w;
+	World w = World("test");
 	w.loadFromGrid(g);
 	return w;
 }

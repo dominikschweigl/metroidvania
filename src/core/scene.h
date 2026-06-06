@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+constexpr std::string worldName = "world";
+
 class SceneStack;
 
 class Scene {

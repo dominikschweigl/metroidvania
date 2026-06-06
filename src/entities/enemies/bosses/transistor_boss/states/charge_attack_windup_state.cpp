@@ -51,4 +51,13 @@ void ChargeAttackWindupState::onExit(BaseEnemy &enemy)
 	chargeTimer = 0;
 }
 
+json ChargeAttackWindupState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "ChargeAttackWindupState";
+
+	return j;
+}
+
 } // namespace transistor_boss

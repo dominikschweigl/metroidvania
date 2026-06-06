@@ -18,3 +18,12 @@ ItemInfo JumpPotionItem::info() const
 	return {"Jump Boost Potion", "A fizzy brew that defies gravity.",
 	        "+" + std::to_string(jumpPct) + "% jump for " + std::to_string(seconds) + " s"};
 }
+
+json JumpPotionItem::serialize() const
+{
+	json j = Item::serialize();
+
+	j["type"] = "JumpPotionItem";
+
+	return j;
+}

@@ -18,10 +18,16 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"New Game",
 	     [&stack, &window]() {
-		     stack.replace(
-		         [&stack, &window]() -> std::unique_ptr<Scene> { return std::make_unique<GameScene>(stack, window); });
+		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
+			     return std::make_unique<GameScene>(stack, window, worldName, true);
+		     });
 	     }},
-	    {"Load Game", {}, false},
+	    {"Load Game",
+	     [&stack, &window]() {
+		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
+			     return std::make_unique<GameScene>(stack, window, worldName, false);
+		     });
+	     }},
 	    {"Settings",
 	     [&stack, &window]() {
 		     stack.push(

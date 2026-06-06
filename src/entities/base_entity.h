@@ -5,7 +5,10 @@
 #include "direction.h"
 #include <SFML/Graphics.hpp>
 #include <cstdint>
+#include <nlohmann/json.hpp>
 #include <vector>
+
+using json = nlohmann::json;
 
 // Shared base for every gameplay entity (player and enemies).
 // Owns position, velocity, facing direction, ground-flag, health, body dimensions,
@@ -76,6 +79,9 @@ class BaseEntity {
 
 	Health health;
 	float gravity;
+
+	virtual json serialize() const;
+	virtual void deserialize(const json &j);
 
   protected:
 	BaseEntity(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth, Team entityTeam,

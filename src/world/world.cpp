@@ -3,6 +3,7 @@
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/player/player.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
 #include "../items/damage_potion_item.h"
@@ -16,6 +17,11 @@
 #include <fstream>
 #include <iostream>
 #include <tileson.hpp>
+
+World::World(const std::string worldName)
+{
+	this->worldName = worldName;
+}
 
 void World::loadTilesets(tson::Map &map)
 {
@@ -120,6 +126,29 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			} else if (name == "BackupDiskItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<BackupDiskItem>()));
+			}
+		}
+	}
+
+	tson::Layer *layer = map->getLayer("Foreground");
+
+	for (int y = 0; y < room.height; ++y) {
+		for (int x = 0; x < room.width; ++x) {
+			tson::Tile *tile = layer->getTileData(x, y);
+
+			if (!tile)
+				continue;
+
+			// identify savepoint tile somehow
+			const std::string tileType = tile->get<std::string>("type");
+			if (tileType == "SavePoint") {
+				auto &objectGroup = tile->getObjectgroup();
+
+				for (auto &obj : objectGroup.getObjects()) {
+					room.savePoints.push_back(
+					    sf::FloatRect({x * TILE_SIZE + obj.getPosition().x, y * TILE_SIZE + obj.getPosition().y},
+					                  {(float)obj.getSize().x, (float)obj.getSize().y}));
+				}
 			}
 		}
 	}
@@ -244,6 +273,82 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 		currentRoomId = "default";
 }
 
+void World::saveWorldData(Player &player)
+{
+	json j;
+	try {
+		j["player"] = player.serialize();
+
+		j["currentRoom"] = getCurrentRoomId();
+
+		j["rooms"] = json::array();
+		for (const auto &room : rooms) {
+			json j_room = room.second.serialize();
+			j_room["id"] = room.first;
+			j["rooms"].push_back(j_room);
+		}
+
+		std::ofstream file("saves/" + worldName + ".json");
+		if (!file.is_open()) {
+			std::cerr << "Failed to open save file\n";
+			return;
+		}
+
+		file << j.dump(4);
+	} catch (const std::exception &e) {
+		std::cerr << "Serialization error: " << e.what() << "\n";
+	}
+}
+
+void World::loadWorldData(Player &player)
+{
+	std::ifstream file("saves/" + worldName + ".json");
+	if (!file.is_open()) {
+		std::cerr << "Failed to open save file\n";
+		return;
+	}
+
+	json j;
+	try {
+		file >> j;
+	} catch (const std::exception &e) {
+		std::cerr << "JSON parse error: " << e.what() << "\n";
+		return;
+	}
+
+	try {
+		if (j.contains("player")) {
+			player.deserialize(j["player"]);
+		}
+
+		if (j.contains("rooms")) {
+			for (const auto &j_room : j["rooms"]) {
+
+				std::string id = "";
+				if (j_room.contains("id"))
+					id = j_room["id"];
+
+				// If room doesn't exist yet, skip or create it
+				if (rooms.find(id) == rooms.end()) {
+					std::cerr << "Unknown room id in save: " << id << "\n";
+					continue;
+				}
+
+				Room &room = rooms[id];
+
+				room.deserialize(j_room);
+			}
+		}
+
+		if (j.contains("currentRoom")) {
+			setCurrentRoom(j["currentRoom"]);
+		}
+
+	} catch (const std::exception &e) {
+		std::cerr << "World loading error: " << e.what() << "\n";
+	}
+}
+
 void World::draw(sf::RenderWindow &window, const sf::View &view) const
 {
 	if (currentRoomId.empty())
@@ -296,7 +401,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 	for (const Door &door : room.doors) {
 		sf::RectangleShape shape(door.bounds.size);
 		shape.setPosition(door.bounds.position);
-		shape.setFillColor(sf::Color(0, 255, 255, 128));
+		shape.setFillColor(sf::Color(119, 143, 129, 128));
 		window.draw(shape);
 	}
 }

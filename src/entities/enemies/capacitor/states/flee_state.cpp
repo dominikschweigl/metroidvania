@@ -30,4 +30,13 @@ void FleeState::onEnter(BaseEnemy & /*enemy*/)
 	timer = 0.f;
 }
 
+json FleeState::serialize() const
+{
+	json j = EnemyState::serialize();
+
+	j["type"] = "FleeState";
+
+	return j;
+}
+
 } // namespace capacitor
