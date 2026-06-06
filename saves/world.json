@@ -1,10 +1,10 @@
 {
     "currentRoom": "start_room",
     "player": {
-        "direction": "Left",
+        "direction": "Right",
         "gravity": 1200.0,
         "health": {
-            "current": 5,
+            "current": 3,
             "max": 5
         },
         "inventory": {
@@ -35,19 +35,27 @@
                 null,
                 null
             ],
-            "gumSlot": null,
-            "hatSlot": null,
+            "gumSlot": {
+                "type": "ChewingGumItem"
+            },
+            "hatSlot": {
+                "type": "HatItem"
+            },
             "hotbar": [
                 null,
                 null,
                 null,
-                null,
-                null
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                }
             ]
         },
         "isOnGround": true,
         "position": [
-            1221.1455078125,
+            1231.0,
             288.0
         ],
         "velocity": [
@@ -59,18 +67,18 @@
         {
             "enemies": [
                 {
-                    "direction": "Right",
+                    "direction": "Left",
                     "gravity": 1200.0,
                     "health": {
-                        "current": 30,
+                        "current": 0,
                         "max": 30
                     },
-                    "isOnGround": false,
+                    "isOnGround": true,
                     "position": [
-                        925.0,
-                        640.0
+                        566.0030517578125,
+                        736.0
                     ],
-                    "state": false,
+                    "state": true,
                     "type": "TransistorBoss",
                     "velocity": [
                         0.0,
@@ -84,110 +92,12 @@
         {
             "enemies": [],
             "id": "7",
-            "items": [
-                {
-                    "collected": false,
-                    "hoverPhase": 0.0,
-                    "isOnGround": false,
-                    "item": {
-                        "type": "ChewingGumItem"
-                    },
-                    "position": [
-                        642.0,
-                        704.0
-                    ],
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ]
+            "items": []
         },
         {
-            "enemies": [
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        350.0,
-                        397.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        323.0,
-                        252.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        223.0,
-                        331.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ],
+            "enemies": [],
             "id": "6",
-            "items": [
-                {
-                    "collected": false,
-                    "hoverPhase": 0.0,
-                    "isOnGround": false,
-                    "item": {
-                        "type": "HatItem"
-                    },
-                    "position": [
-                        347.0,
-                        583.0
-                    ],
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ]
+            "items": []
         },
         {
             "enemies": [],
@@ -205,77 +115,12 @@
             "items": []
         },
         {
-            "enemies": [
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        496.0,
-                        146.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        796.0,
-                        144.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ],
+            "enemies": [],
             "id": "3",
             "items": []
         },
         {
-            "enemies": [
-                {
-                    "direction": "Right",
-                    "gravity": 0.0,
-                    "health": {
-                        "current": 3,
-                        "max": 3
-                    },
-                    "isOnGround": false,
-                    "position": [
-                        924.0,
-                        306.0
-                    ],
-                    "state": {
-                        "type": "HoverState"
-                    },
-                    "type": "Capacitor",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ],
+            "enemies": [],
             "id": "1",
             "items": []
         },

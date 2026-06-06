@@ -6,6 +6,7 @@
 #include "../entities/player/player.h"
 #include "../ui/health_bar.h"
 #include "../ui/hotbar_hud.h"
+#include "../ui/minimap.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -36,6 +37,7 @@ class GameScene : public Scene {
 	CombatSystem combat_;
 	HealthBar healthBar_;
 	HotbarHUD hotbarHud_;
+	MiniMap minimap_;
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;
 	bool showDebugHitboxes_ = false;
