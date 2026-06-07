@@ -14,6 +14,7 @@ include(Catch)
 set(GAME_SOURCES
     src/core/asset_manager.cpp
     src/core/audio_manager.cpp
+    src/core/null_audio_service.cpp
     src/core/input_manager.cpp
     src/core/scene_stack.cpp
     src/ui/audio_settings_list.cpp
@@ -97,6 +98,7 @@ add_executable(metroidvania_tests
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp
+    tests/unit/null_audio_service_tests.cpp
     tests/unit/health_tests.cpp
     tests/unit/hitbox_tests.cpp
     tests/unit/combat_system_tests.cpp

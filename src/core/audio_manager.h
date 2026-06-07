@@ -1,4 +1,5 @@
 #pragma once
+#include "audio_service.h"
 #include <SFML/Audio.hpp>
 #include <array>
 #include <cstddef>
@@ -6,61 +7,34 @@
 #include <string_view>
 #include <unordered_map>
 
-enum class SoundEffect {
-	PLACEHOLDER,
-	VOLUME_PREVIEW,
-	PLAYER_JUMP,
-	PLAYER_LAND,
-	PLAYER_ATTACK_MELEE,
-	PLAYER_HAT_THROW,
-	PLAYER_WALK_1,
-	PLAYER_WALK_2,
-	PLAYER_WALK_3,
-	SLIME_ATTACK,
-	SLIME_JUMP,
-	SLIME_MOVE,
-	TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP,
-	TRANSISTOR_BOSS_CHARGE_ATTACK,
-	TRANSISTOR_BOSS_SHOOT_ATTACK,
-	TRANSISTOR_BOSS_STEP,
-	TRANSISTOR_BOSS_EXPLOSION
-};
-
-enum class MusicTrack { MAIN_MENU_THEME, GAME_THEME, GAME_OVER_THEME, AREA_1_BOSS_THEME, TRANSISTOR_BOSS_VICTORY };
-
-enum class MusicStatus {
-	Stopped,
-	Playing,
-	Paused,
-};
-
-class AudioManager {
+// Core Audio Service used for the game loop.
+// Injected in the program entry at main.
+class AudioManager : public AudioService {
   public:
 	[[nodiscard]] static AudioManager &getInstance();
 
-	~AudioManager() = default;
+	~AudioManager() override = default;
 	AudioManager(const AudioManager &) = delete;
 	AudioManager &operator=(const AudioManager &) = delete;
 	AudioManager(AudioManager &&) = delete;
 	AudioManager &operator=(AudioManager &&) = delete;
 
-	void playSound(SoundEffect sfx, float volume = 100.f);
-	void stopSound(SoundEffect sfx);
-	void pauseAllSounds();
-	void resumeAllSounds();
-	void stopAllSounds();
+	void playSound(SoundEffect sfx, float volume = 100.f) override;
+	void stopSound(SoundEffect sfx) override;
+	void pauseAllSounds() override;
+	void resumeAllSounds() override;
+	void stopAllSounds() override;
 
-	void playMusic(MusicTrack track, float volume = 30.f);
-	void stopMusic();
-	void pauseMusic();
-	void resumeMusic();
-	[[nodiscard]] MusicStatus musicStatus() const;
+	void playMusic(MusicTrack track, float volume = 30.f) override;
+	void stopMusic() override;
+	void pauseMusic() override;
+	void resumeMusic() override;
+	[[nodiscard]] MusicStatus musicStatus() const override;
 
-	// Volume ranges are mapped from 0 to 100. 0 is silent, 100 is full volume.
-	void setSoundVolume(float volume);
-	void setMusicVolume(float volume);
-	[[nodiscard]] float soundVolume() const noexcept { return soundVolume_; }
-	[[nodiscard]] float musicVolume() const noexcept { return musicVolume_; }
+	void setSoundVolume(float volume) override;
+	void setMusicVolume(float volume) override;
+	[[nodiscard]] float soundVolume() const noexcept override { return soundVolume_; }
+	[[nodiscard]] float musicVolume() const noexcept override { return musicVolume_; }
 
   private:
 	AudioManager() = default;
