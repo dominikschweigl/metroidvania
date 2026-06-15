@@ -121,6 +121,12 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/bosses/transistor_boss/recover.png";
 	case TRANSISTOR_BOSS_DEATH:
 		return "./assets/images/enemies/bosses/transistor_boss/death_animation.png";
+	case SEGFAULT_BOSS_IDLE:
+		return "./assets/images/player/idle.png";
+	case SEGFAULT_BOSS_WALK:
+		return "./assets/images/player/walk.png";
+	case SEGFAULT_BOSS_RUN:
+		return "./assets/images/player/run.png";
 	case TILE_BLACK:
 		return "assets/images/tiles/black.png";
 	case TILE_LEFT_EDGE:

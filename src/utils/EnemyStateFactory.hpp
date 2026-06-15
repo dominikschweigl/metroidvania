@@ -5,6 +5,10 @@
 
 using json = nlohmann::json;
 
+// Segfault Boss
+#include "../entities/enemies/bosses/segfault_boss/states/death_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/roaming_state.h"
+
 // Transistor Boss
 #include "../entities/enemies/bosses/transistor_boss/states/charge_attack_state.h"
 #include "../entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.h"
@@ -43,6 +47,13 @@ struct EnemyStateFactory {
 		const std::string type = j["type"];
 
 		std::unique_ptr<EnemyState> state;
+
+		// Segfault Boss States
+		if (type == "SegfaultRoamingState")
+			state = std::make_unique<segfault_boss::RoamingState>();
+
+		if (type == "SegfaultDeathState")
+			state = std::make_unique<segfault_boss::DeathState>();
 
 		// Transistor Boss States
 		if (type == "ChargeAttackState")
