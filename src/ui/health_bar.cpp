@@ -15,7 +15,8 @@ constexpr float BADGE_GAP = 10.f;
 
 HealthBar::HealthBar(const float indicatorGap, const float indicatorSize)
     : indicatorGap_(indicatorGap), indicatorSize_(indicatorSize)
-{}
+{
+}
 
 void HealthBar::rebuildPips(const int count)
 {
