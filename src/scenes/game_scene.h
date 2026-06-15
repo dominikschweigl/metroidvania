@@ -4,7 +4,6 @@
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
 #include "../entities/player/player.h"
-#include "../ui/health_bar.h"
 #include "../ui/hotbar_hud.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>
@@ -34,7 +33,6 @@ class GameScene : public Scene {
 	World world_;
 	Player player_;
 	CombatSystem combat_;
-	HealthBar healthBar_;
 	HotbarHUD hotbarHud_;
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;

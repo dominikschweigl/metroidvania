@@ -6,25 +6,25 @@
 // Top-left HUD health indicator.
 class HealthBar {
   public:
-	static constexpr float PIP_RADIUS = 22.f;
-	static constexpr float PIP_SPACING = 12.f;
-	static constexpr float MARGIN_LEFT = 28.f;
-	static constexpr float MARGIN_TOP = 28.f;
+	static constexpr float PIP_RADIUS = 13.f;
+	static constexpr float PIP_SPACING = 6.f;
 
-	HealthBar() = default;
+	HealthBar(float indicatorGap, float indicatorSize);
 	~HealthBar() = default;
 	HealthBar(const HealthBar &) = delete;
 	HealthBar &operator=(const HealthBar &) = delete;
 	HealthBar(HealthBar &&) = delete;
 	HealthBar &operator=(HealthBar &&) = delete;
 
-	// Draws the health bar in screen-space using the window's default view.
-	// Pass diskEquipped=true to show the Backup Disk badge to the right of the pips.
-	void draw(sf::RenderWindow &window, const Health &health, bool diskEquipped = false);
+	void draw(sf::RenderWindow &window, const Health &health, float hotbarLeftX, float hotbarTopY,
+	          bool diskEquipped = false);
 
   private:
+	float indicatorGap_;
+	float indicatorSize_;
+
 	void rebuildPips(int count);
-	void drawBackupDiskBadge(sf::RenderWindow &window, int pipCount) const;
+	void drawBackupDiskBadge(sf::RenderWindow &window, float hotbarLeftX, float hotbarTopY, int pipCount) const;
 
 	std::vector<sf::ConvexShape> pips;
 };
