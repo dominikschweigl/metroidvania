@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "core/input_manager.h"
+#include "entities/player/inventory.h"
 
 struct InputManagerTestAccess {
 	static constexpr std::size_t gameActionCount() { return InputManager::actionCount; }
@@ -181,4 +182,9 @@ TEST_CASE("InputManager - gameActions returns all actions")
 	const auto actions = InputManager::gameActions();
 
 	CHECK(actions.size() == InputManagerTestAccess::gameActionCount());
+}
+
+TEST_CASE("InputManager - hotbarSlotActions size matches HOTBAR_SIZE")
+{
+	CHECK(InputManager::hotbarSlotActions().size() == static_cast<std::size_t>(Inventory::HOTBAR_SIZE));
 }

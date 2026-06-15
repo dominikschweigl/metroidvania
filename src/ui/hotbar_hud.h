@@ -1,11 +1,10 @@
 #pragma once
 #include "../effects/effect.h"
+#include "../entities/player/inventory.h"
 #include "health_bar.h"
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <vector>
-
-class Inventory;
 
 class HotbarHUD {
   public:
@@ -35,7 +34,7 @@ class HotbarHUD {
 	static constexpr float INDICATOR_GAP = 6.f;
 
 	HealthBar healthBar_{INDICATOR_GAP, EFFECT_BG_SIZE};
-	std::array<float, 5> flashTimers_ = {};
+	std::array<float, Inventory::HOTBAR_SIZE> flashTimers_ = {};
 
 	void drawSlotBackground(sf::RenderWindow &window, int slotIndex, sf::Vector2f slotPos) const;
 	void drawItemIcon(sf::RenderWindow &window, const Inventory &inventory, int slotIndex, sf::Vector2f slotPos) const;

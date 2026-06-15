@@ -12,7 +12,7 @@ inline std::unique_ptr<MenuScene> makeKeyBindingsMenu(SceneStack &stack, sf::Vec
 {
 	MenuScene::Config cfg;
 	cfg.title = "Controls";
-	cfg.panelSize = {540.f, 700.f};
+	cfg.panelSize = {540.f, 800.f};
 	cfg.transparent = true;
 
 	// blPtr is shared between the factory (runs in ctor) and canEscape (called later).

@@ -10,7 +10,7 @@ class Inventory {
   public:
 	static constexpr int EQUIPMENT_SIZE = 3;
 	static constexpr int GRID_SIZE = 24;
-	static constexpr int HOTBAR_SIZE = 5;
+	static constexpr int HOTBAR_SIZE = 7;
 
 	Inventory() = default;
 	~Inventory() = default;
