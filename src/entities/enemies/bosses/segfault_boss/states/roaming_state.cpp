@@ -2,6 +2,7 @@
 #include "../../../../entity_physics.h"
 #include "../segfault_boss.h"
 
+#include <cmath>
 #include <cstdlib>
 
 namespace segfault_boss {
@@ -9,6 +10,9 @@ namespace segfault_boss {
 EnemyState *RoamingState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
+
+	if (!boss.isSpearOnCooldown() && std::abs(playerPos.x - boss.getPosition().x) < SegfaultBoss::SPEAR_RANGE)
+		return &boss.states.nullSpearAttack;
 
 	moveTimer += deltaTime;
 

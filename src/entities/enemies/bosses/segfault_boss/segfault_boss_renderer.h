@@ -7,7 +7,7 @@ namespace segfault_boss {
 // Owns the boss's sprite, its sprite-sheet textures, and all generated visuals
 class SegfaultBossRenderer {
   public:
-	enum class Animation { Idle, Roaming, Death };
+	enum class Animation { Idle, Roaming, Attack, Death };
 
 	// The currently used frames are 32x32. Upscaled by 2 for bigger size.
 	static constexpr int FRAME_SIZE = 32;
@@ -23,6 +23,9 @@ class SegfaultBossRenderer {
 	void setAnimation(Animation anim, int frame);
 
 	void drawSprite(sf::RenderWindow &window, sf::Vector2f position, float scaleX, sf::Color tint);
+
+	void drawSpearTelegraph(sf::RenderWindow &window, sf::Vector2f footPos, float width, float timer) const;
+	void drawSpear(sf::RenderWindow &window, sf::Vector2f footPos, float width, float height, float timer) const;
 
   private:
 	const sf::Texture &idleTexture;

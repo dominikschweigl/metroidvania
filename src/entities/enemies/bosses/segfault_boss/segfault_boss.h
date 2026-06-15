@@ -5,12 +5,26 @@
 #include "segfault_boss_renderer.h"
 
 #include "states/death_state.h"
+#include "states/null_spear_attack_state.h"
+#include "states/recover_state.h"
 #include "states/roaming_state.h"
+
+#include <cstdint>
+#include <vector>
 
 // Second-area boss: a corrupted scientist whose process is leaking memory.
 class SegfaultBoss : public BaseEnemy {
   public:
 	using SegfaultBossAnimation = segfault_boss::SegfaultBossRenderer::Animation;
+
+	enum class SpearPhase { Windup, Strike };
+
+	struct NullSpear {
+		sf::Vector2f foot;
+		SpearPhase phase = SpearPhase::Windup;
+		float timer = 0.f;
+		std::uint32_t sourceId = 0;
+	};
 
 	static constexpr float ENTITY_WIDTH = 40.f;
 	static constexpr float ENTITY_HEIGHT = 64.f;
@@ -20,8 +34,24 @@ class SegfaultBoss : public BaseEnemy {
 	static constexpr float MOVE_SPEED = 70.f;
 	static constexpr float MOVE_DIRECTION_DUR = 5.f;
 
+	// NULL spear attack parameters.
+	static constexpr float SPEAR_RANGE = 320.f;
+	static constexpr int SPEAR_MIN_COUNT = 4;
+	static constexpr int SPEAR_MAX_COUNT = 6;
+	static constexpr float SPEAR_SPAWN_INTERVAL = 0.5f;
+	static constexpr float SPEAR_SPREAD = 240.f;
+	static constexpr float SPEAR_WINDUP_DUR = 1.f;
+	static constexpr float SPEAR_STRIKE_DUR = 0.45f;
+	static constexpr float SPEAR_RECOVER_DUR = 0.8f;
+	static constexpr float SPEAR_COOLDOWN = 3.f;
+	static constexpr int SPEAR_DAMAGE = 2;
+	static constexpr float SPEAR_WIDTH = 26.f;
+	static constexpr float SPEAR_HEIGHT = 104.f;
+
 	struct States {
 		segfault_boss::RoamingState roaming;
+		segfault_boss::NullSpearAttackState nullSpearAttack;
+		segfault_boss::RecoverState recover;
 		segfault_boss::DeathState death;
 	};
 	States states;
@@ -36,6 +66,19 @@ class SegfaultBoss : public BaseEnemy {
 
 	void setInvincible(bool value) noexcept { invincible = value; }
 	[[nodiscard]] bool isInvulnerable() const noexcept override { return invincible; }
+
+	[[nodiscard]] bool isSpearOnCooldown() const noexcept { return spearCooldown > 0.f; }
+	void startSpearCooldown() noexcept { spearCooldown = SPEAR_COOLDOWN; }
+
+	void spawnNullSpear(float worldX, float fromY, const World &world);
+
+	void spawnNullSpearOnPlayer();
+
+	[[nodiscard]] bool hasActiveSpears() const noexcept { return !spears.empty(); }
+	[[nodiscard]] const std::vector<NullSpear> &getSpears() const noexcept { return spears; }
+
+	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
+	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
 	// Ability to request a "bluescreen" between stages 2 and 3.
 	[[nodiscard]] bool consumeBluescreenRequest() noexcept
@@ -61,4 +104,10 @@ class SegfaultBoss : public BaseEnemy {
 	// Raised when crossing into stage three so the scene can show the bluescreen.
 	bool bluescreenRequested = false;
 	Direction deathFacing = Direction::Right;
+
+	std::vector<NullSpear> spears;
+	float spearCooldown = 0.f;
+	std::vector<std::uint32_t> endedSourceIds;
+
+	float effectTimer = 0.f;
 };

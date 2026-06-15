@@ -7,6 +7,8 @@ using json = nlohmann::json;
 
 // Segfault Boss
 #include "../entities/enemies/bosses/segfault_boss/states/death_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/recover_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/roaming_state.h"
 
 // Transistor Boss
@@ -51,6 +53,12 @@ struct EnemyStateFactory {
 		// Segfault Boss States
 		if (type == "SegfaultRoamingState")
 			state = std::make_unique<segfault_boss::RoamingState>();
+
+		if (type == "NullSpearAttackState")
+			state = std::make_unique<segfault_boss::NullSpearAttackState>();
+
+		if (type == "SegfaultRecoverState")
+			state = std::make_unique<segfault_boss::RecoverState>();
 
 		if (type == "SegfaultDeathState")
 			state = std::make_unique<segfault_boss::DeathState>();
