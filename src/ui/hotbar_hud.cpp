@@ -32,7 +32,8 @@ void HotbarHUD::update(const float deltaTime)
 		timer = std::max(0.f, timer - deltaTime);
 }
 
-void HotbarHUD::draw(sf::RenderWindow &window, const Inventory &inventory, const std::vector<Effect> &effects)
+void HotbarHUD::draw(sf::RenderWindow &window, const Inventory &inventory, const std::vector<Effect> &effects,
+                     const Health &health, const bool diskEquipped)
 {
 	const sf::View previousView = window.getView();
 	window.setView(sf::View(sf::FloatRect({0.f, 0.f}, sf::Vector2f(window.getSize()))));
@@ -51,6 +52,7 @@ void HotbarHUD::draw(sf::RenderWindow &window, const Inventory &inventory, const
 
 	const float hotbarRightX = startX + totalWidth;
 	drawEffectIndicators(window, effects, hotbarRightX, startY);
+	healthBar_.draw(window, health, startX, startY, diskEquipped);
 
 	window.setView(previousView);
 }
@@ -94,8 +96,7 @@ void HotbarHUD::drawKeyLabel(sf::RenderWindow &window, const int slotIndex, cons
 void HotbarHUD::drawEffectIndicators(sf::RenderWindow &window, const std::vector<Effect> &effects,
                                      const float hotbarRightX, const float hotbarTopY) const
 {
-	constexpr float GAP_ABOVE = 6.f;
-	const float y = hotbarTopY - GAP_ABOVE - EFFECT_BG_SIZE;
+	const float y = hotbarTopY - INDICATOR_GAP - EFFECT_BG_SIZE;
 
 	for (int i = 0; i < static_cast<int>(effects.size()); ++i) {
 		const Effect &effect = effects[i];

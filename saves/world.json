@@ -1,7 +1,7 @@
 {
     "currentRoom": "start_room",
     "player": {
-        "direction": "Left",
+        "direction": "Right",
         "gravity": 1200.0,
         "health": {
             "current": 5,
@@ -13,9 +13,15 @@
                 null,
                 null,
                 null,
-                null,
-                null,
-                null,
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
                 null,
                 null,
                 null,
@@ -39,15 +45,23 @@
             "hatSlot": null,
             "hotbar": [
                 null,
-                null,
-                null,
-                null,
-                null
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                }
             ]
         },
         "isOnGround": true,
         "position": [
-            1221.1455078125,
+            1231.0,
             288.0
         ],
         "velocity": [

@@ -187,8 +187,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	if (showDebugHitboxes_)
 		drawDebugHitboxes(window);
 
-	healthBar_.draw(window, player_.health, player_.inventory().hasBackup());
-	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects());
+	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects(), player_.health,
+	                player_.inventory().hasBackup());
 }
 
 void GameScene::drawDebugHitboxes(sf::RenderWindow &window)
