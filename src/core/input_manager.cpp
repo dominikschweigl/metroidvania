@@ -41,9 +41,8 @@ std::span<const InputManager::ActionMeta> InputManager::gameActions() noexcept
 
 namespace {
 constexpr std::array<GameAction, 7> hotbarSlotActionsArray = {
-    GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3,
-    GameAction::UseItemSlot4, GameAction::UseItemSlot5,
-    GameAction::UseItemSlot6, GameAction::UseItemSlot7,
+    GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3, GameAction::UseItemSlot4,
+    GameAction::UseItemSlot5, GameAction::UseItemSlot6, GameAction::UseItemSlot7,
 };
 }
 
