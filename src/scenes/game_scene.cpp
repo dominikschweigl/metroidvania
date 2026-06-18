@@ -192,7 +192,8 @@ void GameScene::draw(sf::RenderWindow &window)
 
 	healthBar_.draw(window, player_.health, player_.inventory().hasBackup());
 	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects());
-	minimap_.draw(window, player_.getPosition());
+	Room *room = world_.getCurrentRoom();
+	minimap_.draw(window, player_.getPosition(), world_.getCurrentRoomId(), *room);
 }
 
 void GameScene::drawDebugHitboxes(sf::RenderWindow &window)

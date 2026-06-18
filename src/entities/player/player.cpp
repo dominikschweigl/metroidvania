@@ -10,7 +10,7 @@ std::mt19937 rng{std::random_device{}()};
 } // namespace
 
 namespace {
-constexpr sf::Vector2f PLAYER_SPAWN{15 * 32.f, 0.f};
+constexpr sf::Vector2f PLAYER_SPAWN{0.f, 0.f};
 } // namespace
 
 Inventory &Player::inventory() noexcept
