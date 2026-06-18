@@ -36,6 +36,7 @@ class GameScene : public Scene {
 	CombatSystem combat_;
 	HotbarHUD hotbarHud_;
 	MiniMap minimap_;
+	bool showMinimap_ = true;
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;
 	bool showDebugHitboxes_ = false;
