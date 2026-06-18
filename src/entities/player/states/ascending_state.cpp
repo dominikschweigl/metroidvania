@@ -17,6 +17,8 @@ void AscendingState::onEnter(Player &p)
 
 PlayerState *AscendingState::update(float dt, Player &p)
 {
+	if (p.isOnGround)
+		return &p.states.landing;
 	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
 		return &p.states.wallSlide;
 	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())
