@@ -19,12 +19,14 @@ enum class GameAction {
 	ToggleDebugHitboxes,
 	OpenInventory,
 	UseItem,
+	Interact,
 	UseItemSlot1,
 	UseItemSlot2,
 	UseItemSlot3,
 	UseItemSlot4,
 	UseItemSlot5,
-	Interact
+	UseItemSlot6,
+	UseItemSlot7
 };
 enum class MenuAction { Back, Confirm, NavigateUp, NavigateDown, NavigateLeft, NavigateRight };
 
@@ -90,12 +92,14 @@ class InputManager {
 	    {GameAction::ToggleDebugHitboxes, "Toggle Debug Hitboxes"},
 	    {GameAction::OpenInventory, "Open Inventory"},
 	    {GameAction::UseItem, "Use Item"},
+	    {GameAction::Interact, "Interact"},
 	    {GameAction::UseItemSlot1, "Use Item Slot 1"},
 	    {GameAction::UseItemSlot2, "Use Item Slot 2"},
 	    {GameAction::UseItemSlot3, "Use Item Slot 3"},
 	    {GameAction::UseItemSlot4, "Use Item Slot 4"},
 	    {GameAction::UseItemSlot5, "Use Item Slot 5"},
-	    {GameAction::Interact, "Interact with bounding Boxes touching the player."},
+	    {GameAction::UseItemSlot6, "Use Item Slot 6"},
+	    {GameAction::UseItemSlot7, "Use Item Slot 7"},
 	});
 	static constexpr auto menuBindings = std::to_array<Binding>({
 	    Binding{sf::Keyboard::Scancode::Escape},

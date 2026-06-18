@@ -4,7 +4,6 @@
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
 #include "../entities/player/player.h"
-#include "../ui/health_bar.h"
 #include "../ui/hotbar_hud.h"
 #include "../ui/minimap.h"
 #include "../world/world.h"
@@ -35,7 +34,6 @@ class GameScene : public Scene {
 	World world_;
 	Player player_;
 	CombatSystem combat_;
-	HealthBar healthBar_;
 	HotbarHUD hotbarHud_;
 	MiniMap minimap_;
 	std::vector<Hitbox> hitboxes_;

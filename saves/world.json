@@ -1,133 +1,133 @@
 {
-    "currentRoom": "start_room",
-    "player": {
-        "direction": "Right",
-        "gravity": 1200.0,
-        "health": {
-            "current": 3,
-            "max": 5
-        },
-        "inventory": {
-            "backupSlot": null,
-            "grid": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            ],
-            "gumSlot": {
-                "type": "ChewingGumItem"
-            },
-            "hatSlot": {
-                "type": "HatItem"
-            },
-            "hotbar": [
-                null,
-                null,
-                null,
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                }
-            ]
-        },
-        "isOnGround": true,
-        "position": [
-            1231.0,
-            288.0
-        ],
-        "velocity": [
-            0.0,
-            0.0
-        ]
-    },
-    "rooms": [
-        {
-            "enemies": [
-                {
-                    "direction": "Left",
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 0,
-                        "max": 30
-                    },
-                    "isOnGround": true,
-                    "position": [
-                        566.0030517578125,
-                        736.0
-                    ],
-                    "state": true,
-                    "type": "TransistorBoss",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ],
-            "id": "8",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "7",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "6",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "4",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "2",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "5",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "3",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "1",
-            "items": []
-        },
-        {
-            "enemies": [],
-            "id": "start_room",
-            "items": []
-        }
-    ]
+	"currentRoom": "start_room",
+	"player": {
+		"direction": "Right",
+		"gravity": 1200.0,
+		"health": {
+			"current": 3,
+			"max": 5
+		},
+		"inventory": {
+			"backupSlot": null,
+			"grid": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+			],
+			"gumSlot": {
+				"type": "ChewingGumItem"
+			},
+			"hatSlot": {
+				"type": "HatItem"
+			},
+			"hotbar": [
+				null,
+				null,
+				null,
+				{
+					"type": "HealingPotionItem"
+				},
+				{
+					"type": "HealingPotionItem"
+				}
+			]
+		},
+		"isOnGround": true,
+		"position": [
+			1231.0,
+			288.0
+		],
+		"velocity": [
+			0.0,
+			0.0
+		]
+	},
+	"rooms": [
+		{
+			"enemies": [
+				{
+					"direction": "Left",
+					"gravity": 1200.0,
+					"health": {
+						"current": 0,
+						"max": 30
+					},
+					"isOnGround": true,
+					"position": [
+						566.0030517578125,
+						736.0
+					],
+					"state": true,
+					"type": "TransistorBoss",
+					"velocity": [
+						0.0,
+						0.0
+					]
+				}
+			],
+			"id": "8",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "7",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "6",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "4",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "2",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "5",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "3",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "1",
+			"items": []
+		},
+		{
+			"enemies": [],
+			"id": "start_room",
+			"items": []
+		}
+	]
 }

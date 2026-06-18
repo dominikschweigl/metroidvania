@@ -14,6 +14,15 @@ Panel::Panel(const Theme &theme, sf::Vector2f size, std::string title)
 void Panel::setChild(std::unique_ptr<Widget> child)
 {
 	child_ = std::move(child);
+	const sf::Vector2f contentSize = child_->getSize();
+	const float titleH = hasTitle_ ? (title_.getLocalBounds().size.y + theme_->panelPadding) : 0.f;
+	const float neededW = contentSize.x + theme_->panelPadding * 2.f;
+	const float neededH = contentSize.y + theme_->panelPadding * 2.f + titleH;
+	if (neededW > size_.x || neededH > size_.y) {
+		size_.x = std::max(size_.x, neededW);
+		size_.y = std::max(size_.y, neededH);
+		background_.setSize(size_);
+	}
 	layoutChild();
 }
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "../effects/effect.h"
+#include "../entities/player/inventory.h"
+#include "health_bar.h"
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <vector>
-
-class Inventory;
 
 class HotbarHUD {
   public:
@@ -17,7 +17,8 @@ class HotbarHUD {
 	HotbarHUD &operator=(HotbarHUD &&) = delete;
 
 	void update(float deltaTime);
-	void draw(sf::RenderWindow &window, const Inventory &inventory, const std::vector<Effect> &effects);
+	void draw(sf::RenderWindow &window, const Inventory &inventory, const std::vector<Effect> &effects,
+	          const Health &health, bool diskEquipped = false);
 
 	// Call when a hotbar slot is activated to trigger the flash animation.
 	void flashSlot(int slot);
@@ -30,8 +31,10 @@ class HotbarHUD {
 	static constexpr float EFFECT_ICON_SIZE = 24.f;
 	static constexpr float EFFECT_BG_SIZE = 30.f;
 	static constexpr float EFFECT_SPACING = 6.f;
+	static constexpr float INDICATOR_GAP = 6.f;
 
-	std::array<float, 5> flashTimers_ = {};
+	HealthBar healthBar_{INDICATOR_GAP, EFFECT_BG_SIZE};
+	std::array<float, Inventory::HOTBAR_SIZE> flashTimers_ = {};
 
 	void drawSlotBackground(sf::RenderWindow &window, int slotIndex, sf::Vector2f slotPos) const;
 	void drawItemIcon(sf::RenderWindow &window, const Inventory &inventory, int slotIndex, sf::Vector2f slotPos) const;

@@ -15,12 +15,14 @@ const std::array<Binding, InputManager::actionCount> InputManager::defaultBindin
     Binding{sf::Keyboard::Scancode::F3},
     Binding{sf::Keyboard::Scancode::E},
     Binding{sf::Keyboard::Scancode::Q},
+    Binding{sf::Keyboard::Scancode::F},
     Binding{sf::Keyboard::Scancode::Num1},
     Binding{sf::Keyboard::Scancode::Num2},
     Binding{sf::Keyboard::Scancode::Num3},
     Binding{sf::Keyboard::Scancode::Num4},
     Binding{sf::Keyboard::Scancode::Num5},
-    Binding{sf::Keyboard::Scancode::F},
+    Binding{sf::Keyboard::Scancode::Num6},
+    Binding{sf::Keyboard::Scancode::Num7},
 }};
 // clang-format on
 
@@ -38,9 +40,9 @@ std::span<const InputManager::ActionMeta> InputManager::gameActions() noexcept
 }
 
 namespace {
-constexpr std::array<GameAction, 5> hotbarSlotActionsArray = {
-    GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3,
-    GameAction::UseItemSlot4, GameAction::UseItemSlot5,
+constexpr std::array<GameAction, 7> hotbarSlotActionsArray = {
+    GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3, GameAction::UseItemSlot4,
+    GameAction::UseItemSlot5, GameAction::UseItemSlot6, GameAction::UseItemSlot7,
 };
 }
 

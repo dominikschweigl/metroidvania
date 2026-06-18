@@ -190,6 +190,8 @@ void GameScene::draw(sf::RenderWindow &window)
 	if (showDebugHitboxes_)
 		drawDebugHitboxes(window);
 
+	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects(), player_.health,
+	                player_.inventory().hasBackup());
 	healthBar_.draw(window, player_.health, player_.inventory().hasBackup());
 	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects());
 	Room *room = world_.getCurrentRoom();
