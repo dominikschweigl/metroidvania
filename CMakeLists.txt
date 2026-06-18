@@ -95,6 +95,8 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/segfault_boss/states/recover_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/stage2_transition_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/summon_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage3_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/fork_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/death_state.cpp
 )
 

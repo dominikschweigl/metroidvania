@@ -31,7 +31,10 @@ namespace {
 }
 } // namespace
 
-SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos) : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, BOSS_HEALTH)
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos) : SegfaultBoss(spawnPos, false) {}
+
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, isClone ? CLONE_HEALTH : BOSS_HEALTH), cloneProcess(isClone)
 {
 	currentState = &states.roaming;
 }
@@ -41,15 +44,20 @@ void SegfaultBoss::draw(sf::RenderWindow &window)
 	const Direction facing = dying ? deathFacing : direction;
 	const float scaleX = (facing == Direction::Right) ? 1.f : -1.f;
 
-	// Placeholder until final sprites are created
+	// Placeholder until final sprites are created. Clones wear a teal tint so the
+	// player can tell them apart from the original process.
+	const sf::Color baseTint = cloneProcess ? sf::Color{140, 255, 230} : sf::Color{230, 140, 255};
 	const sf::Color tint = dying              ? sf::Color{120, 120, 120}
 	                       : isHurtFlashing() ? sf::Color{255, 80, 80}
 	                       : invincible       ? sf::Color{150, 220, 255}
-	                                          : sf::Color{230, 140, 255};
+	                                          : baseTint;
 	for (const CorruptionBlock &block : corruptionBlocks)
 		renderer.drawCorruptionBlock(window, block.bounds, block.age / CORRUPTION_LIFETIME, effectTimer);
 
 	renderer.drawSprite(window, position, scaleX, tint);
+
+	if (forkedClone != nullptr)
+		forkedClone->draw(window);
 
 	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 		process->draw(window);
@@ -87,6 +95,11 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 			endedSourceIds.push_back(block.sourceId);
 		corruptionBlocks.clear();
 
+		if (forkedClone != nullptr) {
+			forkedClone->drainEndedSourceIds(endedSourceIds);
+			forkedClone = nullptr;
+		}
+
 		currentState->onExit(*this);
 		currentState = &states.death;
 		currentState->onEnter(*this);
@@ -111,6 +124,17 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 			}
 			return false;
 		});
+	}
+
+	// Drive the boss-owned clone; retire it once the player has destroyed it. The
+	// clone's own isAlive() never goes false (it lingers in a death state), so the
+	// health check is what prunes it.
+	if (forkedClone != nullptr) {
+		forkedClone->update(deltaTime, *lastWorld, lastPlayerPos, lastPlayerBounds);
+		if (!forkedClone->health.isAlive()) {
+			forkedClone->drainEndedSourceIds(endedSourceIds);
+			forkedClone = nullptr;
+		}
 	}
 
 	// Advance each spear through its windup/strike lifecycle, retiring spent ones.
@@ -184,6 +208,15 @@ void SegfaultBoss::spawnSummonedProcesses()
 	}
 }
 
+void SegfaultBoss::spawnFork()
+{
+	stage = 3;
+	stage3Triggered = true;
+
+	const float offsetX = (direction == Direction::Right) ? -FORK_OFFSET_X : FORK_OFFSET_X;
+	forkedClone = std::make_unique<SegfaultBoss>(sf::Vector2f{position.x + offsetX, position.y}, true);
+}
+
 float SegfaultBoss::corruptionInterval() const noexcept
 {
 	const float interval = CORRUPTION_INTERVAL_BASE - static_cast<float>(stage - 1) * CORRUPTION_INTERVAL_STEP;
@@ -222,6 +255,9 @@ void SegfaultBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 
 	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 		process->collectHitboxes(hitboxes);
+
+	if (forkedClone != nullptr)
+		forkedClone->collectHitboxes(hitboxes);
 }
 
 void SegfaultBoss::collectHurtboxes(std::vector<Hurtbox> &hurtboxes)
@@ -231,6 +267,9 @@ void SegfaultBoss::collectHurtboxes(std::vector<Hurtbox> &hurtboxes)
 	// So the player can destroy the summoned processes.
 	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 		process->collectHurtboxes(hurtboxes);
+
+	if (forkedClone != nullptr)
+		forkedClone->collectHurtboxes(hurtboxes);
 }
 
 void SegfaultBoss::drainEndedSourceIds(std::vector<std::uint32_t> &out)
@@ -240,6 +279,9 @@ void SegfaultBoss::drainEndedSourceIds(std::vector<std::uint32_t> &out)
 
 	for (std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 		process->drainEndedSourceIds(out);
+
+	if (forkedClone != nullptr)
+		forkedClone->drainEndedSourceIds(out);
 }
 
 json SegfaultBoss::serialize() const
@@ -248,6 +290,7 @@ json SegfaultBoss::serialize() const
 	j["type"] = "SegfaultBoss";
 	j["stage"] = stage;
 	j["stage2Triggered"] = stage2Triggered;
+	j["stage3Triggered"] = stage3Triggered;
 	return j;
 }
 
@@ -259,4 +302,6 @@ void SegfaultBoss::deserialize(const json &j)
 		stage = j["stage"];
 	if (j.contains("stage2Triggered"))
 		stage2Triggered = j["stage2Triggered"];
+	if (j.contains("stage3Triggered"))
+		stage3Triggered = j["stage3Triggered"];
 }

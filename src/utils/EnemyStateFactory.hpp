@@ -7,10 +7,12 @@ using json = nlohmann::json;
 
 // Segfault Boss
 #include "../entities/enemies/bosses/segfault_boss/states/death_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/fork_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/recover_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/roaming_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/stage2_transition_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/stage3_transition_state.h"
 #include "../entities/enemies/bosses/segfault_boss/states/summon_state.h"
 
 // Transistor Boss
@@ -70,6 +72,12 @@ struct EnemyStateFactory {
 
 		if (type == "SegfaultSummonState")
 			state = std::make_unique<segfault_boss::SummonState>();
+
+		if (type == "SegfaultStage3TransitionState")
+			state = std::make_unique<segfault_boss::Stage3TransitionState>();
+
+		if (type == "SegfaultForkState")
+			state = std::make_unique<segfault_boss::ForkState>();
 
 		// Transistor Boss States
 		if (type == "ChargeAttackState")

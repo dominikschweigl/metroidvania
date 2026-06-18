@@ -333,3 +333,119 @@ TEST_CASE("SegfaultBoss clears its summons when defeated")
 	REQUIRE(boss.getState() == &boss.states.death);
 	REQUIRE(boss.summonedProcessCount() == 0u);
 }
+
+namespace {
+
+// Drives the boss from full health through the stage-two summon back to roaming,
+// so it is ready to cross into stage three.
+void advanceToStageTwo(SegfaultBoss &boss, World &w)
+{
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+	for (int frame = 0; frame < 400; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		if (boss.isStage2Triggered() && boss.getState() == &boss.states.roaming)
+			return;
+	}
+}
+
+} // namespace
+
+TEST_CASE("SegfaultBoss enters an invincible stage-three transition and requests a bluescreen")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	advanceToStageTwo(boss, w);
+	REQUIRE(boss.isStage2Triggered());
+
+	boss.takeDamage(SegfaultBoss::STAGE2_HP - SegfaultBoss::STAGE3_HP);
+	REQUIRE(boss.health.current == SegfaultBoss::STAGE3_HP);
+
+	boss.update(0.016f, w, farPlayer(boss), {});
+	REQUIRE(boss.getState() == &boss.states.stage3Transition);
+	REQUIRE(boss.isInvulnerable());
+	REQUIRE(boss.consumeBluescreenRequest());
+	// The request is consumed exactly once.
+	REQUIRE_FALSE(boss.consumeBluescreenRequest());
+}
+
+TEST_CASE("SegfaultBoss forks a weaker clone on entering stage three")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	advanceToStageTwo(boss, w);
+
+	boss.takeDamage(SegfaultBoss::STAGE2_HP - SegfaultBoss::STAGE3_HP);
+
+	bool sawFork = false;
+	for (int frame = 0; frame < 200 && !sawFork; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		if (boss.hasForkedClone())
+			sawFork = true;
+	}
+
+	REQUIRE(sawFork);
+	REQUIRE(boss.isStage3Triggered());
+	REQUIRE(boss.getStage() == 3);
+	REQUIRE(boss.getForkedClone()->isClone());
+	REQUIRE(boss.getForkedClone()->health.current == SegfaultBoss::CLONE_HEALTH);
+
+	// The clone's hurtbox is exposed through the parent so the player can hit it.
+	std::vector<Hurtbox> hurtboxes;
+	boss.collectHurtboxes(hurtboxes);
+	REQUIRE(hurtboxes.size() > 1u);
+}
+
+TEST_CASE("SegfaultBoss only forks once")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	advanceToStageTwo(boss, w);
+
+	boss.takeDamage(SegfaultBoss::STAGE2_HP - SegfaultBoss::STAGE3_HP);
+	for (int frame = 0; frame < 200 && !boss.hasForkedClone(); ++frame)
+		boss.update(0.05f, w, farPlayer(boss), {});
+	REQUIRE(boss.hasForkedClone());
+
+	// Already in stage three: roaming must not re-enter the transition.
+	for (int frame = 0; frame < 40; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		REQUIRE(boss.getState() != &boss.states.stage3Transition);
+	}
+}
+
+TEST_CASE("SegfaultBoss clears its clone when defeated")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	advanceToStageTwo(boss, w);
+
+	boss.takeDamage(SegfaultBoss::STAGE2_HP - SegfaultBoss::STAGE3_HP);
+	for (int frame = 0; frame < 200 && !boss.hasForkedClone(); ++frame)
+		boss.update(0.05f, w, farPlayer(boss), {});
+	REQUIRE(boss.hasForkedClone());
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH);
+	boss.update(0.016f, w, farPlayer(boss), {});
+
+	REQUIRE(boss.getState() == &boss.states.death);
+	REQUIRE_FALSE(boss.hasForkedClone());
+}
+
+TEST_CASE("SegfaultBoss clone never transitions stages or requests a bluescreen")
+{
+	World w = makeWorld();
+	SegfaultBoss clone(bossSpawn(), true);
+
+	REQUIRE(clone.isClone());
+	REQUIRE(clone.health.current == SegfaultBoss::CLONE_HEALTH);
+	REQUIRE_FALSE(clone.consumeBluescreenRequest());
+
+	// Clone health is already below both stage thresholds, yet it never transitions.
+	for (int frame = 0; frame < 80; ++frame) {
+		clone.update(0.05f, w, farPlayer(clone), {});
+		REQUIRE(clone.getState() != &clone.states.stage2Transition);
+		REQUIRE(clone.getState() != &clone.states.stage3Transition);
+		REQUIRE_FALSE(clone.consumeBluescreenRequest());
+	}
+	REQUIRE_FALSE(clone.hasForkedClone());
+}

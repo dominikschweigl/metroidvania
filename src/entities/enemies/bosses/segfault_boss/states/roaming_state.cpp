@@ -11,9 +11,17 @@ EnemyState *RoamingState::update(float deltaTime, BaseEnemy &enemy, const World 
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 
-	// Crossing into stage two: pause, then summon a wave of processes (once).
-	if (!boss.isStage2Triggered() && boss.health.current <= SegfaultBoss::STAGE2_HP)
-		return &boss.states.stage2Transition;
+	// Stage transitions only apply to the original process, never to a clone.
+	if (!boss.isClone()) {
+		// Crossing into stage two: pause, then summon a wave of processes (once).
+		if (!boss.isStage2Triggered() && boss.health.current <= SegfaultBoss::STAGE2_HP)
+			return &boss.states.stage2Transition;
+
+		// Crossing into stage three: bluescreen interrupt, then fork a clone (once).
+		if (boss.isStage2Triggered() && !boss.isStage3Triggered() &&
+		    boss.health.current <= SegfaultBoss::STAGE3_HP)
+			return &boss.states.stage3Transition;
+	}
 
 	if (!boss.isSpearOnCooldown() && std::abs(playerPos.x - boss.getPosition().x) < SegfaultBoss::SPEAR_RANGE)
 		return &boss.states.nullSpearAttack;

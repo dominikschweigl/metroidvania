@@ -5,10 +5,12 @@
 #include "segfault_boss_renderer.h"
 
 #include "states/death_state.h"
+#include "states/fork_state.h"
 #include "states/null_spear_attack_state.h"
 #include "states/recover_state.h"
 #include "states/roaming_state.h"
 #include "states/stage2_transition_state.h"
+#include "states/stage3_transition_state.h"
 #include "states/summon_state.h"
 
 #include <cstdint>
@@ -79,17 +81,27 @@ class SegfaultBoss : public BaseEnemy {
 	static constexpr float CORRUPTION_SPREAD = 320.f;
 	static constexpr std::size_t CORRUPTION_MAX_BLOCKS = 6;
 
+	// Stage-three fork parameters. The clone is a weaker, self-contained copy that
+	// never forks, summons, or requests a bluescreen again.
+	static constexpr float STAGE3_TRANSITION_DUR = 2.f;
+	static constexpr float FORK_DUR = 1.5f;
+	static constexpr int CLONE_HEALTH = 8;
+	static constexpr float FORK_OFFSET_X = 80.f;
+
 	struct States {
 		segfault_boss::RoamingState roaming;
 		segfault_boss::NullSpearAttackState nullSpearAttack;
 		segfault_boss::RecoverState recover;
 		segfault_boss::Stage2TransitionState stage2Transition;
 		segfault_boss::SummonState summon;
+		segfault_boss::Stage3TransitionState stage3Transition;
+		segfault_boss::ForkState fork;
 		segfault_boss::DeathState death;
 	};
 	States states;
 
 	explicit SegfaultBoss(sf::Vector2f spawnPos);
+	SegfaultBoss(sf::Vector2f spawnPos, bool isClone);
 
 	void draw(sf::RenderWindow &window) override;
 
@@ -120,11 +132,20 @@ class SegfaultBoss : public BaseEnemy {
 	[[nodiscard]] std::size_t corruptionBlockCount() const noexcept { return corruptionBlocks.size(); }
 	[[nodiscard]] const std::vector<CorruptionBlock> &getCorruptionBlocks() const noexcept { return corruptionBlocks; }
 
+	[[nodiscard]] bool isStage3Triggered() const noexcept { return stage3Triggered; }
+	[[nodiscard]] bool isClone() const noexcept { return cloneProcess; }
+
+	// Forks a weaker, self-contained clone as a boss-owned sub-entity.
+	void spawnFork();
+	[[nodiscard]] bool hasForkedClone() const noexcept { return forkedClone != nullptr; }
+	[[nodiscard]] const SegfaultBoss *getForkedClone() const noexcept { return forkedClone.get(); }
+
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 	void collectHurtboxes(std::vector<Hurtbox> &hurtboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
 	// Ability to request a "bluescreen" between stages 2 and 3.
+	void requestBluescreen() noexcept { bluescreenRequested = true; }
 	[[nodiscard]] bool consumeBluescreenRequest() noexcept
 	{
 		const bool requested = bluescreenRequested;
@@ -153,6 +174,9 @@ class SegfaultBoss : public BaseEnemy {
 	bool bluescreenRequested = false;
 	int stage = 1;
 	bool stage2Triggered = false;
+	bool stage3Triggered = false;
+	// A clone never forks, summons, or requests a bluescreen of its own.
+	bool cloneProcess = false;
 	Direction deathFacing = Direction::Right;
 
 	std::vector<NullSpear> spears;
@@ -163,6 +187,8 @@ class SegfaultBoss : public BaseEnemy {
 
 	std::vector<CorruptionBlock> corruptionBlocks;
 	float corruptionSpawnTimer = 0.f;
+
+	std::unique_ptr<SegfaultBoss> forkedClone;
 
 	float effectTimer = 0.f;
 };
