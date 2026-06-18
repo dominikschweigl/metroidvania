@@ -1,8 +1,11 @@
 #include "segfault_boss.h"
 #include "../../../../world/world.h"
+#include "../../capacitor/capacitor.h"
+#include "../../race_condition_slime/race_condition_slime.h"
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <vector>
 
 namespace {
@@ -40,6 +43,9 @@ void SegfaultBoss::draw(sf::RenderWindow &window)
 	                                          : sf::Color{230, 140, 255};
 	renderer.drawSprite(window, position, scaleX, tint);
 
+	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+		process->draw(window);
+
 	// NULL spears: a ground marker while telegraphed, the spear itself while striking.
 	for (const NullSpear &spear : spears) {
 		if (spear.phase == SpearPhase::Windup)
@@ -65,6 +71,10 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 				endedSourceIds.push_back(spear.sourceId);
 		spears.clear();
 
+		for (std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+			process->drainEndedSourceIds(endedSourceIds);
+		summonedProcesses.clear();
+
 		currentState->onExit(*this);
 		currentState = &states.death;
 		currentState->onEnter(*this);
@@ -76,6 +86,20 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 
 	spearCooldown = std::max(0.f, spearCooldown - deltaTime);
 	effectTimer += deltaTime;
+
+	// Drive boss-owned summons, retiring any the player has destroyed.
+	if (!summonedProcesses.empty()) {
+		for (std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+			process->update(deltaTime, *lastWorld, lastPlayerPos, lastPlayerBounds);
+
+		std::erase_if(summonedProcesses, [this](const std::unique_ptr<BaseEnemy> &process) {
+			if (!process->isAlive()) {
+				process->drainEndedSourceIds(endedSourceIds);
+				return true;
+			}
+			return false;
+		});
+	}
 
 	// Advance each spear through its windup/strike lifecycle, retiring spent ones.
 	std::erase_if(spears, [this, deltaTime](NullSpear &spear) {
@@ -113,6 +137,24 @@ void SegfaultBoss::spawnNullSpearOnPlayer()
 		spawnNullSpear(lastPlayerPos.x, lastPlayerPos.y, *lastWorld);
 }
 
+void SegfaultBoss::spawnSummonedProcesses()
+{
+	stage = 2;
+	stage2Triggered = true;
+
+	for (int index = 0; index < SUMMON_COUNT; ++index) {
+		const float offsetX = SUMMON_SPREAD * (static_cast<float>(index) - (SUMMON_COUNT - 1) / 2.f);
+		const sf::Vector2f spawn{position.x + offsetX, position.y};
+
+		// Mix area-1 slimes (grounded) and area-2 capacitors (airborne).
+		if (rand() % 2 == 0)
+			summonedProcesses.push_back(std::make_unique<RaceConditionSlime>(spawn));
+		else
+			summonedProcesses.push_back(
+			    std::make_unique<Capacitor>(sf::Vector2f{spawn.x, spawn.y - SUMMON_AIR_HEIGHT}));
+	}
+}
+
 void SegfaultBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
 	for (const NullSpear &spear : spears) {
@@ -122,22 +164,44 @@ void SegfaultBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 		                           {SPEAR_WIDTH, SPEAR_HEIGHT});
 		hitboxes.push_back(Hitbox{bounds, SPEAR_DAMAGE, Team::Enemy, spear.sourceId});
 	}
+
+	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+		process->collectHitboxes(hitboxes);
+}
+
+void SegfaultBoss::collectHurtboxes(std::vector<Hurtbox> &hurtboxes)
+{
+	BaseEntity::collectHurtboxes(hurtboxes); // the boss's own body
+
+	// So the player can destroy the summoned processes.
+	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+		process->collectHurtboxes(hurtboxes);
 }
 
 void SegfaultBoss::drainEndedSourceIds(std::vector<std::uint32_t> &out)
 {
 	out.insert(out.end(), endedSourceIds.begin(), endedSourceIds.end());
 	endedSourceIds.clear();
+
+	for (std::unique_ptr<BaseEnemy> &process : summonedProcesses)
+		process->drainEndedSourceIds(out);
 }
 
 json SegfaultBoss::serialize() const
 {
 	json j = BaseEnemy::serialize();
 	j["type"] = "SegfaultBoss";
+	j["stage"] = stage;
+	j["stage2Triggered"] = stage2Triggered;
 	return j;
 }
 
 void SegfaultBoss::deserialize(const json &j)
 {
 	BaseEnemy::deserialize(j);
+
+	if (j.contains("stage"))
+		stage = j["stage"];
+	if (j.contains("stage2Triggered"))
+		stage2Triggered = j["stage2Triggered"];
 }

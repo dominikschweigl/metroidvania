@@ -8,8 +8,11 @@
 #include "states/null_spear_attack_state.h"
 #include "states/recover_state.h"
 #include "states/roaming_state.h"
+#include "states/stage2_transition_state.h"
+#include "states/summon_state.h"
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 // Second-area boss: a corrupted scientist whose process is leaking memory.
@@ -48,10 +51,21 @@ class SegfaultBoss : public BaseEnemy {
 	static constexpr float SPEAR_WIDTH = 26.f;
 	static constexpr float SPEAR_HEIGHT = 104.f;
 
+	// Stage thresholds and stage-two summon parameters.
+	static constexpr int STAGE2_HP = 24;
+	static constexpr int STAGE3_HP = 12;
+	static constexpr float STAGE2_TRANSITION_DUR = 2.f;
+	static constexpr float SUMMON_DUR = 1.5f;
+	static constexpr int SUMMON_COUNT = 3;
+	static constexpr float SUMMON_SPREAD = 120.f;
+	static constexpr float SUMMON_AIR_HEIGHT = 80.f;
+
 	struct States {
 		segfault_boss::RoamingState roaming;
 		segfault_boss::NullSpearAttackState nullSpearAttack;
 		segfault_boss::RecoverState recover;
+		segfault_boss::Stage2TransitionState stage2Transition;
+		segfault_boss::SummonState summon;
 		segfault_boss::DeathState death;
 	};
 	States states;
@@ -77,7 +91,15 @@ class SegfaultBoss : public BaseEnemy {
 	[[nodiscard]] bool hasActiveSpears() const noexcept { return !spears.empty(); }
 	[[nodiscard]] const std::vector<NullSpear> &getSpears() const noexcept { return spears; }
 
+	[[nodiscard]] int getStage() const noexcept { return stage; }
+	[[nodiscard]] bool isStage2Triggered() const noexcept { return stage2Triggered; }
+
+	// Spawns the stage-two minions as boss-owned sub-entities.
+	void spawnSummonedProcesses();
+	[[nodiscard]] std::size_t summonedProcessCount() const noexcept { return summonedProcesses.size(); }
+
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
+	void collectHurtboxes(std::vector<Hurtbox> &hurtboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
 
 	// Ability to request a "bluescreen" between stages 2 and 3.
@@ -103,11 +125,15 @@ class SegfaultBoss : public BaseEnemy {
 	bool dying = false;
 	// Raised when crossing into stage three so the scene can show the bluescreen.
 	bool bluescreenRequested = false;
+	int stage = 1;
+	bool stage2Triggered = false;
 	Direction deathFacing = Direction::Right;
 
 	std::vector<NullSpear> spears;
 	float spearCooldown = 0.f;
 	std::vector<std::uint32_t> endedSourceIds;
+
+	std::vector<std::unique_ptr<BaseEnemy>> summonedProcesses;
 
 	float effectTimer = 0.f;
 };

@@ -93,6 +93,8 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/segfault_boss/states/roaming_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/recover_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage2_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/summon_state.cpp
     src/entities/enemies/bosses/segfault_boss/states/death_state.cpp
 )
 

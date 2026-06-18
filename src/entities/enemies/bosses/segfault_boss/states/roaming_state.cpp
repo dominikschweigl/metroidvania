@@ -11,6 +11,10 @@ EnemyState *RoamingState::update(float deltaTime, BaseEnemy &enemy, const World 
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 
+	// Crossing into stage two: pause, then summon a wave of processes (once).
+	if (!boss.isStage2Triggered() && boss.health.current <= SegfaultBoss::STAGE2_HP)
+		return &boss.states.stage2Transition;
+
 	if (!boss.isSpearOnCooldown() && std::abs(playerPos.x - boss.getPosition().x) < SegfaultBoss::SPEAR_RANGE)
 		return &boss.states.nullSpearAttack;
 

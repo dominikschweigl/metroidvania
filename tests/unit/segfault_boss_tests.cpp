@@ -173,3 +173,83 @@ TEST_CASE("SegfaultBoss does not request a bluescreen during stage one")
 	SegfaultBoss boss(bossSpawn());
 	REQUIRE_FALSE(boss.consumeBluescreenRequest());
 }
+
+TEST_CASE("SegfaultBoss enters an invincible transition when it reaches stage two")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+	REQUIRE(boss.health.current == SegfaultBoss::STAGE2_HP);
+
+	boss.update(0.016f, w, farPlayer(boss), {});
+	REQUIRE(boss.getState() == &boss.states.stage2Transition);
+	REQUIRE(boss.isInvulnerable());
+	REQUIRE(boss.getStage() == 1); // stage advances only once the summon fires
+}
+
+TEST_CASE("SegfaultBoss summons a wave of processes on entering stage two")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+	boss.update(0.016f, w, farPlayer(boss), {}); // -> stage-two transition
+
+	bool sawSummon = false;
+	for (int frame = 0; frame < 200 && !sawSummon; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		if (boss.summonedProcessCount() > 0)
+			sawSummon = true;
+	}
+
+	REQUIRE(sawSummon);
+	REQUIRE(boss.summonedProcessCount() == static_cast<std::size_t>(SegfaultBoss::SUMMON_COUNT));
+	REQUIRE(boss.isStage2Triggered());
+	REQUIRE(boss.getStage() == 2);
+
+	// The boss exposes the summons' hurtboxes so the player can destroy them.
+	std::vector<Hurtbox> hurtboxes;
+	boss.collectHurtboxes(hurtboxes);
+	REQUIRE(hurtboxes.size() > 1u); // the boss body plus each summon
+}
+
+TEST_CASE("SegfaultBoss only triggers the stage-two summon once")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+
+	// Run through the transition + summon back to roaming.
+	bool resumedRoaming = false;
+	for (int frame = 0; frame < 400 && !resumedRoaming; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		if (boss.isStage2Triggered() && boss.getState() == &boss.states.roaming)
+			resumedRoaming = true;
+	}
+	REQUIRE(resumedRoaming);
+
+	// Already in stage two: roaming must not re-enter the transition.
+	for (int frame = 0; frame < 20; ++frame) {
+		boss.update(0.05f, w, farPlayer(boss), {});
+		REQUIRE(boss.getState() != &boss.states.stage2Transition);
+	}
+}
+
+TEST_CASE("SegfaultBoss clears its summons when defeated")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+	for (int frame = 0; frame < 200 && boss.summonedProcessCount() == 0; ++frame)
+		boss.update(0.05f, w, farPlayer(boss), {});
+	REQUIRE(boss.summonedProcessCount() > 0);
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH);
+	boss.update(0.016f, w, farPlayer(boss), {});
+
+	REQUIRE(boss.getState() == &boss.states.death);
+	REQUIRE(boss.summonedProcessCount() == 0u);
+}
