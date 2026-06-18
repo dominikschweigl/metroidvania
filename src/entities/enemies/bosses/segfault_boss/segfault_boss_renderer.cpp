@@ -1,6 +1,7 @@
 #include "segfault_boss_renderer.h"
 #include "../../../../core/asset_manager.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 
@@ -126,6 +127,51 @@ void SegfaultBossRenderer::drawSpear(sf::RenderWindow &window, const sf::Vector2
 			sf::Color color = edge ? glow : core;
 			color.a = static_cast<std::uint8_t>(180.f + 75.f * up);
 			addCell(snap(footPos.x + offsetX), cellY, color);
+		}
+	}
+
+	window.draw(cells);
+}
+
+void SegfaultBossRenderer::drawCorruptionBlock(sf::RenderWindow &window, const sf::FloatRect bounds,
+                                               const float lifeFraction, const float timer) const
+{
+	constexpr float PIXEL = 4.f;
+
+	const float flicker = std::floor(timer * 18.f); // re-rolls the glitch pattern
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
+
+	// Fade in over the first fifth of life and out over the last fifth.
+	const float fade = std::clamp(std::min(lifeFraction, 1.f - lifeFraction) * 5.f, 0.f, 1.f);
+
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
+
+	const sf::Color rot{170, 40, 200};   // corrupted purple
+	const sf::Color live{120, 255, 180}; // leaking allocation green
+
+	for (float offsetY = 0.f; offsetY <= bounds.size.y; offsetY += PIXEL) {
+		for (float offsetX = 0.f; offsetX <= bounds.size.x; offsetX += PIXEL) {
+			const float noise = hashNoise(snap(offsetX) + flicker, snap(offsetY));
+			if (noise < 0.15f)
+				continue; // punch holes so the block looks shredded
+
+			const bool hot = noise > 0.8f;
+			sf::Color color = hot ? live : rot;
+			color.a = static_cast<std::uint8_t>(fade * (hot ? 235.f : 150.f));
+			addCell(snap(bounds.position.x + offsetX), snap(bounds.position.y + offsetY), color);
 		}
 	}
 

@@ -237,6 +237,86 @@ TEST_CASE("SegfaultBoss only triggers the stage-two summon once")
 	}
 }
 
+TEST_CASE("SegfaultBoss leaks corruption blocks that deal contact damage")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	const sf::Vector2f player = boss.getPosition() + sf::Vector2f{60.f, 0.f};
+
+	// While a block is present it publishes a hazard hitbox at the stage-one damage.
+	bool sawHazard = false;
+	for (int frame = 0; frame < 600 && !sawHazard; ++frame) {
+		boss.update(0.05f, w, player, {});
+		if (boss.corruptionBlockCount() == 0)
+			continue;
+		std::vector<Hitbox> hitboxes;
+		boss.collectHitboxes(hitboxes);
+		for (const Hitbox &hitbox : hitboxes)
+			if (hitbox.damage == SegfaultBoss::CORRUPTION_DAMAGE_BASE)
+				sawHazard = true;
+	}
+	REQUIRE(sawHazard);
+}
+
+TEST_CASE("SegfaultBoss corruption blocks expire after their lifetime")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	const sf::Vector2f player = boss.getPosition() + sf::Vector2f{60.f, 0.f};
+
+	for (int frame = 0; frame < 600 && boss.corruptionBlockCount() == 0; ++frame)
+		boss.update(0.05f, w, player, {});
+	REQUIRE(boss.corruptionBlockCount() > 0);
+
+	const float age = boss.getCorruptionBlocks().front().age;
+	// Run past the remaining lifetime of the oldest block; it must be cleared.
+	const int frames = static_cast<int>((SegfaultBoss::CORRUPTION_LIFETIME - age) / 0.05f) + 4;
+	const std::size_t before = boss.corruptionBlockCount();
+	bool sawExpiry = false;
+	for (int frame = 0; frame < frames && !sawExpiry; ++frame) {
+		boss.update(0.05f, w, player, {});
+		if (boss.corruptionBlockCount() < before)
+			sawExpiry = true;
+	}
+	REQUIRE(sawExpiry);
+}
+
+TEST_CASE("SegfaultBoss corruption grows more damaging in later stages")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	const sf::Vector2f player = boss.getPosition() + sf::Vector2f{60.f, 0.f};
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH - SegfaultBoss::STAGE2_HP);
+
+	bool sawEscalatedBlock = false;
+	for (int frame = 0; frame < 1200 && !sawEscalatedBlock; ++frame) {
+		boss.update(0.05f, w, player, {});
+		for (const SegfaultBoss::CorruptionBlock &block : boss.getCorruptionBlocks())
+			if (block.damage > SegfaultBoss::CORRUPTION_DAMAGE_BASE)
+				sawEscalatedBlock = true;
+	}
+	REQUIRE(sawEscalatedBlock);
+	REQUIRE(boss.getStage() == 2);
+}
+
+TEST_CASE("SegfaultBoss clears corruption blocks when defeated")
+{
+	World w = makeWorld();
+	SegfaultBoss boss(bossSpawn());
+	const sf::Vector2f player = boss.getPosition() + sf::Vector2f{60.f, 0.f};
+
+	for (int frame = 0; frame < 600 && boss.corruptionBlockCount() == 0; ++frame)
+		boss.update(0.05f, w, player, {});
+	REQUIRE(boss.corruptionBlockCount() > 0);
+
+	boss.takeDamage(SegfaultBoss::BOSS_HEALTH);
+	boss.update(0.016f, w, player, {});
+
+	REQUIRE(boss.getState() == &boss.states.death);
+	REQUIRE(boss.corruptionBlockCount() == 0u);
+}
+
 TEST_CASE("SegfaultBoss clears its summons when defeated")
 {
 	World w = makeWorld();

@@ -29,6 +29,14 @@ class SegfaultBoss : public BaseEnemy {
 		std::uint32_t sourceId = 0;
 	};
 
+	// Corrupted-memory hazard that sits on the floor for a while, dealing damage.
+	struct CorruptionBlock {
+		sf::FloatRect bounds;
+		int damage = 0;
+		float age = 0.f;
+		std::uint32_t sourceId = 0;
+	};
+
 	static constexpr float ENTITY_WIDTH = 40.f;
 	static constexpr float ENTITY_HEIGHT = 64.f;
 
@@ -59,6 +67,17 @@ class SegfaultBoss : public BaseEnemy {
 	static constexpr int SUMMON_COUNT = 3;
 	static constexpr float SUMMON_SPREAD = 120.f;
 	static constexpr float SUMMON_AIR_HEIGHT = 80.f;
+
+	// Escalating corruption-block parameters. The spawn interval shrinks and the
+	// damage grows with the current stage.
+	static constexpr float CORRUPTION_INTERVAL_BASE = 4.f;
+	static constexpr float CORRUPTION_INTERVAL_STEP = 1.2f;
+	static constexpr float CORRUPTION_INTERVAL_MIN = 1.2f;
+	static constexpr float CORRUPTION_LIFETIME = 4.f;
+	static constexpr int CORRUPTION_DAMAGE_BASE = 1;
+	static constexpr float CORRUPTION_SIZE = 40.f;
+	static constexpr float CORRUPTION_SPREAD = 320.f;
+	static constexpr std::size_t CORRUPTION_MAX_BLOCKS = 6;
 
 	struct States {
 		segfault_boss::RoamingState roaming;
@@ -98,6 +117,9 @@ class SegfaultBoss : public BaseEnemy {
 	void spawnSummonedProcesses();
 	[[nodiscard]] std::size_t summonedProcessCount() const noexcept { return summonedProcesses.size(); }
 
+	[[nodiscard]] std::size_t corruptionBlockCount() const noexcept { return corruptionBlocks.size(); }
+	[[nodiscard]] const std::vector<CorruptionBlock> &getCorruptionBlocks() const noexcept { return corruptionBlocks; }
+
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 	void collectHurtboxes(std::vector<Hurtbox> &hurtboxes) override;
 	void drainEndedSourceIds(std::vector<std::uint32_t> &out) override;
@@ -119,6 +141,10 @@ class SegfaultBoss : public BaseEnemy {
 	void onPreUpdate(float deltaTime) override;
 
   private:
+	void spawnCorruptionBlock();
+	[[nodiscard]] float corruptionInterval() const noexcept;
+	[[nodiscard]] int corruptionDamage() const noexcept;
+
 	segfault_boss::SegfaultBossRenderer renderer;
 
 	bool invincible = false;
@@ -134,6 +160,9 @@ class SegfaultBoss : public BaseEnemy {
 	std::vector<std::uint32_t> endedSourceIds;
 
 	std::vector<std::unique_ptr<BaseEnemy>> summonedProcesses;
+
+	std::vector<CorruptionBlock> corruptionBlocks;
+	float corruptionSpawnTimer = 0.f;
 
 	float effectTimer = 0.f;
 };

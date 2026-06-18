@@ -27,6 +27,8 @@ class SegfaultBossRenderer {
 	void drawSpearTelegraph(sf::RenderWindow &window, sf::Vector2f footPos, float width, float timer) const;
 	void drawSpear(sf::RenderWindow &window, sf::Vector2f footPos, float width, float height, float timer) const;
 
+	void drawCorruptionBlock(sf::RenderWindow &window, sf::FloatRect bounds, float lifeFraction, float timer) const;
+
   private:
 	const sf::Texture &idleTexture;
 	const sf::Texture &walkTexture;

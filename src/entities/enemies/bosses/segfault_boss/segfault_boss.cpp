@@ -10,6 +10,11 @@
 
 namespace {
 
+[[nodiscard]] float randomRange(float low, float high)
+{
+	return low + (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (high - low);
+}
+
 [[nodiscard]] float findGroundY(const World &world, float worldX, float fromY)
 {
 	constexpr float TILE = World::TILE_SIZE;
@@ -41,6 +46,9 @@ void SegfaultBoss::draw(sf::RenderWindow &window)
 	                       : isHurtFlashing() ? sf::Color{255, 80, 80}
 	                       : invincible       ? sf::Color{150, 220, 255}
 	                                          : sf::Color{230, 140, 255};
+	for (const CorruptionBlock &block : corruptionBlocks)
+		renderer.drawCorruptionBlock(window, block.bounds, block.age / CORRUPTION_LIFETIME, effectTimer);
+
 	renderer.drawSprite(window, position, scaleX, tint);
 
 	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
@@ -74,6 +82,10 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 		for (std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 			process->drainEndedSourceIds(endedSourceIds);
 		summonedProcesses.clear();
+
+		for (const CorruptionBlock &block : corruptionBlocks)
+			endedSourceIds.push_back(block.sourceId);
+		corruptionBlocks.clear();
 
 		currentState->onExit(*this);
 		currentState = &states.death;
@@ -118,6 +130,23 @@ void SegfaultBoss::onPreUpdate(float deltaTime)
 		}
 		return false;
 	});
+
+	// Leaking memory: corruption blocks erupt periodically and intensify per stage.
+	corruptionSpawnTimer += deltaTime;
+	if (corruptionSpawnTimer >= corruptionInterval()) {
+		corruptionSpawnTimer = 0.f;
+		if (corruptionBlocks.size() < CORRUPTION_MAX_BLOCKS)
+			spawnCorruptionBlock();
+	}
+
+	std::erase_if(corruptionBlocks, [this, deltaTime](CorruptionBlock &block) {
+		block.age += deltaTime;
+		if (block.age >= CORRUPTION_LIFETIME) {
+			endedSourceIds.push_back(block.sourceId);
+			return true;
+		}
+		return false;
+	});
 }
 
 void SegfaultBoss::setAnimation(const SegfaultBossAnimation anim, const int frame)
@@ -155,6 +184,29 @@ void SegfaultBoss::spawnSummonedProcesses()
 	}
 }
 
+float SegfaultBoss::corruptionInterval() const noexcept
+{
+	const float interval = CORRUPTION_INTERVAL_BASE - static_cast<float>(stage - 1) * CORRUPTION_INTERVAL_STEP;
+	return std::max(CORRUPTION_INTERVAL_MIN, interval);
+}
+
+int SegfaultBoss::corruptionDamage() const noexcept
+{
+	return CORRUPTION_DAMAGE_BASE + (stage - 1);
+}
+
+void SegfaultBoss::spawnCorruptionBlock()
+{
+	if (lastWorld == nullptr)
+		return;
+
+	const float spawnX = lastPlayerPos.x + randomRange(-CORRUPTION_SPREAD, CORRUPTION_SPREAD);
+	const float groundY = findGroundY(*lastWorld, spawnX, lastPlayerPos.y);
+	const sf::FloatRect bounds({spawnX - CORRUPTION_SIZE / 2.f, groundY - CORRUPTION_SIZE},
+	                           {CORRUPTION_SIZE, CORRUPTION_SIZE});
+	corruptionBlocks.push_back(CorruptionBlock{bounds, corruptionDamage(), 0.f, nextSourceId()});
+}
+
 void SegfaultBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 {
 	for (const NullSpear &spear : spears) {
@@ -164,6 +216,9 @@ void SegfaultBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)
 		                           {SPEAR_WIDTH, SPEAR_HEIGHT});
 		hitboxes.push_back(Hitbox{bounds, SPEAR_DAMAGE, Team::Enemy, spear.sourceId});
 	}
+
+	for (const CorruptionBlock &block : corruptionBlocks)
+		hitboxes.push_back(Hitbox{block.bounds, block.damage, Team::Enemy, block.sourceId});
 
 	for (const std::unique_ptr<BaseEnemy> &process : summonedProcesses)
 		process->collectHitboxes(hitboxes);
