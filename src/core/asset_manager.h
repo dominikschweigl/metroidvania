@@ -58,6 +58,9 @@ enum TextureAsset {
 
 	// Menus
 	MAIN_MENU_BACKGROUND,
+	SEGFAULT_FRAME_0,
+	SEGFAULT_FRAME_1,
+	SEGFAULT_FRAME_2,
 
 	// Items
 	ITEM_HAT,
