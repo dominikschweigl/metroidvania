@@ -44,13 +44,7 @@ void SegfaultBoss::draw(sf::RenderWindow &window)
 	const Direction facing = dying ? deathFacing : direction;
 	const float scaleX = (facing == Direction::Right) ? 1.f : -1.f;
 
-	// Placeholder until final sprites are created. Clones wear a teal tint so the
-	// player can tell them apart from the original process.
-	const sf::Color baseTint = cloneProcess ? sf::Color{140, 255, 230} : sf::Color{230, 140, 255};
-	const sf::Color tint = dying              ? sf::Color{120, 120, 120}
-	                       : isHurtFlashing() ? sf::Color{255, 80, 80}
-	                       : invincible       ? sf::Color{150, 220, 255}
-	                                          : baseTint;
+	const sf::Color tint = isHurtFlashing() ? sf::Color{255, 80, 80} : sf::Color::White;
 	for (const CorruptionBlock &block : corruptionBlocks)
 		renderer.drawCorruptionBlock(window, block.bounds, block.age / CORRUPTION_LIFETIME, effectTimer);
 

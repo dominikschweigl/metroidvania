@@ -20,8 +20,10 @@ constexpr float SPEAR_PI = 3.14159265f;
 
 SegfaultBossRenderer::SegfaultBossRenderer()
     : idleTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_IDLE)),
-      walkTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_WALK)),
-      runTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_RUN)), sprite(idleTexture)
+      beginRoamingTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_BEGIN_ROAMING)),
+      roamingTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_ROAMING)),
+      chargeTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_CHARGE)),
+      deathTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_DEATH)), sprite(idleTexture)
 {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 }
@@ -30,14 +32,16 @@ void SegfaultBossRenderer::setAnimation(const Animation anim, const int frame)
 {
 	switch (anim) {
 	case Animation::Idle:
-	case Animation::Death:
 		sprite.setTexture(idleTexture);
 		break;
 	case Animation::Roaming:
-		sprite.setTexture(walkTexture);
+		sprite.setTexture(roamingTexture);
 		break;
 	case Animation::Attack:
-		sprite.setTexture(runTexture);
+		sprite.setTexture(chargeTexture);
+		break;
+	case Animation::Death:
+		sprite.setTexture(deathTexture);
 		break;
 	}
 	const int framesPerRow = static_cast<int>(sprite.getTexture().getSize().x) / FRAME_SIZE;
@@ -80,9 +84,15 @@ void SegfaultBossRenderer::drawSpearTelegraph(sf::RenderWindow &window, const sf
 	};
 
 	sf::Color color{255, 50, 50, static_cast<std::uint8_t>(90.f + 120.f * pulse)};
-	for (float offsetX = -width / 2.f; offsetX <= width / 2.f; offsetX += PIXEL)
-		for (float offsetY = -MARKER_HEIGHT; offsetY <= 0.f; offsetY += PIXEL)
+	const int stepsX = static_cast<int>(width / PIXEL) + 1;
+	const int stepsY = static_cast<int>(MARKER_HEIGHT / PIXEL) + 1;
+	for (int ix = 0; ix < stepsX; ++ix) {
+		const float offsetX = -width / 2.f + static_cast<float>(ix) * PIXEL;
+		for (int iy = 0; iy < stepsY; ++iy) {
+			const float offsetY = -MARKER_HEIGHT + static_cast<float>(iy) * PIXEL;
 			addCell(snap(footPos.x + offsetX), snap(footPos.y + offsetY), color);
+		}
+	}
 
 	window.draw(cells);
 }
@@ -122,7 +132,9 @@ void SegfaultBossRenderer::drawSpear(sf::RenderWindow &window, const sf::Vector2
 		const float jitter = (hashNoise(static_cast<float>(row), flicker) - 0.5f) * 2.f * PIXEL;
 		const float halfWidth = std::max(PIXEL, (width / 2.f) * taper + jitter);
 
-		for (float offsetX = -halfWidth; offsetX <= halfWidth; offsetX += PIXEL) {
+		const int innerSteps = static_cast<int>(halfWidth * 2.f / PIXEL) + 1;
+		for (int ix = 0; ix < innerSteps; ++ix) {
+			const float offsetX = -halfWidth + static_cast<float>(ix) * PIXEL;
 			const bool edge = std::abs(offsetX) > halfWidth - PIXEL;
 			sf::Color color = edge ? glow : core;
 			color.a = static_cast<std::uint8_t>(180.f + 75.f * up);
@@ -162,8 +174,12 @@ void SegfaultBossRenderer::drawCorruptionBlock(sf::RenderWindow &window, const s
 	const sf::Color rot{170, 40, 200};   // corrupted purple
 	const sf::Color live{120, 255, 180}; // leaking allocation green
 
-	for (float offsetY = 0.f; offsetY <= bounds.size.y; offsetY += PIXEL) {
-		for (float offsetX = 0.f; offsetX <= bounds.size.x; offsetX += PIXEL) {
+	const int blockStepsY = static_cast<int>(bounds.size.y / PIXEL) + 1;
+	const int blockStepsX = static_cast<int>(bounds.size.x / PIXEL) + 1;
+	for (int iy = 0; iy < blockStepsY; ++iy) {
+		const float offsetY = static_cast<float>(iy) * PIXEL;
+		for (int ix = 0; ix < blockStepsX; ++ix) {
+			const float offsetX = static_cast<float>(ix) * PIXEL;
 			const float noise = hashNoise(snap(offsetX) + flicker, snap(offsetY));
 			if (noise < 0.15f)
 				continue; // punch holes so the block looks shredded

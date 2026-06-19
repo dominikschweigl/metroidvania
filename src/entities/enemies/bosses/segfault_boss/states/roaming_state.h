@@ -16,6 +16,8 @@ class RoamingState : public EnemyState {
   private:
 	float moveTimer = 0.f;
 	float moveSign = 1.f;
+	float roamTimer = 0.f;
+	float roamDuration = 0.f;
 };
 
 } // namespace segfault_boss

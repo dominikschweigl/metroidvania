@@ -39,7 +39,7 @@ void NullSpearAttackState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 
-	constexpr int FRAME_COUNT = 8;
+	constexpr int FRAME_COUNT = 12;
 	constexpr float FRAME_DURATION = 0.1f;
 
 	frameTimer += deltaTime;

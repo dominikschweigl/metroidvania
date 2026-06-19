@@ -16,6 +16,7 @@ class DeathState : public EnemyState {
 
   private:
 	bool victorySignaled = false;
+	bool animationComplete = false;
 };
 
 } // namespace segfault_boss

@@ -17,7 +17,17 @@ EnemyState *Stage3TransitionState::update(float deltaTime, BaseEnemy &enemy, con
 void Stage3TransitionState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
-	boss.setAnimation(SegfaultBoss::SegfaultBossAnimation::Idle, 0);
+
+	constexpr int FRAME_COUNT = 10;
+	constexpr float FRAME_DURATION = 0.1f;
+
+	frameTimer += deltaTime;
+	if (frameTimer >= FRAME_DURATION) {
+		frameTimer -= FRAME_DURATION;
+		currentFrame = (currentFrame + 1) % FRAME_COUNT;
+	}
+
+	boss.setAnimation(SegfaultBoss::SegfaultBossAnimation::Idle, currentFrame);
 }
 
 void Stage3TransitionState::onEnter(BaseEnemy &enemy)

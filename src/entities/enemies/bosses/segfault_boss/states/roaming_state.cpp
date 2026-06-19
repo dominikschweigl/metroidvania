@@ -11,24 +11,21 @@ EnemyState *RoamingState::update(float deltaTime, BaseEnemy &enemy, const World 
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 
-	// Stage transitions only apply to the original process, never to a clone.
 	if (!boss.isClone()) {
-		// Crossing into stage two: pause, then summon a wave of processes (once).
 		if (!boss.isStage2Triggered() && boss.health.current <= SegfaultBoss::STAGE2_HP)
 			return &boss.states.stage2Transition;
 
-		// Crossing into stage three: bluescreen interrupt, then fork a clone (once).
-		if (boss.isStage2Triggered() && !boss.isStage3Triggered() &&
-		    boss.health.current <= SegfaultBoss::STAGE3_HP)
+		if (boss.isStage2Triggered() && !boss.isStage3Triggered() && boss.health.current <= SegfaultBoss::STAGE3_HP)
 			return &boss.states.stage3Transition;
 	}
 
-	if (!boss.isSpearOnCooldown() && std::abs(playerPos.x - boss.getPosition().x) < SegfaultBoss::SPEAR_RANGE)
+	roamTimer += deltaTime;
+	if (!boss.isSpearOnCooldown() && roamTimer >= roamDuration
+	    && std::abs(playerPos.x - boss.getPosition().x) < SegfaultBoss::SPEAR_RANGE)
 		return &boss.states.nullSpearAttack;
 
 	moveTimer += deltaTime;
 
-	// Drift toward the player, flipping to a random patrol direction regularly
 	if (moveTimer > SegfaultBoss::MOVE_DIRECTION_DUR && rand() % 2 == 1) {
 		moveSign = -moveSign;
 		moveTimer = 0.f;
@@ -59,7 +56,7 @@ void RoamingState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 
-	constexpr int FRAME_COUNT = 16;
+	constexpr int FRAME_COUNT = 10;
 	constexpr float FRAME_DURATION = 0.1f;
 
 	frameTimer += deltaTime;
@@ -78,6 +75,8 @@ void RoamingState::onEnter(BaseEnemy &enemy)
 	moveSign = (rand() % 2 == 0) ? 1.f : -1.f;
 	currentFrame = 0;
 	frameTimer = 0.f;
+	roamTimer = 0.f;
+	roamDuration = 1.5f + (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2.5f;
 }
 
 void RoamingState::onExit(BaseEnemy & /*enemy*/)

@@ -13,8 +13,7 @@ inline std::unique_ptr<Scene> makeVictoryMenu(SceneStack &stack, sf::RenderWindo
 	AudioManager::getInstance().stopAllSounds();
 	AudioManager::getInstance().playMusic(MusicTrack::TRANSISTOR_BOSS_VICTORY);
 
-	return std::make_unique<VictoryScene>(window.getSize(),
-	                                      [&stack, &window]() {
-		                                      stack.replace([&stack, &window]() { return makeMainMenu(stack, window); });
-	                                      });
+	return std::make_unique<VictoryScene>(window.getSize(), [&stack, &window]() {
+		stack.replace([&stack, &window]() { return makeMainMenu(stack, window); });
+	});
 }

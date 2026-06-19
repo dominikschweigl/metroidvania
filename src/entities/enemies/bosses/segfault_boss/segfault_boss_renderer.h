@@ -9,9 +9,8 @@ class SegfaultBossRenderer {
   public:
 	enum class Animation { Idle, Roaming, Attack, Death };
 
-	// The currently used frames are 32x32. Upscaled by 2 for bigger size.
-	static constexpr int FRAME_SIZE = 32;
-	static constexpr float SPRITE_SCALE = 2.f;
+	static constexpr int FRAME_SIZE = 64;
+	static constexpr float SPRITE_SCALE = 1.f;
 
 	SegfaultBossRenderer();
 	~SegfaultBossRenderer() = default;
@@ -31,8 +30,10 @@ class SegfaultBossRenderer {
 
   private:
 	const sf::Texture &idleTexture;
-	const sf::Texture &walkTexture;
-	const sf::Texture &runTexture;
+	const sf::Texture &beginRoamingTexture;
+	const sf::Texture &roamingTexture;
+	const sf::Texture &chargeTexture;
+	const sf::Texture &deathTexture;
 	sf::Sprite sprite;
 };
 

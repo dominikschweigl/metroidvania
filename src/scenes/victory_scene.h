@@ -30,6 +30,6 @@ class VictoryScene : public Scene {
 	[[nodiscard]] bool canContinue() const noexcept;
 	void layoutForSize(sf::Vector2u size);
 	void drawScanlines(sf::RenderWindow &window) const;
-	void drawTextLine(sf::RenderWindow &window, const std::string &str, unsigned int charSize, sf::Color color,
-	                  float x, float &curY, bool centered = false) const;
+	void drawTextLine(sf::RenderWindow &window, const std::string &str, unsigned int charSize, sf::Color color, float x,
+	                  float &curY, bool centered = false) const;
 };
