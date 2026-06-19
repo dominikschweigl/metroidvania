@@ -44,6 +44,13 @@ using json = nlohmann::json;
 #include "../entities/enemies/resistor_bug/states/jump_attack_state.h"
 #include "../entities/enemies/resistor_bug/states/recover_state.h"
 
+// Recursion Golem
+#include "../entities/enemies/recursion_golem/states/attack_state.h"
+#include "../entities/enemies/recursion_golem/states/chase_state.h"
+#include "../entities/enemies/recursion_golem/states/explode_state.h"
+#include "../entities/enemies/recursion_golem/states/idle_state.h"
+#include "../entities/enemies/recursion_golem/states/windup_state.h"
+
 struct EnemyStateFactory {
 	static EnemyState *create(const json &j)
 	{
@@ -145,6 +152,22 @@ struct EnemyStateFactory {
 
 		if (type == "ResistorRecoverState")
 			state = std::make_unique<resistor_bug::RecoverState>();
+
+		// Recursion Golem
+		if (type == "GolemIdleState")
+			state = std::make_unique<recursion_golem::IdleState>();
+
+		if (type == "GolemChaseState")
+			state = std::make_unique<recursion_golem::ChaseState>();
+
+		if (type == "GolemWindUpState")
+			state = std::make_unique<recursion_golem::WindUpState>();
+
+		if (type == "GolemAttackState")
+			state = std::make_unique<recursion_golem::AttackState>();
+
+		if (type == "GolemExplodeState")
+			state = std::make_unique<recursion_golem::ExplodeState>();
 
 		return state.release();
 	}

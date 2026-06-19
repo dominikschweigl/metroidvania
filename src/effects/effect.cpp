@@ -26,3 +26,8 @@ Effect Effect::resistance() noexcept
 {
 	return Effect{30.f, ITEM_RESISTANCE_POTION, "Resistance", "resistance", 1.f, 1.f, 1.f, 0.5f};
 }
+
+Effect Effect::slow() noexcept
+{
+	return Effect{4.f, ITEM_CHEWING_GUM, "Slow", "slow", 0.5f, 1.f, 1.f, 0.f};
+}

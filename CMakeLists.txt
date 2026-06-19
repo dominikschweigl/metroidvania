@@ -48,6 +48,12 @@ set(GAME_SOURCES
     src/entities/enemies/resistor_bug/states/chase_state.cpp
     src/entities/enemies/resistor_bug/states/jump_attack_state.cpp
     src/entities/enemies/resistor_bug/states/recover_state.cpp
+    src/entities/enemies/recursion_golem/recursion_golem.cpp
+    src/entities/enemies/recursion_golem/states/idle_state.cpp
+    src/entities/enemies/recursion_golem/states/chase_state.cpp
+    src/entities/enemies/recursion_golem/states/windup_state.cpp
+    src/entities/enemies/recursion_golem/states/attack_state.cpp
+    src/entities/enemies/recursion_golem/states/explode_state.cpp
     src/effects/effect.cpp
     src/items/item_registry.cpp
     src/items/healing_potion_item.cpp
@@ -112,6 +118,7 @@ add_executable(metroidvania_tests
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
     tests/unit/resistor_bug_tests.cpp
+    tests/unit/recursion_golem_tests.cpp
     tests/unit/capacitor_tests.cpp
     tests/unit/transistor_boss_tests.cpp
     tests/unit/segfault_boss_tests.cpp

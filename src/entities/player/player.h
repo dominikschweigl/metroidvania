@@ -77,6 +77,9 @@ class Player : public BaseEntity {
 	void takeDamage(int amount) noexcept override;
 	void triggerIframes() noexcept { iframes = IFRAME_DURATION; }
 
+	// Applies knockback (base behaviour) and queues any status effect the hit carries.
+	void onHit(const Hitbox &hit) noexcept override;
+
 	void addEffect(Effect effect);
 	[[nodiscard]] const std::vector<Effect> &activeEffects() const noexcept;
 
@@ -104,6 +107,9 @@ class Player : public BaseEntity {
 
 	float iframes = 0.f;
 	int previousHealth = MAX_HEALTH;
+
+	// Set by onHit when a hit carries a Slow tag
+	bool pendingSlow_ = false;
 
 	std::vector<Effect> activeEffects_;
 
