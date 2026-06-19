@@ -105,6 +105,10 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/race_condition/attack.png";
 	case SLIME_RECOVER:
 		return "./assets/images/enemies/race_condition/recover.png";
+	case RESISTOR_BUG_IDLE:
+		return "./assets/images/enemies/resistor_bug/idle.png";
+	case RESISTOR_BUG_MOVING:
+		return "./assets/images/enemies/resistor_bug/moving.png";
 	case CAPACITOR_HOVER:
 		return "./assets/images/enemies/capacitor/capacitor_hover.png";
 	case TRANSISTOR_BOSS_ROAMING:

@@ -3,6 +3,7 @@
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/resistor_bug/resistor_bug.h"
 #include "../entities/player/player.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
@@ -99,6 +100,8 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				room.enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "Capacitor") {
 				room.enemies_.push_back(std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "ResistorBug") {
+				room.enemies_.push_back(std::make_unique<ResistorBug>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "ChewingGumItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<ChewingGumItem>()));
