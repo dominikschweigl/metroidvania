@@ -28,6 +28,12 @@ using json = nlohmann::json;
 #include "../entities/enemies/race_condition_slime/states/recover_state.h"
 #include "../entities/enemies/race_condition_slime/states/windup_state.h"
 
+// Resistor Bug
+#include "../entities/enemies/resistor_bug/states/chase_state.h"
+#include "../entities/enemies/resistor_bug/states/idle_state.h"
+#include "../entities/enemies/resistor_bug/states/jump_attack_state.h"
+#include "../entities/enemies/resistor_bug/states/recover_state.h"
+
 struct EnemyStateFactory {
 	static EnemyState *create(const json &j)
 	{
@@ -91,6 +97,19 @@ struct EnemyStateFactory {
 
 		if (type == "WindUpState")
 			state = std::make_unique<rc_slime::WindUpState>();
+
+		// Resistor Bug States
+		if (type == "ResistorIdleState")
+			state = std::make_unique<resistor_bug::IdleState>();
+
+		if (type == "ResistorChaseState")
+			state = std::make_unique<resistor_bug::ChaseState>();
+
+		if (type == "ResistorJumpAttackState")
+			state = std::make_unique<resistor_bug::JumpAttackState>();
+
+		if (type == "ResistorRecoverState")
+			state = std::make_unique<resistor_bug::RecoverState>();
 
 		return state.release();
 	}

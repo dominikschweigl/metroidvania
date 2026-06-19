@@ -3,6 +3,7 @@
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/resistor_bug/resistor_bug.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -22,6 +23,12 @@ struct EnemyFactory {
 
 		if (type == "Capacitor") {
 			auto enemy = std::make_unique<Capacitor>(sf::Vector2f{0.f, 0.f});
+			enemy->deserialize(j);
+			return enemy;
+		}
+
+		if (type == "ResistorBug") {
+			auto enemy = std::make_unique<ResistorBug>(sf::Vector2f{0.f, 0.f});
 			enemy->deserialize(j);
 			return enemy;
 		}
