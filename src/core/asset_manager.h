@@ -30,6 +30,10 @@ enum TextureAsset {
 	SLIME_ATTACK,
 	SLIME_RECOVER,
 
+	// Resistor Bug
+	RESISTOR_BUG_IDLE,
+	RESISTOR_BUG_MOVING,
+
 	// Capacitor
 	CAPACITOR_HOVER,
 

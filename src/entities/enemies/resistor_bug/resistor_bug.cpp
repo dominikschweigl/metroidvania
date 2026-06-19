@@ -3,11 +3,12 @@
 #include <algorithm>
 
 ResistorBug::ResistorBug(sf::Vector2f spawnPos)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
-      movingTexture(AssetManager::getInstance().getTexture(SLIME_MOVING)),
-      telegraphTexture(AssetManager::getInstance().getTexture(SLIME_WIND_UP)),
-      attackTexture(AssetManager::getInstance().getTexture(SLIME_ATTACK)),
-      recoverTexture(AssetManager::getInstance().getTexture(SLIME_RECOVER)), sprite(idleTexture)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT),
+      idleTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
+      movingTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_MOVING)),
+      telegraphTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
+      attackTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
+      recoverTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)), sprite(idleTexture)
 {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	currentState = &states.idle;
