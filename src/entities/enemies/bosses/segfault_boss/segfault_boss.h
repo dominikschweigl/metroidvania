@@ -153,6 +153,15 @@ class SegfaultBoss : public BaseEnemy {
 		return requested;
 	}
 
+	// Raised by the death state when the final death animation has finished.
+	void requestVictory() noexcept { victoryRequested = true; }
+	[[nodiscard]] bool consumeVictoryRequest() noexcept
+	{
+		const bool requested = victoryRequested;
+		victoryRequested = false;
+		return requested;
+	}
+
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
 	json serialize() const override;
@@ -172,6 +181,8 @@ class SegfaultBoss : public BaseEnemy {
 	bool dying = false;
 	// Raised when crossing into stage three so the scene can show the bluescreen.
 	bool bluescreenRequested = false;
+	// Raised by the death state once the death animation completes.
+	bool victoryRequested = false;
 	int stage = 1;
 	bool stage2Triggered = false;
 	bool stage3Triggered = false;

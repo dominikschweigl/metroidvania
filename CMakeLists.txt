@@ -29,6 +29,7 @@ set(GAME_SOURCES
     src/ui/interaction_indicator.cpp
     src/scenes/menu_scene.cpp
     src/scenes/bluescreen_scene.cpp
+    src/scenes/victory_scene.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
     src/world/world.cpp

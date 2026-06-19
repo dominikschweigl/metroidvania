@@ -15,6 +15,7 @@
 #include "menus/bluescreen_menu.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
+#include "menus/victory_menu.h"
 #include <algorithm>
 #include <cstdint>
 #include <vector>
@@ -110,11 +111,16 @@ void GameScene::update(float deltaTime)
 		}
 	}
 
-	// The segfault boss interrupts the fight with a "bluescreen" between stages.
+	// The segfault boss interrupts the fight with a "bluescreen" between stages,
+	// and raises a victory request once the death animation finishes.
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		auto *segfaultBoss = dynamic_cast<SegfaultBoss *>(enemy.get());
-		if (segfaultBoss != nullptr && segfaultBoss->consumeBluescreenRequest())
+		if (segfaultBoss == nullptr)
+			continue;
+		if (segfaultBoss->consumeBluescreenRequest())
 			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeBluescreenMenu(stack, window); });
+		if (segfaultBoss->consumeVictoryRequest())
+			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeVictoryMenu(stack, window); });
 	}
 
 	// Update world items and check for player pickup.
