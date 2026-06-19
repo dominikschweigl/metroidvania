@@ -177,7 +177,7 @@ void GameScene::draw(sf::RenderWindow &window)
 	view_.setSize({windowSize.x * zoomFactor_, windowSize.y * zoomFactor_});
 	window.setView(view_);
 	window.clear({0, 0, 0});
-	world_.draw(window, view_);
+	world_.draw(window, view_, player_.getBounds());
 	for (auto &item : world_.getCurrentRoom()->items_)
 		item->draw(window);
 	player_.draw(window);

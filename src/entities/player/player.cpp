@@ -233,12 +233,9 @@ void Player::handleMovement(float deltaTime, const World &world)
 		}
 	}
 
-	const bool wasOnGround = isOnGround;
 	EntityPhysics::simulateMovement(deltaTime, position, velocity, isOnGround, gravity, width, height, world);
 	isAgainstLeftWall = EntityPhysics::isWallOnLeft(position, width, height, world);
 	isAgainstRightWall = EntityPhysics::isWallOnRight(position, width, height, world);
-	if (!wasOnGround && isOnGround)
-		transitionTo(states.landing);
 }
 
 void Player::transitionTo(PlayerState &next)

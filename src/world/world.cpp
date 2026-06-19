@@ -145,9 +145,9 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				auto &objectGroup = tile->getObjectgroup();
 
 				for (auto &obj : objectGroup.getObjects()) {
-					room.savePoints.push_back(
+					room.savePoints.push_back(SavePoint{
 					    sf::FloatRect({x * TILE_SIZE + obj.getPosition().x, y * TILE_SIZE + obj.getPosition().y},
-					                  {(float)obj.getSize().x, (float)obj.getSize().y}));
+					                  {(float)obj.getSize().x, (float)obj.getSize().y})});
 				}
 			}
 		}
@@ -349,7 +349,7 @@ void World::loadWorldData(Player &player)
 	}
 }
 
-void World::draw(sf::RenderWindow &window, const sf::View &view) const
+void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::FloatRect playerBounds) const
 {
 	if (currentRoomId.empty())
 		return;
@@ -404,6 +404,9 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 		shape.setFillColor(sf::Color(119, 143, 129, 128));
 		window.draw(shape);
 	}
+
+	const float playerX = playerBounds.position.x + playerBounds.size.x / 2.f;
+	room.draw(window, playerBounds, playerX);
 }
 
 void World::update(float deltaTime, sf::FloatRect playerBounds)

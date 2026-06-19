@@ -74,6 +74,7 @@ class InputManager {
 	void resetToDefaults();
 
 	[[nodiscard]] std::string inputName(GameAction action) const;
+	[[nodiscard]] InputBinding getPrimaryBinding(GameAction action) const;
 	[[nodiscard]] static std::span<const ActionMeta> gameActions() noexcept;
 	[[nodiscard]] static std::span<const GameAction> hotbarSlotActions() noexcept;
 

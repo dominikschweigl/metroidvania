@@ -159,6 +159,11 @@ std::optional<GameAction> InputManager::findConflict(const InputBinding binding,
 	return std::nullopt;
 }
 
+InputBinding InputManager::getPrimaryBinding(const GameAction action) const
+{
+	return bindings_[idx(action)].primary;
+}
+
 void InputManager::resetToDefaults()
 {
 	bindings_ = defaultBindings;

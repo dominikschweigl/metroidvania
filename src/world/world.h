@@ -47,8 +47,8 @@ class World {
 	// Load the last saved world state
 	void loadWorldData(Player &player);
 
-	// Render all visible tiles
-	void draw(sf::RenderWindow &window, const sf::View &view) const;
+	// Render all visible tiles and interaction indicators
+	void draw(sf::RenderWindow &window, const sf::View &view, sf::FloatRect playerBounds) const;
 
 	void update(float deltaTime, sf::FloatRect playerBounds);
 

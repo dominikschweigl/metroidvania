@@ -26,6 +26,7 @@ set(GAME_SOURCES
     src/ui/panel.cpp
     src/ui/health_bar.cpp
     src/ui/hotbar_hud.cpp
+    src/ui/interaction_indicator.cpp
     src/scenes/menu_scene.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
@@ -105,6 +106,7 @@ add_executable(metroidvania_tests
     tests/unit/melee_attack_tests.cpp
     tests/unit/inventory_tests.cpp
     tests/unit/effect_tests.cpp
+    tests/unit/interaction_indicator_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)
