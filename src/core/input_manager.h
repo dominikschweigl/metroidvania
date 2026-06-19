@@ -65,6 +65,10 @@ class InputManager {
 	[[nodiscard]] bool consume(GameAction action);
 	[[nodiscard]] bool consume(MenuAction action);
 
+	/// Silences the action for the rest of this frame: isHeld() and wasPressed() both return false for it.
+	void suppress(GameAction action);
+	void suppress(MenuAction action);
+
 	void rebind(GameAction action, InputBinding newBinding);
 
 	// Returns the action (other than `except`) that already has `binding` as its
@@ -77,6 +81,7 @@ class InputManager {
 	[[nodiscard]] InputBinding getPrimaryBinding(GameAction action) const;
 	[[nodiscard]] static std::span<const ActionMeta> gameActions() noexcept;
 	[[nodiscard]] static std::span<const GameAction> hotbarSlotActions() noexcept;
+	[[nodiscard]] static std::span<const GameAction> playerActions() noexcept;
 
   private:
 	InputManager();
@@ -117,6 +122,8 @@ class InputManager {
 	std::array<Binding, actionCount> bindings_;
 	std::array<bool, actionCount> wasPressed_ = {};
 	std::array<bool, menuActionCount> wasMenuPressed_ = {};
+	std::array<bool, actionCount> suppressed_ = {};
+	std::array<bool, menuActionCount> menuSuppressed_ = {};
 
 	static const std::array<Binding, actionCount> defaultBindings;
 
