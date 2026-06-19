@@ -34,12 +34,13 @@ enum TextureAsset {
 	RESISTOR_BUG_IDLE,
 	RESISTOR_BUG_MOVING,
 
-	// Recursion golem (placeholder art: reuses the slime sheets for now)
+	// Recursion golem
 	GOLEM_IDLE,
 	GOLEM_MOVING,
 	GOLEM_WIND_UP,
 	GOLEM_ATTACK,
 	GOLEM_EXPLODE,
+	GOLEM_EXPLOSION,
 
 	// Capacitor
 	CAPACITOR_HOVER,

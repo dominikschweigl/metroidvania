@@ -18,7 +18,7 @@
 // State flow: Idle -> Chase -> WindUp -> Attack. Explode is entered on base-case defeat.
 class RecursionGolem : public BaseEnemy {
   public:
-	enum class GolemAnimation { Idle, Moving, WindUp, Attack, Explode };
+	enum class GolemAnimation { Idle, Moving, WindUp, Attack, Explode, Explosion };
 
 	static constexpr int DEFAULT_SIZE = 3;
 	static constexpr int MAX_SIZE = 4;
@@ -34,13 +34,20 @@ class RecursionGolem : public BaseEnemy {
 	static constexpr float ATTACK_LUNGE_SPEED = 130.f;
 	static constexpr int ATTACK_DAMAGE = 1;
 
+	static constexpr float JUMP_THRESHOLD = 30.f;
+	static constexpr float JUMP_COOLDOWN = 1.5f;
+	static constexpr float MAX_JUMP_SPEED = 620.f;
+
 	static constexpr float BOB_SPEED = 6.f;
 	static constexpr float BOB_AMPLITUDE = 1.8f;
 	static constexpr float EXPLODE_SWELL = 0.4f;
 
-	static constexpr float EXPLODE_COUNTDOWN = 0.9f;
+	static constexpr float EXPLODE_COUNTDOWN = 2.5f;
 	static constexpr float EXPLODE_RADIUS_FACTOR = 1.6f;
 	static constexpr int EXPLODE_DAMAGE = 2;
+
+	static constexpr int EXPLOSION_FRAME_COUNT = 8;
+	static constexpr float EXPLOSION_FRAME_DURATION = 0.12f;
 
 	static constexpr float SPLIT_POP_X = 140.f;
 	static constexpr float SPLIT_POP_Y = 220.f;
@@ -71,6 +78,8 @@ class RecursionGolem : public BaseEnemy {
 
 	[[nodiscard]] bool isAttacking() const noexcept { return currentState == &states.attack; }
 	[[nodiscard]] bool isExploding() const noexcept { return isExploding_; }
+	[[nodiscard]] bool isExplosionFired() const noexcept { return explosionFired_; }
+	[[nodiscard]] int explosionAnimFrame() const noexcept { return explosionAnimFrame_; }
 
 	[[nodiscard]] std::optional<Hitbox> getHitbox() noexcept override;
 
@@ -81,6 +90,8 @@ class RecursionGolem : public BaseEnemy {
 
 	[[nodiscard]] float getAttackCooldown() const noexcept { return attackCooldown; }
 	void setAttackCooldown(float seconds) noexcept { attackCooldown = seconds; }
+
+	void tryJumpTowards(float heightDiff);
 
 	void takeDamage(int amount) noexcept override;
 
@@ -98,6 +109,7 @@ class RecursionGolem : public BaseEnemy {
   private:
 	const int size_;
 	float attackCooldown = 0.f;
+	float jumpCooldown = 0.f;
 
 	bool defeated_ = false;
 	bool resolved_ = false;
@@ -106,6 +118,8 @@ class RecursionGolem : public BaseEnemy {
 	bool explosionFired_ = false;
 	bool explosionActive_ = false;
 	float explodeTimer_ = 0.f;
+	float explosionAnimTimer_ = 0.f;
+	int explosionAnimFrame_ = 0;
 	std::uint32_t attackSourceId = 0;
 	std::uint32_t explosionSourceId = 0;
 	std::vector<std::uint32_t> endedSourceIds;
@@ -118,6 +132,7 @@ class RecursionGolem : public BaseEnemy {
 	const sf::Texture &windupTexture;
 	const sf::Texture &attackTexture;
 	const sf::Texture &explodeTexture;
+	const sf::Texture &explosionTexture;
 	sf::Sprite sprite;
 
 	std::mt19937 rng;

@@ -14,16 +14,20 @@ void ExplodeState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 {
 	auto &golem = static_cast<RecursionGolem &>(enemy);
 
-	constexpr int FRAME_COUNT = 8;
-	constexpr float FRAME_DURATION = RecursionGolem::EXPLODE_COUNTDOWN / FRAME_COUNT;
+	if (!golem.isExplosionFired()) {
+		constexpr int FRAME_COUNT = 8;
+		constexpr float FRAME_DURATION = RecursionGolem::EXPLODE_COUNTDOWN / FRAME_COUNT;
 
-	frameTimer += deltaTime;
-	if (frameTimer >= FRAME_DURATION) {
-		frameTimer -= FRAME_DURATION;
-		currentFrame = (currentFrame + 1) % FRAME_COUNT;
+		frameTimer += deltaTime;
+		if (frameTimer >= FRAME_DURATION) {
+			frameTimer -= FRAME_DURATION;
+			currentFrame = (currentFrame + 1) % FRAME_COUNT;
+		}
+
+		golem.setAnimation(RecursionGolem::GolemAnimation::Explode, currentFrame);
+	} else {
+		golem.setAnimation(RecursionGolem::GolemAnimation::Explosion, golem.explosionAnimFrame());
 	}
-
-	golem.setAnimation(RecursionGolem::GolemAnimation::Explode, currentFrame);
 }
 
 void ExplodeState::onEnter(BaseEnemy &enemy)

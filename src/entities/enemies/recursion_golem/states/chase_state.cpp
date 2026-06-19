@@ -10,10 +10,10 @@ EnemyState *ChaseState::update(float deltaTime, BaseEnemy &enemy, const World &w
 
 	const float deltaX = playerPos.x - golem.getPosition().x;
 	const float dist = std::abs(deltaX);
-	const float heightDiff = std::abs(golem.getPosition().y - playerPos.y);
+	const float heightDiff = golem.getPosition().y - playerPos.y; // positive when player is above
 
 	// Melee range: attack if ready, otherwise wait out the cooldown in Idle.
-	if (dist < RecursionGolem::ATTACK_RANGE && heightDiff < RecursionGolem::ATTACK_RANGE) {
+	if (dist < RecursionGolem::ATTACK_RANGE && std::abs(heightDiff) < RecursionGolem::ATTACK_RANGE) {
 		golem.setVelocityX(0.f);
 		if (golem.getAttackCooldown() <= 0.f)
 			return &golem.states.windup;
@@ -28,6 +28,7 @@ EnemyState *ChaseState::update(float deltaTime, BaseEnemy &enemy, const World &w
 
 	const float sign = (golem.getDirection() == Direction::Right) ? 1.f : -1.f;
 	golem.setVelocityX(sign * golem.moveSpeed());
+	golem.tryJumpTowards(heightDiff);
 
 	return this;
 }

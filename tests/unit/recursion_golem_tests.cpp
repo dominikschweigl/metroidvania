@@ -185,8 +185,8 @@ TEST_CASE("RecursionGolem decomposes into fib children (n-1, n-2) on defeat")
 	World w = makeOpenWorld();
 	RecursionGolem g(groundSpawn(), 3);
 
-	g.takeDamage(100); // killing blow
-	tick(g, w, 0.016f); // resolveDefeat runs in onPreUpdate
+	g.takeDamage(100);
+	tick(g, w, 0.016f);
 
 	std::vector<std::unique_ptr<BaseEnemy>> spawned;
 	g.drainSpawns(spawned);
@@ -249,8 +249,7 @@ TEST_CASE("Base-case RecursionGolem explodes instead of splitting")
 	// The blast area is larger than the golem's body.
 	REQUIRE(blast->bounds.size.x > RecursionGolem::widthForSize(1));
 
-	// Next frame retires the explosion: golem dies and surrenders its source id.
-	tick(g, w, 0.016f);
+	tick(g, w, RecursionGolem::EXPLOSION_FRAME_COUNT * RecursionGolem::EXPLOSION_FRAME_DURATION + 0.05f);
 	REQUIRE_FALSE(g.isAlive());
 
 	std::vector<std::uint32_t> ended;
@@ -275,8 +274,8 @@ TEST_CASE("A Slow-tagged hit applies the Slow effect to the player on next updat
 	Hitbox hit{p.getBounds(), 1, Team::Enemy, 42u};
 	hit.statusOnHit = StatusEffectKind::Slow;
 
-	p.onHit(hit);          // queues the debuff (deferred out of noexcept onHit)
-	p.update(0.016f, w);   // applies it
+	p.onHit(hit);
+	p.update(0.016f, w);
 
 	bool hasSlow = false;
 	for (const Effect &effect : p.activeEffects())

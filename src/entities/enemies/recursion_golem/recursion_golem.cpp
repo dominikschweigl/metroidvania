@@ -22,7 +22,8 @@ RecursionGolem::RecursionGolem(sf::Vector2f spawnPos, int size)
       movingTexture(AssetManager::getInstance().getTexture(GOLEM_MOVING)),
       windupTexture(AssetManager::getInstance().getTexture(GOLEM_WIND_UP)),
       attackTexture(AssetManager::getInstance().getTexture(GOLEM_ATTACK)),
-      explodeTexture(AssetManager::getInstance().getTexture(GOLEM_EXPLODE)), sprite(idleTexture),
+      explodeTexture(AssetManager::getInstance().getTexture(GOLEM_EXPLODE)),
+      explosionTexture(AssetManager::getInstance().getTexture(GOLEM_EXPLOSION)), sprite(idleTexture),
       rng(std::random_device{}())
 {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
@@ -42,11 +43,11 @@ void RecursionGolem::draw(sf::RenderWindow &window)
 	float bob = 0.f;
 
 	if (isExploding_) {
-		// Swell and pulse brighter the closer the stack-overflow blast gets.
-		const float progress = std::clamp(1.f - explodeTimer_ / EXPLODE_COUNTDOWN, 0.f, 1.f);
-		scale *= 1.f + EXPLODE_SWELL * progress;
-		const std::uint8_t pulse = static_cast<std::uint8_t>(120 + 135 * std::abs(std::sin(animClock_ * 18.f)));
-		sprite.setColor(sf::Color{255, pulse, 60});
+		if (!explosionFired_) {
+			const float progress = std::clamp(1.f - explodeTimer_ / EXPLODE_COUNTDOWN, 0.f, 1.f);
+			scale *= 1.f + EXPLODE_SWELL * progress;
+		}
+		sprite.setColor(sf::Color::White);
 	} else {
 		if (isOnGround)
 			bob = std::sin(animClock_ * BOB_SPEED) * BOB_AMPLITUDE;
@@ -62,6 +63,7 @@ void RecursionGolem::draw(sf::RenderWindow &window)
 void RecursionGolem::onPreUpdate(float deltaTime)
 {
 	attackCooldown = std::max(0.f, attackCooldown - deltaTime);
+	jumpCooldown = std::max(0.f, jumpCooldown - deltaTime);
 	animClock_ += deltaTime;
 
 	if (defeated_ && !resolved_)
@@ -71,17 +73,39 @@ void RecursionGolem::onPreUpdate(float deltaTime)
 		if (!explosionFired_) {
 			explodeTimer_ -= deltaTime;
 			if (explodeTimer_ <= 0.f) {
-				explosionActive_ = true;
 				explosionFired_ = true;
+				explosionActive_ = true;
+				explosionAnimTimer_ = 0.f;
+				explosionAnimFrame_ = 0;
 				explosionSourceId = nextSourceId();
 				AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_EXPLOSION);
 			}
-		} else if (explosionActive_) {
-			explosionActive_ = false;
-			endedSourceIds.push_back(explosionSourceId);
-			removeRequested_ = true;
+		} else {
+			explosionAnimTimer_ += deltaTime;
+			while (explosionAnimTimer_ >= EXPLOSION_FRAME_DURATION) {
+				explosionAnimTimer_ -= EXPLOSION_FRAME_DURATION;
+				explosionAnimFrame_++;
+			}
+			if (explosionAnimFrame_ >= EXPLOSION_FRAME_COUNT) {
+				if (explosionActive_) {
+					explosionActive_ = false;
+					endedSourceIds.push_back(explosionSourceId);
+				}
+				removeRequested_ = true;
+			}
 		}
 	}
+}
+
+void RecursionGolem::tryJumpTowards(const float heightDiff)
+{
+	if (!isOnGround || heightDiff <= JUMP_THRESHOLD || jumpCooldown > 0.f)
+		return;
+
+	const float necessaryVelocity = std::sqrt(2.f * gravity * (heightDiff + height));
+	velocity.y = -std::min(necessaryVelocity, MAX_JUMP_SPEED);
+	isOnGround = false;
+	jumpCooldown = JUMP_COOLDOWN;
 }
 
 void RecursionGolem::resolveDefeat()
@@ -179,6 +203,9 @@ void RecursionGolem::setAnimation(GolemAnimation anim, int frame)
 		break;
 	case GolemAnimation::Explode:
 		sprite.setTexture(explodeTexture);
+		break;
+	case GolemAnimation::Explosion:
+		sprite.setTexture(explosionTexture);
 		break;
 	}
 	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
