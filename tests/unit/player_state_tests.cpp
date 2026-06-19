@@ -439,6 +439,15 @@ TEST_CASE("WallSlideState transitions")
 		states.wallSlide.onEnter(p);
 		REQUIRE(PlayerTestAccess::getVelocity(p).y < originalVelocity.y);
 	}
+
+	SECTION("transitions to landing when player touches ground")
+	{
+		PlayerTestAccess::setAgainstLeftWall(p, true);
+		states.wallSlide.onEnter(p);
+		PlayerTestAccess::setInputLeft(p, true);
+		PlayerTestAccess::setOnGround(p, true);
+		REQUIRE(states.wallSlide.update(0.1f, p) == &states.landing);
+	}
 }
 
 // ─── Wall slide gating: no gum ────────────────────────────────────────────────
