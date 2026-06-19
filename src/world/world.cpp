@@ -1,5 +1,5 @@
 #include "world.h"
-#include "../core/audio_manager.h"
+#include "../entities/enemies/bosses/segfault_boss/segfault_boss.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
@@ -98,6 +98,8 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "TransistorBoss") {
 				room.enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "SegfaultBoss") {
+				room.enemies_.push_back(std::make_unique<SegfaultBoss>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "Capacitor") {
 				room.enemies_.push_back(std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "ResistorBug") {

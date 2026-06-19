@@ -1,5 +1,6 @@
 #include "game_scene.h"
 #include "../core/input_manager.h"
+#include "../entities/enemies/bosses/segfault_boss/segfault_boss.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
@@ -11,8 +12,10 @@
 #include "../items/speed_potion_item.h"
 #include "../items/usb_key_item.h"
 #include "inventory_scene.h"
+#include "menus/bluescreen_menu.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
+#include "menus/victory_menu.h"
 #include <algorithm>
 #include <cstdint>
 #include <vector>
@@ -106,6 +109,18 @@ void GameScene::update(float deltaTime)
 			}
 			combat_.clearVictim(&enemy->health);
 		}
+	}
+
+	// The segfault boss interrupts the fight with a "bluescreen" between stages,
+	// and raises a victory request once the death animation finishes.
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
+		auto *segfaultBoss = dynamic_cast<SegfaultBoss *>(enemy.get());
+		if (segfaultBoss == nullptr)
+			continue;
+		if (segfaultBoss->consumeBluescreenRequest())
+			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeBluescreenMenu(stack, window); });
+		if (segfaultBoss->consumeVictoryRequest())
+			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeVictoryMenu(stack, window); });
 	}
 
 	// Update world items and check for player pickup.

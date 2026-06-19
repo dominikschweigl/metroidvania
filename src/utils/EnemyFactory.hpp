@@ -1,5 +1,6 @@
 #pragma once
 #include "../entities/enemies/base_enemy.h"
+#include "../entities/enemies/bosses/segfault_boss/segfault_boss.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
@@ -35,6 +36,12 @@ struct EnemyFactory {
 
 		if (type == "TransistorBoss") {
 			auto enemy = std::make_unique<TransistorBoss>(sf::Vector2f{0.f, 0.f});
+			enemy->deserialize(j);
+			return enemy;
+		}
+
+		if (type == "SegfaultBoss") {
+			auto enemy = std::make_unique<SegfaultBoss>(sf::Vector2f{0.f, 0.f});
 			enemy->deserialize(j);
 			return enemy;
 		}

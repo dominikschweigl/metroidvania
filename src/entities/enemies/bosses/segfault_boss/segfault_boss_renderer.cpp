@@ -1,0 +1,197 @@
+#include "segfault_boss_renderer.h"
+#include "../../../../core/asset_manager.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+
+namespace segfault_boss {
+
+namespace {
+constexpr float SPEAR_PI = 3.14159265f;
+
+// Cheap deterministic hash noise in [0, 1), used to jitter the glitch cells.
+[[nodiscard]] float hashNoise(float a, float b)
+{
+	const float v = std::sin(a * 12.9898f + b * 78.233f) * 43758.5453f;
+	return v - std::floor(v);
+}
+} // namespace
+
+SegfaultBossRenderer::SegfaultBossRenderer()
+    : idleTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_IDLE)),
+      beginRoamingTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_BEGIN_ROAMING)),
+      roamingTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_ROAMING)),
+      chargeTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_CHARGE)),
+      deathTexture(AssetManager::getInstance().getTexture(SEGFAULT_BOSS_DEATH)), sprite(idleTexture)
+{
+	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
+}
+
+void SegfaultBossRenderer::setAnimation(const Animation anim, const int frame)
+{
+	switch (anim) {
+	case Animation::Idle:
+		sprite.setTexture(idleTexture);
+		break;
+	case Animation::Roaming:
+		sprite.setTexture(roamingTexture);
+		break;
+	case Animation::Attack:
+		sprite.setTexture(chargeTexture);
+		break;
+	case Animation::Death:
+		sprite.setTexture(deathTexture);
+		break;
+	}
+	const int framesPerRow = static_cast<int>(sprite.getTexture().getSize().x) / FRAME_SIZE;
+	const int column = frame % framesPerRow;
+	const int row = frame / framesPerRow;
+	sprite.setTextureRect(sf::IntRect({column * FRAME_SIZE, row * FRAME_SIZE}, {FRAME_SIZE, FRAME_SIZE}));
+}
+
+void SegfaultBossRenderer::drawSprite(sf::RenderWindow &window, const sf::Vector2f position, const float scaleX,
+                                      const sf::Color tint)
+{
+	sprite.setPosition(position);
+	sprite.setScale({scaleX * SPRITE_SCALE, SPRITE_SCALE});
+	sprite.setColor(tint);
+	window.draw(sprite);
+}
+
+void SegfaultBossRenderer::drawSpearTelegraph(sf::RenderWindow &window, const sf::Vector2f footPos, const float width,
+                                              const float timer) const
+{
+	constexpr float PIXEL = 4.f;
+	constexpr float MARKER_HEIGHT = 8.f;
+
+	const float pulse = 0.5f + 0.5f * std::sin(timer * 14.f);
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
+
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
+
+	sf::Color color{255, 50, 50, static_cast<std::uint8_t>(90.f + 120.f * pulse)};
+	const int stepsX = static_cast<int>(width / PIXEL) + 1;
+	const int stepsY = static_cast<int>(MARKER_HEIGHT / PIXEL) + 1;
+	for (int ix = 0; ix < stepsX; ++ix) {
+		const float offsetX = -width / 2.f + static_cast<float>(ix) * PIXEL;
+		for (int iy = 0; iy < stepsY; ++iy) {
+			const float offsetY = -MARKER_HEIGHT + static_cast<float>(iy) * PIXEL;
+			addCell(snap(footPos.x + offsetX), snap(footPos.y + offsetY), color);
+		}
+	}
+
+	window.draw(cells);
+}
+
+void SegfaultBossRenderer::drawSpear(sf::RenderWindow &window, const sf::Vector2f footPos, const float width,
+                                     const float height, const float timer) const
+{
+	constexpr float PIXEL = 4.f;
+
+	const float flicker = std::floor(timer * 24.f); // re-rolls the glitch edge
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
+
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
+
+	const sf::Color core{235, 250, 255};
+	const sf::Color glow{120, 90, 255};
+
+	const int rows = static_cast<int>(height / PIXEL);
+	for (int row = 0; row < rows; ++row) {
+		const float cellY = snap(footPos.y - row * PIXEL);
+		const float up = static_cast<float>(row) / rows;
+
+		const float taper = 1.f - up;
+		const float jitter = (hashNoise(static_cast<float>(row), flicker) - 0.5f) * 2.f * PIXEL;
+		const float halfWidth = std::max(PIXEL, (width / 2.f) * taper + jitter);
+
+		const int innerSteps = static_cast<int>(halfWidth * 2.f / PIXEL) + 1;
+		for (int ix = 0; ix < innerSteps; ++ix) {
+			const float offsetX = -halfWidth + static_cast<float>(ix) * PIXEL;
+			const bool edge = std::abs(offsetX) > halfWidth - PIXEL;
+			sf::Color color = edge ? glow : core;
+			color.a = static_cast<std::uint8_t>(180.f + 75.f * up);
+			addCell(snap(footPos.x + offsetX), cellY, color);
+		}
+	}
+
+	window.draw(cells);
+}
+
+void SegfaultBossRenderer::drawCorruptionBlock(sf::RenderWindow &window, const sf::FloatRect bounds,
+                                               const float lifeFraction, const float timer) const
+{
+	constexpr float PIXEL = 4.f;
+
+	const float flicker = std::floor(timer * 18.f); // re-rolls the glitch pattern
+	const auto snap = [](float value) { return std::round(value / PIXEL) * PIXEL; };
+
+	// Fade in over the first fifth of life and out over the last fifth.
+	const float fade = std::clamp(std::min(lifeFraction, 1.f - lifeFraction) * 5.f, 0.f, 1.f);
+
+	sf::VertexArray cells(sf::PrimitiveType::Triangles);
+	const auto addCell = [&cells](float cellX, float cellY, sf::Color color) {
+		const float half = PIXEL * 0.5f;
+		const sf::Vector2f topLeft{cellX - half, cellY - half};
+		const sf::Vector2f topRight{cellX + half, cellY - half};
+		const sf::Vector2f bottomRight{cellX + half, cellY + half};
+		const sf::Vector2f bottomLeft{cellX - half, cellY + half};
+		cells.append({topLeft, color});
+		cells.append({topRight, color});
+		cells.append({bottomRight, color});
+		cells.append({topLeft, color});
+		cells.append({bottomRight, color});
+		cells.append({bottomLeft, color});
+	};
+
+	const sf::Color rot{170, 40, 200};   // corrupted purple
+	const sf::Color live{120, 255, 180}; // leaking allocation green
+
+	const int blockStepsY = static_cast<int>(bounds.size.y / PIXEL) + 1;
+	const int blockStepsX = static_cast<int>(bounds.size.x / PIXEL) + 1;
+	for (int iy = 0; iy < blockStepsY; ++iy) {
+		const float offsetY = static_cast<float>(iy) * PIXEL;
+		for (int ix = 0; ix < blockStepsX; ++ix) {
+			const float offsetX = static_cast<float>(ix) * PIXEL;
+			const float noise = hashNoise(snap(offsetX) + flicker, snap(offsetY));
+			if (noise < 0.15f)
+				continue; // punch holes so the block looks shredded
+
+			const bool hot = noise > 0.8f;
+			sf::Color color = hot ? live : rot;
+			color.a = static_cast<std::uint8_t>(fade * (hot ? 235.f : 150.f));
+			addCell(snap(bounds.position.x + offsetX), snap(bounds.position.y + offsetY), color);
+		}
+	}
+
+	window.draw(cells);
+}
+
+} // namespace segfault_boss

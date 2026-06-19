@@ -28,6 +28,8 @@ set(GAME_SOURCES
     src/ui/hotbar_hud.cpp
     src/ui/interaction_indicator.cpp
     src/scenes/menu_scene.cpp
+    src/scenes/bluescreen_scene.cpp
+    src/scenes/victory_scene.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
     src/world/world.cpp
@@ -88,6 +90,16 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/transistor_boss/states/stage2_recover_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/summon_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/death_state.cpp
+    src/entities/enemies/bosses/segfault_boss/segfault_boss.cpp
+    src/entities/enemies/bosses/segfault_boss/segfault_boss_renderer.cpp
+    src/entities/enemies/bosses/segfault_boss/states/roaming_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/recover_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage2_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/summon_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage3_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/fork_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/death_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -102,6 +114,7 @@ add_executable(metroidvania_tests
     tests/unit/resistor_bug_tests.cpp
     tests/unit/capacitor_tests.cpp
     tests/unit/transistor_boss_tests.cpp
+    tests/unit/segfault_boss_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp
