@@ -45,10 +45,10 @@ constexpr std::array<GameAction, 7> hotbarSlotActionsArray = {
     GameAction::UseItemSlot5, GameAction::UseItemSlot6, GameAction::UseItemSlot7,
 };
 constexpr std::array<GameAction, 7> playerActionsArray = {
-    GameAction::MoveLeft, GameAction::MoveRight, GameAction::Jump,        GameAction::Sprint,
+    GameAction::MoveLeft, GameAction::MoveRight,   GameAction::Jump,     GameAction::Sprint,
     GameAction::ThrowHat, GameAction::AttackMelee, GameAction::Interact,
 };
-}
+} // namespace
 
 std::span<const GameAction> InputManager::hotbarSlotActions() noexcept
 {
