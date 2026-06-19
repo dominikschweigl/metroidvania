@@ -20,6 +20,10 @@ constexpr sf::Color TEXT_TITLE{240, 240, 240};
 constexpr sf::Color TEXT_BODY{180, 180, 200};
 constexpr sf::Color TEXT_EFFECT{120, 220, 120};
 constexpr float OUTLINE_THICK = 2.f;
+constexpr sf::Color HOTBAR_LABEL_COLOR{180, 180, 200};
+constexpr unsigned int HOTBAR_LABEL_SIZE = 13;
+constexpr float HOTBAR_LABEL_PADDING_X = 4.f;
+constexpr float HOTBAR_LABEL_PADDING_Y = 6.f;
 
 constexpr int PLAYER_FRAME_SIZE = 32;
 } // namespace
@@ -99,8 +103,22 @@ void InventoryScene::handleEvent(const sf::Event &event, sf::RenderWindow &windo
 		if (pressed->button == sf::Mouse::Button::Left) {
 			const sf::Vector2f mousePos = toViewCoords(pressed->position);
 			if (const auto slot = slotAtPoint(mousePos)) {
-				if (inv.hasItem(*slot))
-					drag_ = DragState{*slot, mousePos};
+				if (inv.hasItem(*slot)) {
+					const bool shiftHeld = sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::LShift)
+					                       || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::RShift);
+					if (shiftHeld) {
+						const std::span<const SlotRef> targets =
+						    (slot->kind == SlotKind::Hotbar) ? Inventory::gridSlots() : Inventory::hotbarSlots();
+						for (const SlotRef &target : targets) {
+							if (!inv.hasItem(target)) {
+								inv.moveItem(*slot, target);
+								break;
+							}
+						}
+					} else {
+						drag_ = DragState{*slot, mousePos};
+					}
+				}
 			}
 		}
 	}
@@ -119,6 +137,12 @@ void InventoryScene::handleEvent(const sf::Event &event, sf::RenderWindow &windo
 void InventoryScene::update(const float /*deltaTime*/)
 {
 	InputManager &input = InputManager::getInstance();
+	Inventory &inv = player_.inventory();
+
+	updateItemActions(input, inv);
+
+	for (const GameAction playerAction : InputManager::playerActions())
+		input.suppress(playerAction);
 
 	// Consume both close keys so GameScene::update() never sees them this frame.
 	const bool wantsClose = input.consume(MenuAction::Back) || input.consume(GameAction::OpenInventory);
@@ -129,9 +153,26 @@ void InventoryScene::update(const float /*deltaTime*/)
 			stack_.pop();
 		return;
 	}
+}
+
+void InventoryScene::updateItemActions(InputManager &input, Inventory &inv)
+{
+	// Hotbar slot keys: move the hovered item into the pressed slot, then block the key from GameScene.
+	const std::span<const GameAction> slotActions = InputManager::hotbarSlotActions();
+	for (int i = 0; i < static_cast<int>(slotActions.size()); ++i) {
+		const bool pressed = input.consume(slotActions[i]);
+
+		if (pressed && hovered_ && !drag_) {
+			if (inv.hasItem(*hovered_)) {
+				inv.moveItem(*hovered_, SlotRef{SlotKind::Hotbar, i});
+			} else {
+				inv.moveItem(SlotRef{SlotKind::Hotbar, i}, *hovered_);
+			}
+		}
+	}
 
 	if (input.wasPressed(GameAction::UseItem) && hovered_ && !drag_)
-		player_.inventory().interact(*hovered_, player_);
+		inv.interact(*hovered_, player_);
 }
 
 // --- Drawing ---
@@ -280,6 +321,17 @@ void InventoryScene::drawSlot(sf::RenderTarget &target, const SlotRef slot, cons
 		sprite.setScale({iconSize / static_cast<float>(texSize.x), iconSize / static_cast<float>(texSize.y)});
 		sprite.setPosition({pos.x + 5.f, pos.y + 5.f});
 		target.draw(sprite);
+	}
+
+	if (slot.kind == SlotKind::Hotbar) {
+		const std::string keyName =
+		    InputManager::getInstance().inputName(InputManager::hotbarSlotActions()[slot.index]);
+		sf::Text label(AssetManager::getInstance().getFont(UI_FONT), keyName, HOTBAR_LABEL_SIZE);
+		label.setFillColor(HOTBAR_LABEL_COLOR);
+		const sf::FloatRect textBounds = label.getLocalBounds();
+		label.setPosition({pos.x + SLOT_SIZE - textBounds.size.x - HOTBAR_LABEL_PADDING_X,
+		                   pos.y + SLOT_SIZE - textBounds.size.y - HOTBAR_LABEL_PADDING_Y});
+		target.draw(label);
 	}
 }
 

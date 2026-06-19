@@ -72,7 +72,7 @@ void SceneStack::update(float deltaTime)
 		if (!scenes_[start]->updateBelow())
 			break;
 	}
-	for (std::size_t i = start; i < scenes_.size(); ++i)
+	for (std::size_t i = scenes_.size(); i-- > start;)
 		scenes_[i]->update(deltaTime);
 }
 

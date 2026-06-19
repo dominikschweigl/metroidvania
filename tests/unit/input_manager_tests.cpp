@@ -188,3 +188,88 @@ TEST_CASE("InputManager - hotbarSlotActions size matches HOTBAR_SIZE")
 {
 	CHECK(InputManager::hotbarSlotActions().size() == static_cast<std::size_t>(Inventory::HOTBAR_SIZE));
 }
+
+// ─── suppress ────────────────────────────────────────────────────────────────
+
+TEST_CASE("InputManager - suppress(GameAction) makes wasPressed return false")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Space));
+	im.suppress(GameAction::Jump);
+
+	CHECK_FALSE(im.wasPressed(GameAction::Jump));
+}
+
+TEST_CASE("InputManager - suppress(GameAction) makes consume return false")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Space));
+	im.suppress(GameAction::Jump);
+
+	CHECK_FALSE(im.consume(GameAction::Jump));
+}
+
+TEST_CASE("InputManager - suppress(GameAction) does not affect other actions")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Space));
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::A));
+	im.suppress(GameAction::Jump);
+
+	CHECK_FALSE(im.wasPressed(GameAction::Jump));
+	CHECK(im.wasPressed(GameAction::MoveLeft));
+}
+
+TEST_CASE("InputManager - suppress(GameAction) is cleared by clearFrameState")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Space));
+	im.suppress(GameAction::Jump);
+	im.clearFrameState();
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Space));
+
+	CHECK(im.wasPressed(GameAction::Jump));
+}
+
+TEST_CASE("InputManager - suppress(MenuAction) makes wasPressed return false")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Escape));
+	im.suppress(MenuAction::Back);
+
+	CHECK_FALSE(im.wasPressed(MenuAction::Back));
+}
+
+TEST_CASE("InputManager - suppress(MenuAction) makes consume return false")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Escape));
+	im.suppress(MenuAction::Back);
+
+	CHECK_FALSE(im.consume(MenuAction::Back));
+}
+
+TEST_CASE("InputManager - suppress(MenuAction) is cleared by clearFrameState")
+{
+	auto &im = InputManager::getInstance();
+	im.resetToDefaults();
+
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Escape));
+	im.suppress(MenuAction::Back);
+	im.clearFrameState();
+	im.handleEvent(keyPressed(sf::Keyboard::Scancode::Escape));
+
+	CHECK(im.wasPressed(MenuAction::Back));
+}
