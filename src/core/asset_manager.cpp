@@ -109,6 +109,18 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/resistor_bug/idle.png";
 	case RESISTOR_BUG_MOVING:
 		return "./assets/images/enemies/resistor_bug/moving.png";
+	case GOLEM_IDLE:
+		return "./assets/images/enemies/recursion_golem/idle.png";
+	case GOLEM_MOVING:
+		return "./assets/images/enemies/recursion_golem/moving.png";
+	case GOLEM_WIND_UP:
+		return "./assets/images/enemies/recursion_golem/windup.png";
+	case GOLEM_ATTACK:
+		return "./assets/images/enemies/recursion_golem/attack.png";
+	case GOLEM_EXPLODE:
+		return "./assets/images/enemies/recursion_golem/explode_windup.png";
+	case GOLEM_EXPLOSION:
+		return "./assets/images/enemies/recursion_golem/explode.png";
 	case CAPACITOR_HOVER:
 		return "./assets/images/enemies/capacitor/capacitor_hover.png";
 	case TRANSISTOR_BOSS_ROAMING:

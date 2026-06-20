@@ -57,6 +57,12 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 		return effect.remainingDuration <= 0.f;
 	});
 
+	// Apply any status effect queued by onHit() (kept out of onHit to stay noexcept).
+	if (pendingSlow_) {
+		addEffect(Effect::slow());
+		pendingSlow_ = false;
+	}
+
 	handleMovement(deltaTime, world);
 
 	PlayerState *next = currentState->update(deltaTime, *this);
@@ -163,6 +169,13 @@ void Player::takeDamage(const int amount) noexcept
 	std::uniform_real_distribution<float> dist{0.f, 1.f};
 	const int extraDamage = (fraction > 0.f && dist(rng) < fraction) ? 1 : 0;
 	health.damage(guaranteedDamage + extraDamage);
+}
+
+void Player::onHit(const Hitbox &hit) noexcept
+{
+	BaseEntity::onHit(hit);
+	if (hit.statusOnHit == StatusEffectKind::Slow)
+		pendingSlow_ = true;
 }
 
 void Player::drainEndedSourceIds(std::vector<std::uint32_t> &out)

@@ -4,6 +4,7 @@
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/recursion_golem/recursion_golem.h"
 #include "../entities/enemies/resistor_bug/resistor_bug.h"
 #include <nlohmann/json.hpp>
 
@@ -42,6 +43,13 @@ struct EnemyFactory {
 
 		if (type == "SegfaultBoss") {
 			auto enemy = std::make_unique<SegfaultBoss>(sf::Vector2f{0.f, 0.f});
+			enemy->deserialize(j);
+			return enemy;
+		}
+
+		if (type == "RecursionGolem") {
+			const int size = j.contains("size") ? j["size"].get<int>() : RecursionGolem::DEFAULT_SIZE;
+			auto enemy = std::make_unique<RecursionGolem>(sf::Vector2f{0.f, 0.f}, size);
 			enemy->deserialize(j);
 			return enemy;
 		}

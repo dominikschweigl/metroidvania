@@ -101,6 +101,13 @@ void GameScene::update(float deltaTime)
 	// Update all alive enemies; collect drops before removing dead ones.
 	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
+
+	std::vector<std::unique_ptr<BaseEnemy>> spawnedEnemies;
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
+		enemy->drainSpawns(spawnedEnemies);
+	for (auto &spawned : spawnedEnemies)
+		world_.getCurrentRoom()->enemies_.push_back(std::move(spawned));
+
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (!enemy->isAlive()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
