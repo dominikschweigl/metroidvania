@@ -55,7 +55,7 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 {
 	float deltaY = velY * dt;
 	float futureY = pos.y + deltaY;
-	sf::FloatRect future({pos.x - width / 2.f, futureY - height}, {width, height});
+	sf::FloatRect future({pos.x - width / 2.f, futureY - height}, {width, height - 1.f});
 
 	if (world.isSolidAtRect(future)) {
 		if (deltaY > 0.f) {

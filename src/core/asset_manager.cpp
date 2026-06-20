@@ -129,6 +129,8 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/tiles/top1.png";
 	case TILE_TOP_2:
 		return "assets/images/tiles/top2.png";
+	case GROUND:
+		return "assets/images/tiles/ground.png";
 	case MAIN_MENU_BACKGROUND:
 		return "assets/images/menus/main_menu_background.jpeg";
 	case ITEM_HAT:

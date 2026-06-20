@@ -47,6 +47,7 @@ enum TextureAsset {
 	TILE_STRUCTURE,
 	TILE_TOP_1,
 	TILE_TOP_2,
+	GROUND,
 
 	// Menus
 	MAIN_MENU_BACKGROUND,
