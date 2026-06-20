@@ -82,6 +82,9 @@ enum TextureAsset {
 	ITEM_DAMAGE_POTION,
 	ITEM_USB_KEY,
 	ITEM_BACKUP_DISK,
+
+	// Minimap
+	MINIMAP,
 };
 
 enum FontAsset {

@@ -181,6 +181,8 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/items/keys/damaged_usb_key.png";
 	case ITEM_BACKUP_DISK:
 		return "assets/images/items/floppy_disk/floppy_disk_blackwhite.png";
+	case MINIMAP:
+		return "assets/images/mini_map.png";
 	}
 
 	throw std::logic_error("texturePath: missing TextureAsset path entry");

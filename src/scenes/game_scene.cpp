@@ -43,6 +43,10 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 		this->newGame(window);
 	else
 		this->loadGame(window);
+
+	sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
+		return std::make_unique<InventoryScene>(player, stack, windowSize);
+	});
 }
 
 void GameScene::newGame(sf::RenderWindow &window)
@@ -80,7 +84,8 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
 	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
 		showDebugHitboxes_ = !showDebugHitboxes_;
-
+	if (input.wasPressed(GameAction::ToggleMinimap))
+		showMinimap_ = !showMinimap_;
 	if (input.wasPressed(GameAction::OpenInventory))
 		sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
 			return std::make_unique<InventoryScene>(player, stack, windowSize);
@@ -211,6 +216,10 @@ void GameScene::draw(sf::RenderWindow &window)
 
 	hotbarHud_.draw(window, player_.inventory(), player_.activeEffects(), player_.health,
 	                player_.inventory().hasBackup());
+	if (showMinimap_) {
+		Room *room = world_.getCurrentRoom();
+		minimap_.draw(window, player_.getPosition(), world_.getCurrentRoomId(), *room);
+	}
 }
 
 void GameScene::drawDebugHitboxes(sf::RenderWindow &window)

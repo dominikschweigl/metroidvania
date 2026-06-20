@@ -27,6 +27,7 @@ set(GAME_SOURCES
     src/ui/health_bar.cpp
     src/ui/hotbar_hud.cpp
     src/ui/interaction_indicator.cpp
+    src/ui/minimap.cpp
     src/scenes/menu_scene.cpp
     src/scenes/bluescreen_scene.cpp
     src/scenes/victory_scene.cpp

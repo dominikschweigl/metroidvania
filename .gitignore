@@ -48,6 +48,7 @@ compile_commands.json
 
 # Build directories
 build/
+saves/
 
 # IDE specific files
 .vscode/

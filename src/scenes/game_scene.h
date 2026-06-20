@@ -5,6 +5,7 @@
 #include "../core/scene_stack.h"
 #include "../entities/player/player.h"
 #include "../ui/hotbar_hud.h"
+#include "../ui/minimap.h"
 #include "../world/world.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -34,6 +35,8 @@ class GameScene : public Scene {
 	Player player_;
 	CombatSystem combat_;
 	HotbarHUD hotbarHud_;
+	MiniMap minimap_;
+	bool showMinimap_ = true;
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;
 	bool showDebugHitboxes_ = false;
