@@ -8,6 +8,8 @@ struct Effect {
 	[[nodiscard]] static Effect damage() noexcept;
 	[[nodiscard]] static Effect resistance() noexcept;
 
+	[[nodiscard]] static Effect slow() noexcept;
+
 	[[nodiscard]] TextureAsset icon() const noexcept { return icon_; }
 	[[nodiscard]] std::string_view name() const noexcept { return name_; }
 	[[nodiscard]] std::string_view effectId() const noexcept { return effectId_; }

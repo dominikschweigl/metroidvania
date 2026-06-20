@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+class InputManager;
 class Player;
 
 class InventoryScene : public Scene {
@@ -19,7 +20,7 @@ class InventoryScene : public Scene {
 	void draw(sf::RenderWindow &window) override;
 
 	[[nodiscard]] bool isTransparent() const override { return true; }
-	[[nodiscard]] bool updateBelow() const override { return false; }
+	[[nodiscard]] bool updateBelow() const override { return true; }
 
   private:
 	struct DragState {
@@ -31,6 +32,8 @@ class InventoryScene : public Scene {
 	[[nodiscard]] sf::Vector2f slotScreenPos(SlotRef slot) const noexcept;
 	[[nodiscard]] sf::FloatRect slotBounds(SlotRef slot) const noexcept;
 	[[nodiscard]] std::optional<SlotRef> slotAtPoint(sf::Vector2f point) const noexcept;
+
+	void updateItemActions(InputManager &input, Inventory &inv);
 
 	void drawBackground(sf::RenderTarget &target) const;
 	void drawPlayerPreview(sf::RenderTarget &target) const;

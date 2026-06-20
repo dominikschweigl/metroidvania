@@ -33,6 +33,8 @@ class BaseEnemy : public BaseEntity {
 	// Returns items to drop when this enemy dies. Override per enemy to configure drops.
 	[[nodiscard]] virtual std::vector<std::unique_ptr<Item>> rollDrops() { return {}; }
 
+	virtual void drainSpawns(std::vector<std::unique_ptr<BaseEnemy>> &out) {}
+
 	void collectHitboxes(std::vector<Hitbox> &hitboxes) override;
 
 	json serialize() const override;

@@ -1,8 +1,10 @@
 #include "world.h"
-#include "../core/audio_manager.h"
+#include "../entities/enemies/bosses/segfault_boss/segfault_boss.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../entities/enemies/capacitor/capacitor.h"
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
+#include "../entities/enemies/recursion_golem/recursion_golem.h"
+#include "../entities/enemies/resistor_bug/resistor_bug.h"
 #include "../entities/player/player.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
@@ -97,8 +99,15 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "TransistorBoss") {
 				room.enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "SegfaultBoss") {
+				room.enemies_.push_back(std::make_unique<SegfaultBoss>(sf::Vector2f{float(p.x), float(p.y)}));
 			} else if (name == "Capacitor") {
 				room.enemies_.push_back(std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "ResistorBug") {
+				room.enemies_.push_back(std::make_unique<ResistorBug>(sf::Vector2f{float(p.x), float(p.y)}));
+			} else if (name == "RecursionGolem") {
+				room.enemies_.push_back(std::make_unique<RecursionGolem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                                         RecursionGolem::DEFAULT_SIZE));
 			} else if (name == "ChewingGumItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<ChewingGumItem>()));
@@ -145,9 +154,9 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				auto &objectGroup = tile->getObjectgroup();
 
 				for (auto &obj : objectGroup.getObjects()) {
-					room.savePoints.push_back(
+					room.savePoints.push_back(SavePoint{
 					    sf::FloatRect({x * TILE_SIZE + obj.getPosition().x, y * TILE_SIZE + obj.getPosition().y},
-					                  {(float)obj.getSize().x, (float)obj.getSize().y}));
+					                  {(float)obj.getSize().x, (float)obj.getSize().y})});
 				}
 			}
 		}
@@ -349,7 +358,7 @@ void World::loadWorldData(Player &player)
 	}
 }
 
-void World::draw(sf::RenderWindow &window, const sf::View &view) const
+void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::FloatRect playerBounds) const
 {
 	if (currentRoomId.empty())
 		return;
@@ -404,6 +413,9 @@ void World::draw(sf::RenderWindow &window, const sf::View &view) const
 		shape.setFillColor(sf::Color(119, 143, 129, 128));
 		window.draw(shape);
 	}
+
+	const float playerX = playerBounds.position.x + playerBounds.size.x / 2.f;
+	room.draw(window, playerBounds, playerX);
 }
 
 void World::update(float deltaTime, sf::FloatRect playerBounds)

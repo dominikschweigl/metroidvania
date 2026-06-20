@@ -1,6 +1,7 @@
 #pragma once
 #include "../entities/enemies/base_enemy.h"
 #include "../items/world_item.h"
+#include "../ui/interaction_indicator.h"
 #include "../utils/EnemyFactory.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
@@ -13,10 +14,16 @@
 
 using json = nlohmann::json;
 
+struct SavePoint {
+	sf::FloatRect bounds;
+	InteractionIndicator indicator;
+};
+
 struct Door {
 	std::string targetRoomId;
 	int targetSpawnIdx;
 	sf::FloatRect bounds;
+	InteractionIndicator indicator;
 };
 
 struct ImageLayer {
@@ -33,7 +40,7 @@ struct Room {
 	std::vector<sf::Vector2f> playerSpawns;
 	Direction playerSpawnDirection = Direction::Right;
 	std::vector<Door> doors;
-	std::vector<sf::FloatRect> savePoints;
+	std::vector<SavePoint> savePoints;
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	std::vector<std::unique_ptr<WorldItem>> items_;
 
@@ -52,7 +59,7 @@ struct Room {
 	bool isTouchingSavepoint(const sf::FloatRect &entityBounds) const
 	{
 		for (size_t i = 0; i < savePoints.size(); ++i) {
-			if (savePoints[i].findIntersection(entityBounds)) {
+			if (savePoints[i].bounds.findIntersection(entityBounds)) {
 				return true;
 			}
 		}
@@ -69,12 +76,33 @@ struct Room {
 		return std::nullopt;
 	}
 
+	std::optional<sf::FloatRect> getTouchingInteractableBounds(const sf::FloatRect &entityBounds) const
+	{
+		for (const Door &door : doors) {
+			if (door.bounds.findIntersection(entityBounds)) {
+				return door.bounds;
+			}
+		}
+		for (const SavePoint &savePoint : savePoints) {
+			if (savePoint.bounds.findIntersection(entityBounds)) {
+				return savePoint.bounds;
+			}
+		}
+		return std::nullopt;
+	}
+
 	void update(float deltaTime, const World &world)
 	{
 		enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
 		               enemies_.end());
 		items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
 		             items_.end());
+		updateInteractionIndicators(deltaTime);
+	}
+
+	void draw(sf::RenderWindow &window, const sf::FloatRect playerBounds, const float playerX) const
+	{
+		drawInteractionIndicators(window, playerBounds, playerX);
 	}
 
 	bool isAllowedLeaving()
@@ -126,6 +154,34 @@ struct Room {
 
 			for (const auto &i : j["items"]) {
 				items_.push_back(WorldItem::deserialize(i));
+			}
+		}
+	}
+
+  private:
+	void updateInteractionIndicators(const float deltaTime)
+	{
+		for (Door &door : doors) {
+			door.indicator.update(deltaTime);
+		}
+		for (SavePoint &savePoint : savePoints) {
+			savePoint.indicator.update(deltaTime);
+		}
+	}
+
+	void drawInteractionIndicators(sf::RenderWindow &window, const sf::FloatRect playerBounds,
+	                               const float playerX) const
+	{
+		for (const Door &door : doors) {
+			if (door.bounds.findIntersection(playerBounds)) {
+				door.indicator.draw(window, door.bounds, playerX);
+				return;
+			}
+		}
+		for (const SavePoint &savePoint : savePoints) {
+			if (savePoint.bounds.findIntersection(playerBounds)) {
+				savePoint.indicator.draw(window, savePoint.bounds, playerX);
+				return;
 			}
 		}
 	}

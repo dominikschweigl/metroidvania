@@ -8,6 +8,8 @@ class BaseEntity;
 
 enum class Team : std::uint8_t { Player, Enemy };
 
+enum class StatusEffectKind : std::uint8_t { None, Slow };
+
 // Damage dealing rectangle.
 // sourceId identifies the attack instance so the central
 // CombatSystem applies damage only once across frames.
@@ -16,6 +18,7 @@ struct Hitbox {
 	int damage;
 	Team team;
 	std::uint32_t sourceId;
+	StatusEffectKind statusOnHit = StatusEffectKind::None;
 };
 
 // Damage receiving rectangle.

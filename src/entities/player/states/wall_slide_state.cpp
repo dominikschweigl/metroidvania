@@ -9,6 +9,7 @@ WallSlideState::WallSlideState()
 
 void WallSlideState::onEnter(Player &p)
 {
+	p.isOnGround = false;
 	originalGravity = p.gravity;
 	p.gravity *= WALL_SLIDE_GRAVITY_FACTOR;
 	p.velocity.y *= 0.1f;
@@ -24,6 +25,9 @@ void WallSlideState::onExit(Player &p)
 
 PlayerState *WallSlideState::update(float dt, Player &p)
 {
+	if (p.isOnGround) {
+		return &p.states.landing;
+	}
 	if (p.inputJump) {
 		p.wallJumpTimer = Player::WALL_JUMP_DURATION;
 		p.velocity.x = wallDirection == Direction::Left ? Player::RUNNING_SPEED : -Player::RUNNING_SPEED;
