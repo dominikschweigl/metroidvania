@@ -9,12 +9,15 @@ PeakState::PeakState()
 
 void PeakState::onEnter(Player &p)
 {
+	p.isOnGround = false;
 	currentFrame = 0;
 	frameTimer = 0.f;
 }
 
 PlayerState *PeakState::update(float dt, Player &p)
 {
+	if (p.isOnGround)
+		return &p.states.landing;
 	if (p.isAgainstLeftWall && p.inputLeft && p.inventory_.hasGum())
 		return &p.states.wallSlide;
 	if (p.isAgainstRightWall && p.inputRight && p.inventory_.hasGum())

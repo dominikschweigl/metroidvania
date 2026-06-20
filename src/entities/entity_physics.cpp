@@ -4,18 +4,14 @@ namespace EntityPhysics {
 
 bool isWallOnLeft(const sf::Vector2f position, const float width, const float height, const World &world)
 {
-	const float probeX = position.x - width / 2.f - 1.f;
-	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f}, "Solid");
-	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f}, "Solid");
-	return (top || mid);
+	const sf::FloatRect probe({position.x - width / 2.f - 1.f, position.y - height + 1.f}, {1.f, height - 2.f});
+	return world.isSolidAtRect(probe);
 }
 
 bool isWallOnRight(const sf::Vector2f position, const float width, const float height, const World &world)
 {
-	const float probeX = position.x + width / 2.f + 1.f;
-	const auto top = world.getTileAtCoordinate({probeX, position.y - height + 1.f}, "Solid");
-	const auto mid = world.getTileAtCoordinate({probeX, position.y - height / 2.f}, "Solid");
-	return (top || mid);
+	const sf::FloatRect probe({position.x + width / 2.f, position.y - height + 1.f}, {1.f, height - 2.f});
+	return world.isSolidAtRect(probe);
 }
 
 bool isGroundBelow(sf::FloatRect bounds, const World &world)
@@ -27,7 +23,9 @@ bool isGroundBelow(sf::FloatRect bounds, const World &world)
 }
 void applyGravity(float &velY, bool &isOnGround, float dt, float gravity, sf::FloatRect bounds, const World &world)
 {
-	if (!isGroundBelow(bounds, world)) {
+	if (isGroundBelow(bounds, world)) {
+		isOnGround = true;
+	} else {
 		isOnGround = false;
 		velY += gravity * (double)dt;
 	}
@@ -58,7 +56,7 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 	sf::FloatRect future({pos.x - width / 2.f, futureY - height}, {width, height - 1.f});
 
 	if (world.isSolidAtRect(future)) {
-		if (deltaY > 0.f) {
+		if (deltaY >= 0.f) {
 			isOnGround = true;
 			int tileY = static_cast<int>(futureY / World::TILE_SIZE);
 			futureY = float(tileY * World::TILE_SIZE);

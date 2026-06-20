@@ -26,8 +26,11 @@ set(GAME_SOURCES
     src/ui/panel.cpp
     src/ui/health_bar.cpp
     src/ui/hotbar_hud.cpp
+    src/ui/interaction_indicator.cpp
     src/ui/minimap.cpp
     src/scenes/menu_scene.cpp
+    src/scenes/bluescreen_scene.cpp
+    src/scenes/victory_scene.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
     src/world/world.cpp
@@ -41,6 +44,17 @@ set(GAME_SOURCES
     src/entities/enemies/race_condition_slime/states/windup_state.cpp
     src/entities/enemies/race_condition_slime/states/attack_state.cpp
     src/entities/enemies/race_condition_slime/states/recover_state.cpp
+    src/entities/enemies/resistor_bug/resistor_bug.cpp
+    src/entities/enemies/resistor_bug/states/idle_state.cpp
+    src/entities/enemies/resistor_bug/states/chase_state.cpp
+    src/entities/enemies/resistor_bug/states/jump_attack_state.cpp
+    src/entities/enemies/resistor_bug/states/recover_state.cpp
+    src/entities/enemies/recursion_golem/recursion_golem.cpp
+    src/entities/enemies/recursion_golem/states/idle_state.cpp
+    src/entities/enemies/recursion_golem/states/chase_state.cpp
+    src/entities/enemies/recursion_golem/states/windup_state.cpp
+    src/entities/enemies/recursion_golem/states/attack_state.cpp
+    src/entities/enemies/recursion_golem/states/explode_state.cpp
     src/effects/effect.cpp
     src/items/item_registry.cpp
     src/items/healing_potion_item.cpp
@@ -83,6 +97,16 @@ set(GAME_SOURCES
     src/entities/enemies/bosses/transistor_boss/states/stage2_recover_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/summon_state.cpp
     src/entities/enemies/bosses/transistor_boss/states/death_state.cpp
+    src/entities/enemies/bosses/segfault_boss/segfault_boss.cpp
+    src/entities/enemies/bosses/segfault_boss/segfault_boss_renderer.cpp
+    src/entities/enemies/bosses/segfault_boss/states/roaming_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/recover_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage2_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/summon_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/stage3_transition_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/fork_state.cpp
+    src/entities/enemies/bosses/segfault_boss/states/death_state.cpp
 )
 
 add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
@@ -94,8 +118,11 @@ add_executable(metroidvania_tests
     tests/unit/base_entity_tests.cpp
     tests/unit/base_enemy_tests.cpp
     tests/unit/race_condition_slime_tests.cpp
+    tests/unit/resistor_bug_tests.cpp
+    tests/unit/recursion_golem_tests.cpp
     tests/unit/capacitor_tests.cpp
     tests/unit/transistor_boss_tests.cpp
+    tests/unit/segfault_boss_tests.cpp
     tests/unit/hat_projectile_tests.cpp
     tests/unit/input_manager_tests.cpp
     tests/unit/audio_manager_tests.cpp
@@ -106,6 +133,8 @@ add_executable(metroidvania_tests
     tests/unit/melee_attack_tests.cpp
     tests/unit/inventory_tests.cpp
     tests/unit/effect_tests.cpp
+    tests/unit/interaction_indicator_tests.cpp
+    tests/unit/entity_physics_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)

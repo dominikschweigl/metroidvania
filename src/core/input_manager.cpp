@@ -45,11 +45,20 @@ constexpr std::array<GameAction, 7> hotbarSlotActionsArray = {
     GameAction::UseItemSlot1, GameAction::UseItemSlot2, GameAction::UseItemSlot3, GameAction::UseItemSlot4,
     GameAction::UseItemSlot5, GameAction::UseItemSlot6, GameAction::UseItemSlot7,
 };
-}
+constexpr std::array<GameAction, 7> playerActionsArray = {
+    GameAction::MoveLeft, GameAction::MoveRight,   GameAction::Jump,     GameAction::Sprint,
+    GameAction::ThrowHat, GameAction::AttackMelee, GameAction::Interact,
+};
+} // namespace
 
 std::span<const GameAction> InputManager::hotbarSlotActions() noexcept
 {
 	return hotbarSlotActionsArray;
+}
+
+std::span<const GameAction> InputManager::playerActions() noexcept
+{
+	return playerActionsArray;
 }
 
 bool InputManager::matchesKey(const InputBinding &binding, const sf::Keyboard::Scancode scancode)
@@ -97,6 +106,8 @@ void InputManager::clearFrameState()
 {
 	wasPressed_.fill(false);
 	wasMenuPressed_.fill(false);
+	suppressed_.fill(false);
+	menuSuppressed_.fill(false);
 }
 
 bool InputManager::isHeldBinding(const InputBinding &binding)
@@ -108,23 +119,25 @@ bool InputManager::isHeldBinding(const InputBinding &binding)
 
 bool InputManager::isHeld(const GameAction action) const
 {
+	if (suppressed_[idx(action)])
+		return false;
 	return isHeldBinding(bindings_[idx(action)].primary);
 }
 
 bool InputManager::wasPressed(const GameAction action) const
 {
-	return wasPressed_[idx(action)];
+	return !suppressed_[idx(action)] && wasPressed_[idx(action)];
 }
 
 bool InputManager::wasPressed(const MenuAction action) const
 {
-	return wasMenuPressed_[idx(action)];
+	return !menuSuppressed_[idx(action)] && wasMenuPressed_[idx(action)];
 }
 
 bool InputManager::consume(const GameAction action)
 {
 	bool &flag = wasPressed_[idx(action)];
-	const bool result = flag;
+	const bool result = !suppressed_[idx(action)] && flag;
 	flag = false;
 	return result;
 }
@@ -132,9 +145,21 @@ bool InputManager::consume(const GameAction action)
 bool InputManager::consume(const MenuAction action)
 {
 	bool &flag = wasMenuPressed_[idx(action)];
-	const bool result = flag;
+	const bool result = !menuSuppressed_[idx(action)] && flag;
 	flag = false;
 	return result;
+}
+
+void InputManager::suppress(const GameAction action)
+{
+	suppressed_[idx(action)] = true;
+	wasPressed_[idx(action)] = false;
+}
+
+void InputManager::suppress(const MenuAction action)
+{
+	menuSuppressed_[idx(action)] = true;
+	wasMenuPressed_[idx(action)] = false;
 }
 
 void InputManager::rebind(const GameAction action, InputBinding newBinding)
@@ -160,11 +185,18 @@ std::optional<GameAction> InputManager::findConflict(const InputBinding binding,
 	return std::nullopt;
 }
 
+InputBinding InputManager::getPrimaryBinding(const GameAction action) const
+{
+	return bindings_[idx(action)].primary;
+}
+
 void InputManager::resetToDefaults()
 {
 	bindings_ = defaultBindings;
 	wasPressed_.fill(false);
 	wasMenuPressed_.fill(false);
+	suppressed_.fill(false);
+	menuSuppressed_.fill(false);
 }
 
 std::string InputManager::bindingDisplayName(const InputBinding &binding)

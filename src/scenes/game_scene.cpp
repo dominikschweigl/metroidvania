@@ -1,5 +1,6 @@
 #include "game_scene.h"
 #include "../core/input_manager.h"
+#include "../entities/enemies/bosses/segfault_boss/segfault_boss.h"
 #include "../entities/enemies/bosses/transistor_boss/transistor_boss.h"
 #include "../items/backup_disk_item.h"
 #include "../items/chewing_gum_item.h"
@@ -11,8 +12,10 @@
 #include "../items/speed_potion_item.h"
 #include "../items/usb_key_item.h"
 #include "inventory_scene.h"
+#include "menus/bluescreen_menu.h"
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
+#include "menus/victory_menu.h"
 #include <algorithm>
 #include <cstdint>
 #include <vector>
@@ -105,6 +108,13 @@ void GameScene::update(float deltaTime)
 	// Update all alive enemies; collect drops before removing dead ones.
 	for (auto &enemy : world_.getCurrentRoom()->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
+
+	std::vector<std::unique_ptr<BaseEnemy>> spawnedEnemies;
+	for (auto &enemy : world_.getCurrentRoom()->enemies_)
+		enemy->drainSpawns(spawnedEnemies);
+	for (auto &spawned : spawnedEnemies)
+		world_.getCurrentRoom()->enemies_.push_back(std::move(spawned));
+
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (!enemy->isAlive()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
@@ -113,6 +123,18 @@ void GameScene::update(float deltaTime)
 			}
 			combat_.clearVictim(&enemy->health);
 		}
+	}
+
+	// The segfault boss interrupts the fight with a "bluescreen" between stages,
+	// and raises a victory request once the death animation finishes.
+	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
+		auto *segfaultBoss = dynamic_cast<SegfaultBoss *>(enemy.get());
+		if (segfaultBoss == nullptr)
+			continue;
+		if (segfaultBoss->consumeBluescreenRequest())
+			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeBluescreenMenu(stack, window); });
+		if (segfaultBoss->consumeVictoryRequest())
+			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeVictoryMenu(stack, window); });
 	}
 
 	// Update world items and check for player pickup.
@@ -184,7 +206,7 @@ void GameScene::draw(sf::RenderWindow &window)
 	view_.setSize({windowSize.x * zoomFactor_, windowSize.y * zoomFactor_});
 	window.setView(view_);
 	window.clear({0, 0, 0});
-	world_.draw(window, view_);
+	world_.draw(window, view_, player_.getBounds());
 	for (auto &item : world_.getCurrentRoom()->items_)
 		item->draw(window);
 	player_.draw(window);

@@ -105,6 +105,22 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/race_condition/attack.png";
 	case SLIME_RECOVER:
 		return "./assets/images/enemies/race_condition/recover.png";
+	case RESISTOR_BUG_IDLE:
+		return "./assets/images/enemies/resistor_bug/idle.png";
+	case RESISTOR_BUG_MOVING:
+		return "./assets/images/enemies/resistor_bug/moving.png";
+	case GOLEM_IDLE:
+		return "./assets/images/enemies/recursion_golem/idle.png";
+	case GOLEM_MOVING:
+		return "./assets/images/enemies/recursion_golem/moving.png";
+	case GOLEM_WIND_UP:
+		return "./assets/images/enemies/recursion_golem/windup.png";
+	case GOLEM_ATTACK:
+		return "./assets/images/enemies/recursion_golem/attack.png";
+	case GOLEM_EXPLODE:
+		return "./assets/images/enemies/recursion_golem/explode_windup.png";
+	case GOLEM_EXPLOSION:
+		return "./assets/images/enemies/recursion_golem/explode.png";
 	case CAPACITOR_HOVER:
 		return "./assets/images/enemies/capacitor/capacitor_hover.png";
 	case TRANSISTOR_BOSS_ROAMING:
@@ -117,6 +133,16 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "./assets/images/enemies/bosses/transistor_boss/recover.png";
 	case TRANSISTOR_BOSS_DEATH:
 		return "./assets/images/enemies/bosses/transistor_boss/death_animation.png";
+	case SEGFAULT_BOSS_IDLE:
+		return "./assets/images/enemies/bosses/segfault_boss/idle.png";
+	case SEGFAULT_BOSS_BEGIN_ROAMING:
+		return "./assets/images/enemies/bosses/segfault_boss/begin_roaming.png";
+	case SEGFAULT_BOSS_ROAMING:
+		return "./assets/images/enemies/bosses/segfault_boss/roaming.png";
+	case SEGFAULT_BOSS_CHARGE:
+		return "./assets/images/enemies/bosses/segfault_boss/charge.png";
+	case SEGFAULT_BOSS_DEATH:
+		return "./assets/images/enemies/bosses/segfault_boss/death.png";
 	case TILE_BLACK:
 		return "assets/images/tiles/black.png";
 	case TILE_LEFT_EDGE:
@@ -133,6 +159,12 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/tiles/ground.png";
 	case MAIN_MENU_BACKGROUND:
 		return "assets/images/menus/main_menu_background.jpeg";
+	case SEGFAULT_FRAME_0:
+		return "assets/images/menus/segfault_frame_0.png";
+	case SEGFAULT_FRAME_1:
+		return "assets/images/menus/segfault_frame_1.png";
+	case SEGFAULT_FRAME_2:
+		return "assets/images/menus/segfault_frame_2.png";
 	case ITEM_HAT:
 		return "assets/images/items/hat.png";
 	case ITEM_CHEWING_GUM:

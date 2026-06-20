@@ -5,6 +5,16 @@
 
 using json = nlohmann::json;
 
+// Segfault Boss
+#include "../entities/enemies/bosses/segfault_boss/states/death_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/fork_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/null_spear_attack_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/recover_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/roaming_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/stage2_transition_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/stage3_transition_state.h"
+#include "../entities/enemies/bosses/segfault_boss/states/summon_state.h"
+
 // Transistor Boss
 #include "../entities/enemies/bosses/transistor_boss/states/charge_attack_state.h"
 #include "../entities/enemies/bosses/transistor_boss/states/charge_attack_windup_state.h"
@@ -28,6 +38,19 @@ using json = nlohmann::json;
 #include "../entities/enemies/race_condition_slime/states/recover_state.h"
 #include "../entities/enemies/race_condition_slime/states/windup_state.h"
 
+// Resistor Bug
+#include "../entities/enemies/resistor_bug/states/chase_state.h"
+#include "../entities/enemies/resistor_bug/states/idle_state.h"
+#include "../entities/enemies/resistor_bug/states/jump_attack_state.h"
+#include "../entities/enemies/resistor_bug/states/recover_state.h"
+
+// Recursion Golem
+#include "../entities/enemies/recursion_golem/states/attack_state.h"
+#include "../entities/enemies/recursion_golem/states/chase_state.h"
+#include "../entities/enemies/recursion_golem/states/explode_state.h"
+#include "../entities/enemies/recursion_golem/states/idle_state.h"
+#include "../entities/enemies/recursion_golem/states/windup_state.h"
+
 struct EnemyStateFactory {
 	static EnemyState *create(const json &j)
 	{
@@ -37,6 +60,31 @@ struct EnemyStateFactory {
 		const std::string type = j["type"];
 
 		std::unique_ptr<EnemyState> state;
+
+		// Segfault Boss States
+		if (type == "SegfaultRoamingState")
+			state = std::make_unique<segfault_boss::RoamingState>();
+
+		if (type == "NullSpearAttackState")
+			state = std::make_unique<segfault_boss::NullSpearAttackState>();
+
+		if (type == "SegfaultRecoverState")
+			state = std::make_unique<segfault_boss::RecoverState>();
+
+		if (type == "SegfaultDeathState")
+			state = std::make_unique<segfault_boss::DeathState>();
+
+		if (type == "SegfaultStage2TransitionState")
+			state = std::make_unique<segfault_boss::Stage2TransitionState>();
+
+		if (type == "SegfaultSummonState")
+			state = std::make_unique<segfault_boss::SummonState>();
+
+		if (type == "SegfaultStage3TransitionState")
+			state = std::make_unique<segfault_boss::Stage3TransitionState>();
+
+		if (type == "SegfaultForkState")
+			state = std::make_unique<segfault_boss::ForkState>();
 
 		// Transistor Boss States
 		if (type == "ChargeAttackState")
@@ -91,6 +139,35 @@ struct EnemyStateFactory {
 
 		if (type == "WindUpState")
 			state = std::make_unique<rc_slime::WindUpState>();
+
+		// Resistor Bug States
+		if (type == "ResistorIdleState")
+			state = std::make_unique<resistor_bug::IdleState>();
+
+		if (type == "ResistorChaseState")
+			state = std::make_unique<resistor_bug::ChaseState>();
+
+		if (type == "ResistorJumpAttackState")
+			state = std::make_unique<resistor_bug::JumpAttackState>();
+
+		if (type == "ResistorRecoverState")
+			state = std::make_unique<resistor_bug::RecoverState>();
+
+		// Recursion Golem
+		if (type == "GolemIdleState")
+			state = std::make_unique<recursion_golem::IdleState>();
+
+		if (type == "GolemChaseState")
+			state = std::make_unique<recursion_golem::ChaseState>();
+
+		if (type == "GolemWindUpState")
+			state = std::make_unique<recursion_golem::WindUpState>();
+
+		if (type == "GolemAttackState")
+			state = std::make_unique<recursion_golem::AttackState>();
+
+		if (type == "GolemExplodeState")
+			state = std::make_unique<recursion_golem::ExplodeState>();
 
 		return state.release();
 	}
