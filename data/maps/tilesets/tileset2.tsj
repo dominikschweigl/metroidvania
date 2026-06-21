@@ -9,13 +9,133 @@
  "margin":0,
  "name":"test",
  "spacing":0,
- "tilecount":1,
+ "tilecount":21,
  "tiledversion":"1.12.2",
  "tileheight":32,
  "tiles":[
         {
          "id":0,
-         "image":"..\/..\/..\/assets\/images\/tiles\/ground.png",
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/center.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":1,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/center_ai.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":2,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/center2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":3,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/rolling table.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":4,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/screen.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":5,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/table1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":6,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/table2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":7,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/top.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":8,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/top2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":9,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/top3.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":10,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/top4.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":11,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/wall1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":12,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/wall2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":20,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":21,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":22,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_3.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":23,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_4.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":24,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_5.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":25,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/big_table_6.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":26,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/teleport_bot.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":27,
+         "image":"..\/..\/..\/assets\/images\/tiles\/area2\/teleport_top.png",
          "imageheight":32,
          "imagewidth":32
         }],

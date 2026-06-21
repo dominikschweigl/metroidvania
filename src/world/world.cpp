@@ -172,7 +172,17 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 
 		if (texture->loadFromFile(path.string(), true)) {
 
-			room.backgroundLayers.push_back({texture, {float(layer.getOffset().x), float(layer.getOffset().y)}});
+			int width = 0;
+			if (auto *prop = layer.getProp("imagewidth")) {
+				auto w = prop->getValue<std::string>();
+				std::cout << "w: " << w << std::endl;
+				// width = static_cast<int>(w);
+			}
+
+			room.backgroundLayers.push_back({.texture = texture,
+			                                 .position = {float(layer.getOffset().x), float(layer.getOffset().y)},
+			                                 .parallax = {},
+			                                 .repeatX = layer.hasRepeatX()});
 		}
 	}
 
@@ -367,14 +377,25 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	const sf::Vector2f center = view.getCenter();
 	const sf::Vector2f size = view.getSize();
 
-	for (const auto &img : room.backgroundLayers) {
-		sf::Sprite sprite(*img.texture);
-		// Does not work correctly
-		// sprite.setPosition(sf::Vector2f(img.position.x + center.x * (1.f - img.parallax.x),
-		//                                 img.position.y + center.y * (1.f - img.parallax.y)));
-		window.draw(sprite);
+	const float roomWidth = World::TILE_SIZE * room.width;
+
+	for (const ImageLayer &img : room.backgroundLayers) {
+		if (img.repeatX) {
+			for (float x = img.position.x; x < roomWidth; x += img.texture->getSize().x) {
+				sf::Sprite sprite(*img.texture);
+				sprite.setPosition({x, img.position.y});
+				window.draw(sprite);
+			}
+		} else {
+			sf::Sprite sprite(*img.texture);
+			sprite.setPosition({img.position.x, img.position.y});
+			window.draw(sprite);
+		}
 	}
 
+	// Does not work correctly
+	// sprite.setPosition(sf::Vector2f(img.position.x + center.x * (1.f - img.parallax.x),
+	//                                 img.position.y + center.y * (1.f - img.parallax.y)));
 	const int left = static_cast<int>((center.x - size.x * 0.5f) / TILE_SIZE);
 	const int right = static_cast<int>((center.x + size.x * 0.5f) / TILE_SIZE);
 	const int top = static_cast<int>((center.y - size.y * 0.5f) / TILE_SIZE);

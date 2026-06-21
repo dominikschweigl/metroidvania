@@ -30,6 +30,7 @@ struct ImageLayer {
 	std::shared_ptr<sf::Texture> texture;
 	tson::Vector2f position;
 	tson::Vector2f parallax;
+	bool repeatX = false;
 };
 
 struct Room {
