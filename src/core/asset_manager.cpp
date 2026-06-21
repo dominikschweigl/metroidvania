@@ -155,6 +155,8 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/tiles/top1.png";
 	case TILE_TOP_2:
 		return "assets/images/tiles/top2.png";
+	case GROUND:
+		return "assets/images/tiles/ground.png";
 	case MAIN_MENU_BACKGROUND:
 		return "assets/images/menus/main_menu_background.jpeg";
 	case SEGFAULT_FRAME_0:
@@ -181,8 +183,10 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/items/keys/damaged_usb_key.png";
 	case ITEM_BACKUP_DISK:
 		return "assets/images/items/floppy_disk/floppy_disk_blackwhite.png";
-	case MINIMAP:
-		return "assets/images/mini_map.png";
+	case FIRST_AREA_MINIMAP:
+		return "assets/images/minimaps/minimap1.png";
+	case SECOND_AREA_MINIMAP:
+		return "assets/images/minimaps/minimap2.png";
 	}
 
 	throw std::logic_error("texturePath: missing TextureAsset path entry");

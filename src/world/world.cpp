@@ -69,8 +69,11 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	Room room;
 	room.width = map->getSize().x;
 	room.height = map->getSize().y;
-	room.needsToClearAllEnemies =
-	    map->getProp("needsToClearAllEnemies") ? map->get<bool>("needsToClearAllEnemies") : false;
+	room.needsToClearAllEnemies = map->get<bool>("needsToClearAllEnemies");
+	room.minimap_pixel_rect = {
+	    {float(map->get<int>("minimap_pixel_rect_x")), float(map->get<int>("minimap_pixel_rect_y"))},
+	    {float(map->get<int>("minimap_pixel_rect_w")), float(map->get<int>("minimap_pixel_rect_h"))}};
+	room.world_index = map->getProp("world_index");
 
 	// --- Load textures ---
 	loadTilesets(*map);
@@ -148,7 +151,6 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			if (!tile)
 				continue;
 
-			// identify savepoint tile somehow
 			const std::string tileType = tile->get<std::string>("type");
 			if (tileType == "SavePoint") {
 				auto &objectGroup = tile->getObjectgroup();
@@ -171,8 +173,10 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 		auto path = fs::weakly_canonical(fs::absolute("maps/tilesets/" + layer.getImage()));
 
 		if (texture->loadFromFile(path.string(), true)) {
-
-			room.backgroundLayers.push_back({texture, {float(layer.getOffset().x), float(layer.getOffset().y)}});
+			room.backgroundLayers.push_back({.texture = texture,
+			                                 .position = {float(layer.getOffset().x), float(layer.getOffset().y)},
+			                                 .parallax = {},
+			                                 .repeatX = layer.hasRepeatX()});
 		}
 	}
 
@@ -367,12 +371,22 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	const sf::Vector2f center = view.getCenter();
 	const sf::Vector2f size = view.getSize();
 
-	for (const auto &img : room.backgroundLayers) {
-		sf::Sprite sprite(*img.texture);
-		// Does not work correctly
-		// sprite.setPosition(sf::Vector2f(img.position.x + center.x * (1.f - img.parallax.x),
-		//                                 img.position.y + center.y * (1.f - img.parallax.y)));
-		window.draw(sprite);
+	const float roomWidth = World::TILE_SIZE * room.width;
+
+	for (const ImageLayer &img : room.backgroundLayers) {
+		if (img.repeatX) {
+			float x = img.position.x;
+			for (int counter = 0; x < roomWidth; counter++) {
+				sf::Sprite sprite(*img.texture);
+				sprite.setPosition({x, img.position.y});
+				window.draw(sprite);
+				x += img.texture->getSize().x;
+			}
+		} else {
+			sf::Sprite sprite(*img.texture);
+			sprite.setPosition({img.position.x, img.position.y});
+			window.draw(sprite);
+		}
 	}
 
 	const int left = static_cast<int>((center.x - size.x * 0.5f) / TILE_SIZE);
@@ -405,13 +419,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 				window.draw(shape);
 			}
 		}
-	}
-
-	for (const Door &door : room.doors) {
-		sf::RectangleShape shape(door.bounds.size);
-		shape.setPosition(door.bounds.position);
-		shape.setFillColor(sf::Color(119, 143, 129, 128));
-		window.draw(shape);
 	}
 
 	const float playerX = playerBounds.position.x + playerBounds.size.x / 2.f;

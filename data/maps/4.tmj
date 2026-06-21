@@ -255,12 +255,32 @@
  "orientation":"orthogonal",
  "properties":[
         {
+         "name":"minimap_pixel_rect_h",
+         "type":"int",
+         "value":78
+        }, 
+        {
+         "name":"minimap_pixel_rect_w",
+         "type":"int",
+         "value":13
+        }, 
+        {
+         "name":"minimap_pixel_rect_x",
+         "type":"int",
+         "value":45
+        }, 
+        {
+         "name":"minimap_pixel_rect_y",
+         "type":"int",
+         "value":72
+        }, 
+        {
          "name":"needsToClearAllEnemies",
          "type":"bool",
          "value":false
         }],
  "renderorder":"right-down",
- "tiledversion":"1.12.1",
+ "tiledversion":"1.12.2",
  "tileheight":32,
  "tilesets":[
         {

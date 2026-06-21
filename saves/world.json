@@ -1,133 +1,1209 @@
 {
-	"currentRoom": "start_room",
-	"player": {
-		"direction": "Right",
-		"gravity": 1200.0,
-		"health": {
-			"current": 3,
-			"max": 5
-		},
-		"inventory": {
-			"backupSlot": null,
-			"grid": [
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null
-			],
-			"gumSlot": {
-				"type": "ChewingGumItem"
-			},
-			"hatSlot": {
-				"type": "HatItem"
-			},
-			"hotbar": [
-				null,
-				null,
-				null,
-				{
-					"type": "HealingPotionItem"
-				},
-				{
-					"type": "HealingPotionItem"
-				}
-			]
-		},
-		"isOnGround": true,
-		"position": [
-			1231.0,
-			288.0
-		],
-		"velocity": [
-			0.0,
-			0.0
-		]
-	},
-	"rooms": [
-		{
-			"enemies": [
-				{
-					"direction": "Left",
-					"gravity": 1200.0,
-					"health": {
-						"current": 0,
-						"max": 30
-					},
-					"isOnGround": true,
-					"position": [
-						566.0030517578125,
-						736.0
-					],
-					"state": true,
-					"type": "TransistorBoss",
-					"velocity": [
-						0.0,
-						0.0
-					]
-				}
-			],
-			"id": "8",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "7",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "6",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "4",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "2",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "5",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "3",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "1",
-			"items": []
-		},
-		{
-			"enemies": [],
-			"id": "start_room",
-			"items": []
-		}
-	]
+    "currentRoom": "start_room",
+    "player": {
+        "direction": "Right",
+        "gravity": 1200.0,
+        "health": {
+            "current": 5,
+            "max": 5
+        },
+        "inventory": {
+            "backupSlot": null,
+            "grid": [
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ],
+            "gumSlot": null,
+            "hatSlot": null,
+            "hotbar": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        "isOnGround": true,
+        "position": [
+            1210.3065185546875,
+            288.0
+        ],
+        "velocity": [
+            0.0,
+            0.0
+        ]
+    },
+    "rooms": [
+        {
+            "enemies": [],
+            "id": "start_room",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        761.0,
+                        385.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        924.0,
+                        306.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "1",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 36,
+                        "max": 36
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        807.0,
+                        890.0
+                    ],
+                    "stage": 1,
+                    "stage2Triggered": false,
+                    "stage3Triggered": false,
+                    "state": {
+                        "type": "SegfaultRoamingState"
+                    },
+                    "type": "SegfaultBoss",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        535.0,
+                        884.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1138.0,
+                        877.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "16",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        496.0,
+                        146.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        796.0,
+                        144.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "3",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        801.0,
+                        400.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        496.0,
+                        562.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        796.0,
+                        560.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        504.0,
+                        398.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        506.0,
+                        246.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        784.0,
+                        241.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "5",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        801.0,
+                        400.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        496.0,
+                        562.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        796.0,
+                        560.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        504.0,
+                        398.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        506.0,
+                        246.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        784.0,
+                        241.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "2",
+            "items": []
+        },
+        {
+            "enemies": [],
+            "id": "4",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        350.0,
+                        397.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        323.0,
+                        252.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        223.0,
+                        331.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "6",
+            "items": [
+                {
+                    "collected": false,
+                    "hoverPhase": 0.0,
+                    "isOnGround": false,
+                    "item": {
+                        "type": "HatItem"
+                    },
+                    "position": [
+                        347.0,
+                        583.0
+                    ],
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ]
+        },
+        {
+            "enemies": [],
+            "id": "7",
+            "items": [
+                {
+                    "collected": false,
+                    "hoverPhase": 0.0,
+                    "isOnGround": false,
+                    "item": {
+                        "type": "ChewingGumItem"
+                    },
+                    "position": [
+                        642.0,
+                        704.0
+                    ],
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ]
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 30,
+                        "max": 30
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        925.0,
+                        640.0
+                    ],
+                    "state": false,
+                    "type": "TransistorBoss",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "8",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        793.0,
+                        458.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1642.0,
+                        469.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "11",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        991.0,
+                        433.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        664.0,
+                        437.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1033.0,
+                        330.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        594.0,
+                        336.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        797.0,
+                        308.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "14",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        616.0,
+                        684.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1066.0,
+                        660.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        620.0,
+                        864.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1018.0,
+                        870.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1028.0,
+                        476.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        626.0,
+                        466.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1006.0,
+                        296.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        708.0,
+                        294.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "13",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        405.0,
+                        715.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1180.0,
+                        719.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        682.0,
+                        918.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        915.0,
+                        917.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1162.0,
+                        530.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        400.0,
+                        518.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        1159.0,
+                        338.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        404.0,
+                        334.0
+                    ],
+                    "state": {
+                        "type": "IdleState"
+                    },
+                    "type": "RaceConditionSlime",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        658.0,
+                        775.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "position": [
+                        931.0,
+                        764.0
+                    ],
+                    "size": 3,
+                    "state": {
+                        "type": "GolemIdleState"
+                    },
+                    "type": "RecursionGolem",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "15",
+            "items": []
+        }
+    ]
 }

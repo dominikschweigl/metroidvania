@@ -30,6 +30,7 @@ struct ImageLayer {
 	std::shared_ptr<sf::Texture> texture;
 	tson::Vector2f position;
 	tson::Vector2f parallax;
+	bool repeatX = false;
 };
 
 struct Room {
@@ -47,6 +48,8 @@ struct Room {
 	std::vector<ImageLayer> backgroundLayers;
 
 	bool needsToClearAllEnemies = false;
+	bool world_index = 0;
+	sf::FloatRect minimap_pixel_rect{};
 
 	Room() = default;
 	Room(Room &&) = default;
