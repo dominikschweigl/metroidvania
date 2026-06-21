@@ -4,9 +4,9 @@
  "layers":[
         {
          "id":2,
-         "image":"..\/..\/assets\/images\/menus\/second_background_3_1440x960.jpeg",
+         "image":"..\/..\/assets\/images\/menus\/background4_1440x960.png",
          "imageheight":960,
-         "imagewidth":1440,
+         "imagewidth":1441,
          "name":"Image Layer 1",
          "offsetx":88,
          "offsety":0,

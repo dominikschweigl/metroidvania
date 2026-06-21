@@ -43,7 +43,6 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 	world_.loadRoom("14", "data/maps/14.tmj");
 	world_.loadRoom("15", "data/maps/15.tmj");
 	world_.loadRoom("16", "data/maps/16.tmj");
-	world_.setCurrentRoom("11");
 
 	if (makeNewGame)
 		this->newGame(window);

@@ -41,7 +41,42 @@
          "id":4,
          "image":"..\/..\/..\/assets\/images\/tiles\/area2\/screen.png",
          "imageheight":32,
-         "imagewidth":32
+         "imagewidth":32,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":35,
+                     "id":1,
+                     "name":"",
+                     "opacity":1,
+                     "properties":[
+                            {
+                             "name":"type",
+                             "type":"string",
+                             "value":"SavePoint"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":38,
+                     "x":-3,
+                     "y":-3
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"SavePoint"
+                }]
         }, 
         {
          "id":5,

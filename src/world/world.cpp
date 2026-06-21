@@ -151,7 +151,6 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			if (!tile)
 				continue;
 
-			// identify savepoint tile somehow
 			const std::string tileType = tile->get<std::string>("type");
 			if (tileType == "SavePoint") {
 				auto &objectGroup = tile->getObjectgroup();
@@ -174,14 +173,6 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 		auto path = fs::weakly_canonical(fs::absolute("maps/tilesets/" + layer.getImage()));
 
 		if (texture->loadFromFile(path.string(), true)) {
-
-			int width = 0;
-			if (auto *prop = layer.getProp("imagewidth")) {
-				auto w = prop->getValue<std::string>();
-				std::cout << "w: " << w << std::endl;
-				// width = static_cast<int>(w);
-			}
-
 			room.backgroundLayers.push_back({.texture = texture,
 			                                 .position = {float(layer.getOffset().x), float(layer.getOffset().y)},
 			                                 .parallax = {},
@@ -396,9 +387,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 		}
 	}
 
-	// Does not work correctly
-	// sprite.setPosition(sf::Vector2f(img.position.x + center.x * (1.f - img.parallax.x),
-	//                                 img.position.y + center.y * (1.f - img.parallax.y)));
 	const int left = static_cast<int>((center.x - size.x * 0.5f) / TILE_SIZE);
 	const int right = static_cast<int>((center.x + size.x * 0.5f) / TILE_SIZE);
 	const int top = static_cast<int>((center.y - size.y * 0.5f) / TILE_SIZE);
@@ -429,13 +417,6 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 				window.draw(shape);
 			}
 		}
-	}
-
-	for (const Door &door : room.doors) {
-		sf::RectangleShape shape(door.bounds.size);
-		shape.setPosition(door.bounds.position);
-		shape.setFillColor(sf::Color(119, 143, 129, 128));
-		window.draw(shape);
 	}
 
 	const float playerX = playerBounds.position.x + playerBounds.size.x / 2.f;
