@@ -222,9 +222,34 @@
  "orientation":"orthogonal",
  "properties":[
         {
+         "name":"minimap_pixel_rect_h",
+         "type":"int",
+         "value":15
+        }, 
+        {
+         "name":"minimap_pixel_rect_w",
+         "type":"int",
+         "value":63
+        }, 
+        {
+         "name":"minimap_pixel_rect_x",
+         "type":"int",
+         "value":97
+        }, 
+        {
+         "name":"minimap_pixel_rect_y",
+         "type":"int",
+         "value":128
+        }, 
+        {
          "name":"needsToClearAllEnemies",
          "type":"bool",
          "value":false
+        }, 
+        {
+         "name":"world_index",
+         "type":"int",
+         "value":1
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

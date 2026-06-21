@@ -298,13 +298,38 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":27,
+ "nextobjectid":28,
  "orientation":"orthogonal",
  "properties":[
+        {
+         "name":"minimap_pixel_rect_h",
+         "type":"int",
+         "value":47
+        }, 
+        {
+         "name":"minimap_pixel_rect_w",
+         "type":"int",
+         "value":79
+        }, 
+        {
+         "name":"minimap_pixel_rect_x",
+         "type":"int",
+         "value":160
+        }, 
+        {
+         "name":"minimap_pixel_rect_y",
+         "type":"int",
+         "value":112
+        }, 
         {
          "name":"needsToClearAllEnemies",
          "type":"bool",
          "value":false
+        }, 
+        {
+         "name":"world_index",
+         "type":"int",
+         "value":1
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

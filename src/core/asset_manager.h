@@ -85,7 +85,8 @@ enum TextureAsset {
 	ITEM_BACKUP_DISK,
 
 	// Minimap
-	MINIMAP,
+	FIRST_AREA_MINIMAP,
+	SECOND_AREA_MINIMAP,
 };
 
 enum FontAsset {

@@ -69,8 +69,11 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	Room room;
 	room.width = map->getSize().x;
 	room.height = map->getSize().y;
-	room.needsToClearAllEnemies =
-	    map->getProp("needsToClearAllEnemies") ? map->get<bool>("needsToClearAllEnemies") : false;
+	room.needsToClearAllEnemies = map->get<bool>("needsToClearAllEnemies");
+	room.minimap_pixel_rect = {
+	    {float(map->get<int>("minimap_pixel_rect_x")), float(map->get<int>("minimap_pixel_rect_y"))},
+	    {float(map->get<int>("minimap_pixel_rect_w")), float(map->get<int>("minimap_pixel_rect_h"))}};
+	room.world_index = map->getProp("world_index");
 
 	// --- Load textures ---
 	loadTilesets(*map);

@@ -224,7 +224,7 @@ void GameScene::draw(sf::RenderWindow &window)
 	                player_.inventory().hasBackup());
 	if (showMinimap_) {
 		Room *room = world_.getCurrentRoom();
-		minimap_.draw(window, player_.getPosition(), world_.getCurrentRoomId(), *room);
+		minimap_.draw(window, player_.getPosition(), *room);
 	}
 }
 

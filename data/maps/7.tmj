@@ -241,6 +241,26 @@
  "orientation":"orthogonal",
  "properties":[
         {
+         "name":"minimap_pixel_rect_h",
+         "type":"int",
+         "value":58
+        }, 
+        {
+         "name":"minimap_pixel_rect_w",
+         "type":"int",
+         "value":104
+        }, 
+        {
+         "name":"minimap_pixel_rect_x",
+         "type":"int",
+         "value":68
+        }, 
+        {
+         "name":"minimap_pixel_rect_y",
+         "type":"int",
+         "value":47
+        }, 
+        {
          "name":"needsToClearAllEnemies",
          "type":"bool",
          "value":false
