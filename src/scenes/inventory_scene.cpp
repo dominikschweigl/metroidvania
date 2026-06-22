@@ -141,8 +141,7 @@ void InventoryScene::update(const float /*deltaTime*/)
 
 	updateItemActions(input, inv);
 
-	for (const GameAction playerAction : InputManager::playerActions())
-		input.suppress(playerAction);
+	input.suppressPlayerActions();
 
 	// Consume both close keys so GameScene::update() never sees them this frame.
 	const bool wantsClose = input.consume(MenuAction::Back) || input.consume(GameAction::OpenInventory);

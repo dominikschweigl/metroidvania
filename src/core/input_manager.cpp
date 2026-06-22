@@ -162,6 +162,12 @@ void InputManager::suppress(const MenuAction action)
 	wasMenuPressed_[idx(action)] = false;
 }
 
+void InputManager::suppressPlayerActions()
+{
+	for (const GameAction action : playerActionsArray)
+		suppress(action);
+}
+
 void InputManager::rebind(const GameAction action, InputBinding newBinding)
 {
 	const std::size_t targetIdx = idx(action);

@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/audio_manager.h"
+#include "../../core/input_manager.h"
 #include "../../core/scene_stack.h"
 #include "../menu_scene.h"
 #include "main_menu.h"
@@ -23,11 +24,13 @@ inline std::unique_ptr<MenuScene> makePauseMenu(SceneStack &stack, sf::RenderWin
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"Continue",
 	     [&stack, resumeGameAudio]() {
+		     InputManager::getInstance().suppressPlayerActions();
 		     resumeGameAudio();
 		     stack.pop();
 	     }},
 	    {"Load Game",
 	     [&stack, &window]() {
+		     InputManager::getInstance().suppressPlayerActions();
 		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
 			     return std::make_unique<GameScene>(stack, window, worldName, false);
 		     });
