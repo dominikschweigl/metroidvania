@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/audio_manager.h"
+#include "../../core/input_manager.h"
 #include "../../core/scene_stack.h"
 #include "../game_scene.h"
 #include "../menu_scene.h"
@@ -18,6 +19,7 @@ inline std::unique_ptr<MenuScene> makeGameOverMenu(SceneStack &stack, sf::Render
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"Try Again",
 	     [&stack, &window]() {
+		     InputManager::getInstance().suppressPlayerActions();
 		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
 			     return std::make_unique<GameScene>(stack, window, worldName, true);
 		     });

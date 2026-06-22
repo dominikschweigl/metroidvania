@@ -69,6 +69,7 @@ class InputManager {
 	/// Silences the action for the rest of this frame: isHeld() and wasPressed() both return false for it.
 	void suppress(GameAction action);
 	void suppress(MenuAction action);
+	void suppressPlayerActions();
 
 	void rebind(GameAction action, InputBinding newBinding);
 

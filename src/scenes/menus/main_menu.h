@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/audio_manager.h"
+#include "../../core/input_manager.h"
 #include "../../core/scene_stack.h"
 #include "../game_scene.h"
 #include "../menu_scene.h"
@@ -18,12 +19,14 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"New Game",
 	     [&stack, &window]() {
+		     InputManager::getInstance().suppressPlayerActions();
 		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
 			     return std::make_unique<GameScene>(stack, window, worldName, true);
 		     });
 	     }},
 	    {"Load Game",
 	     [&stack, &window]() {
+		     InputManager::getInstance().suppressPlayerActions();
 		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
 			     return std::make_unique<GameScene>(stack, window, worldName, false);
 		     });
