@@ -187,6 +187,10 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 		return "assets/images/minimaps/minimap1.png";
 	case SECOND_AREA_MINIMAP:
 		return "assets/images/minimaps/minimap2.png";
+	case HEALTH_ONE_BIT:
+		return "assets/images/player/health/red_heart.png";
+	case HEALTH_ZERO_BIT:
+		return "assets/images/player/health/grey_heart.png";
 	}
 
 	throw std::logic_error("texturePath: missing TextureAsset path entry");

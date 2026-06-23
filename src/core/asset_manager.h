@@ -87,6 +87,10 @@ enum TextureAsset {
 	// Minimap
 	FIRST_AREA_MINIMAP,
 	SECOND_AREA_MINIMAP,
+
+	// Health
+	HEALTH_ONE_BIT,
+	HEALTH_ZERO_BIT,
 };
 
 enum FontAsset {

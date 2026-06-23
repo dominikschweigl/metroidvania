@@ -11,8 +11,6 @@ constexpr sf::Color SLOT_FILL{30, 30, 45, 200};
 constexpr sf::Color SLOT_OUTLINE{120, 120, 140};
 constexpr sf::Color FLASH_FILL{70, 70, 100, 200};
 constexpr sf::Color LABEL_COLOR{180, 180, 200};
-constexpr sf::Color EFFECT_BG_COLOR{20, 20, 30, 210};
-constexpr sf::Color EFFECT_BG_OUTLINE{90, 90, 110};
 constexpr float OUTLINE_THICKNESS = 2.f;
 constexpr unsigned LABEL_SIZE = 13;
 constexpr float MARGIN_BOTTOM = 16.f;
@@ -96,28 +94,20 @@ void HotbarHUD::drawKeyLabel(sf::RenderWindow &window, const int slotIndex, cons
 void HotbarHUD::drawEffectIndicators(sf::RenderWindow &window, const std::vector<Effect> &effects,
                                      const float hotbarRightX, const float hotbarTopY) const
 {
-	const float y = hotbarTopY - INDICATOR_GAP - EFFECT_BG_SIZE;
+	const float y = hotbarTopY - INDICATOR_VERTICAL_HOTBAR_OFFSET - INDICATOR_SIZE;
 
 	for (int i = 0; i < static_cast<int>(effects.size()); ++i) {
 		const Effect &effect = effects[i];
 		// Stack right-to-left: first effect is rightmost
 		const float x =
-		    hotbarRightX - static_cast<float>(i + 1) * EFFECT_BG_SIZE - static_cast<float>(i) * EFFECT_SPACING;
-
-		sf::RectangleShape bg({EFFECT_BG_SIZE, EFFECT_BG_SIZE});
-		bg.setPosition({x, y});
-		bg.setFillColor(EFFECT_BG_COLOR);
-		bg.setOutlineColor(EFFECT_BG_OUTLINE);
-		bg.setOutlineThickness(1.f);
-		window.draw(bg);
+		    hotbarRightX - static_cast<float>(i + 1) * INDICATOR_SIZE - static_cast<float>(i) * INDICATOR_GAP;
 
 		const sf::Texture &tex = AssetManager::getInstance().getTexture(effect.icon());
 		sf::Sprite sprite(tex);
 		const sf::Vector2u texSize = tex.getSize();
 		sprite.setScale(
-		    {EFFECT_ICON_SIZE / static_cast<float>(texSize.x), EFFECT_ICON_SIZE / static_cast<float>(texSize.y)});
-		sprite.setPosition(
-		    {x + (EFFECT_BG_SIZE - EFFECT_ICON_SIZE) / 2.f, y + (EFFECT_BG_SIZE - EFFECT_ICON_SIZE) / 2.f});
+		    {INDICATOR_SIZE / static_cast<float>(texSize.x), INDICATOR_SIZE / static_cast<float>(texSize.y)});
+		sprite.setPosition({x + (INDICATOR_SIZE - INDICATOR_SIZE) / 2.f, y + (INDICATOR_SIZE - INDICATOR_SIZE) / 2.f});
 
 		if (effect.remainingDuration < 10.f) {
 			const float norm = 0.5f * (1.f + std::sin(effect.remainingDuration * 2.f * std::numbers::pi_v<float>));
