@@ -83,8 +83,10 @@ void GameScene::update(float deltaTime)
 
 	if (input.wasPressed(GameAction::ZoomIn))
 		zoomFactor_ *= 0.9f;
-	if (input.wasPressed(GameAction::ZoomOut))
+	if (input.wasPressed(GameAction::ZoomOut)) {
 		zoomFactor_ *= 1.1f;
+		zoomFactor_ = std::min(zoomFactor_, MAX_ZOOM_FACTOR);
+	}
 	if (input.wasPressed(MenuAction::Back))
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
 	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
@@ -200,7 +202,20 @@ void GameScene::update(float deltaTime)
 		}
 	}
 
-	view_.setCenter(player_.getPosition());
+	float halfViewWidth = view_.getSize().x / 2.f;
+	float halfViewHeight = view_.getSize().y / 2.f;
+
+	float viewX = player_.getPosition().x;
+	float viewY = player_.getPosition().y;
+
+	// Clamp X
+	viewX = std::max(halfViewWidth, std::min(viewX, world_.getCurrentRoom()->width * World::TILE_SIZE - halfViewWidth));
+
+	// Clamp Y
+	viewY =
+	    std::max(halfViewHeight, std::min(viewY, world_.getCurrentRoom()->height * World::TILE_SIZE - halfViewHeight));
+
+	view_.setCenter({viewX, viewY});
 }
 
 void GameScene::draw(sf::RenderWindow &window)

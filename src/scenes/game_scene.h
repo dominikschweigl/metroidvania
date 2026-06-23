@@ -11,6 +11,8 @@
 #include <memory>
 #include <vector>
 
+const float MAX_ZOOM_FACTOR = 0.332188f;
+
 // Gameplay scene. Owns the world, player, enemies and the camera view.
 class GameScene : public Scene {
   public:
@@ -40,7 +42,7 @@ class GameScene : public Scene {
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;
 	bool showDebugHitboxes_ = false;
-	float zoomFactor_ = 0.4f;
+	float zoomFactor_ = 0.332188f;
 	bool isPlayerFalling = false;
 	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};
 	Direction lastPlayerDirection;
