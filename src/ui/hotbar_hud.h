@@ -28,12 +28,12 @@ class HotbarHUD {
 	static constexpr float ICON_SIZE = SLOT_SIZE - 10.f;
 	static constexpr float SLOT_SPACING = 8.f;
 	static constexpr float FLASH_DURATION = 0.15f;
-	static constexpr float EFFECT_ICON_SIZE = 24.f;
-	static constexpr float EFFECT_BG_SIZE = 30.f;
 	static constexpr float EFFECT_SPACING = 6.f;
-	static constexpr float INDICATOR_GAP = 6.f;
+	static constexpr float INDICATOR_SIZE = 30.f;
+	static constexpr float INDICATOR_GAP = 3.f;
+	static constexpr float INDICATOR_VERTICAL_HOTBAR_OFFSET = 6.f;
 
-	HealthBar healthBar_{INDICATOR_GAP, EFFECT_BG_SIZE};
+	HealthBar healthBar_{INDICATOR_GAP, INDICATOR_VERTICAL_HOTBAR_OFFSET, INDICATOR_SIZE};
 	std::array<float, Inventory::HOTBAR_SIZE> flashTimers_ = {};
 
 	void drawSlotBackground(sf::RenderWindow &window, int slotIndex, sf::Vector2f slotPos) const;
