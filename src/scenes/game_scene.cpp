@@ -129,12 +129,16 @@ void GameScene::update(float deltaTime)
 		world_.getCurrentRoom()->enemies_.push_back(std::move(spawned));
 
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
-		if (!enemy->isAlive()) {
+		if (!enemy->isAlive()
+		    || (dynamic_cast<TransistorBoss *>(enemy.get()) != nullptr && enemy->health.current <= 0
+		        && !dynamic_cast<TransistorBoss *>(enemy.get())->lootDropped)) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
 				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
 				world_.getCurrentRoom()->appendItem(droppedItem);
 			}
-			combat_.clearVictim(&enemy->health);
+			if (!enemy->isAlive()) {
+				combat_.clearVictim(&enemy->health);
+			}
 		}
 	}
 

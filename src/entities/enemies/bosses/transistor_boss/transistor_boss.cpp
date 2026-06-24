@@ -1,9 +1,11 @@
 #include "transistor_boss.h"
 #include "../../../../core/audio_manager.h"
+#include "../../../../items/usb_key_item.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <iostream>
 
 TransistorBoss::TransistorBoss(sf::Vector2f spawnPos) : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, BOSS_HEALTH)
 {
@@ -199,6 +201,15 @@ void TransistorBoss::drainEndedSourceIds(std::vector<std::uint32_t> &out)
 void TransistorBoss::setAnimation(TransistorBossAnimation anim, int frame)
 {
 	renderer.setAnimation(anim, frame);
+}
+
+std::vector<std::unique_ptr<Item>> TransistorBoss::rollDrops()
+{
+	lootDropped = true;
+	std::cout << "rollDrops" << std::endl;
+	std::vector<std::unique_ptr<Item>> drops;
+	drops.push_back(std::make_unique<UsbKeyItem>());
+	return drops;
 }
 
 json TransistorBoss::serialize() const

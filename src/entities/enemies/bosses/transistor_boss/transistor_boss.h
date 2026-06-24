@@ -27,7 +27,7 @@ class TransistorBoss : public BaseEnemy {
 	static constexpr float ENTITY_WIDTH = 120.f;
 	static constexpr float ENTITY_HEIGHT = 120.f;
 
-	static constexpr int BOSS_HEALTH = 30;
+	static constexpr int BOSS_HEALTH = 1;
 
 	static constexpr float MOVE_SPEED = 50.f;
 
@@ -109,8 +109,12 @@ class TransistorBoss : public BaseEnemy {
 	// and stays visible on its last frame, so it must report as alive throughout.
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
+	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
+
 	json serialize() const override;
 	void deserialize(const json &j) override;
+
+	bool lootDropped = false;
 
   protected:
 	void onPreUpdate(float deltaTime) override;

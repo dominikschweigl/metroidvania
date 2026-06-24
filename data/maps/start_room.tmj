@@ -150,7 +150,7 @@
                 {
                  "height":0,
                  "id":5,
-                 "name":"UsbKeyItem",
+                 "name":"TransistorBoss",
                  "opacity":1,
                  "point":true,
                  "rotation":0,
@@ -250,6 +250,19 @@
                  "width":0,
                  "x":592,
                  "y":548
+                }, 
+                {
+                 "height":0,
+                 "id":13,
+                 "name":"HatItem",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":406.167979002625,
+                 "y":704.724409448819
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -258,7 +271,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":13,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "properties":[
         {
