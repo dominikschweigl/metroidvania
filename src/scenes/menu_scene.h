@@ -33,6 +33,11 @@ class MenuScene : public Scene {
 		const sf::Texture *backgroundTexture = nullptr;
 		sf::Color backgroundFallback = {30, 34, 60};
 
+		bool transparentPanel = false;
+		// 0-1 relative position within the background image; panel center is placed here.
+		// Falls back to window-center when not set.
+		std::optional<sf::Vector2f> panelImageAnchor;
+
 		// Optional Escape handler. If empty, Escape is ignored.
 		std::function<void()> onEscape;
 		// When set, gates onEscape: Escape is only acted on when this returns true.
