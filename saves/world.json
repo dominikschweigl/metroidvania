@@ -10,7 +10,9 @@
         "inventory": {
             "backupSlot": null,
             "grid": [
-                null,
+                {
+                    "type": "UsbKeyItem"
+                },
                 {
                     "type": "HealingPotionItem"
                 },
@@ -52,9 +54,7 @@
             "gumSlot": null,
             "hatSlot": null,
             "hotbar": [
-                {
-                    "type": "UsbKeyItem"
-                },
+                null,
                 null,
                 null,
                 null,
@@ -65,7 +65,7 @@
         },
         "isOnGround": true,
         "position": [
-            1221.1346435546875,
+            1238.0,
             288.0
         ],
         "velocity": [

@@ -24,6 +24,13 @@ inline std::unique_ptr<MenuScene> makeGameOverMenu(SceneStack &stack, sf::Render
 			     return std::make_unique<GameScene>(stack, window, worldName, true);
 		     });
 	     }},
+	    {"Last Checkpoint",
+	     [&stack, &window]() {
+		     InputManager::getInstance().suppressPlayerActions();
+		     stack.replace([&stack, &window]() -> std::unique_ptr<Scene> {
+			     return std::make_unique<GameScene>(stack, window, worldName, false);
+		     });
+	     }},
 	    {"Exit to Main Menu",
 	     [&stack, &window]() { stack.replace([&stack, &window]() { return makeMainMenu(stack, window); }); }},
 	});
