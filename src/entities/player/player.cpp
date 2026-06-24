@@ -28,8 +28,7 @@ void Player::useHotbarSlot(const int slot)
 }
 
 Player::Player()
-    : BaseEntity(PLAYER_SPAWN, static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE), MAX_HEALTH,
-                 Team::Player),
+    : BaseEntity(PLAYER_SPAWN, BODY_WIDTH, static_cast<float>(FRAME_SIZE), MAX_HEALTH, Team::Player),
       lowerBodySprite(states.idle.idle_lower_texture), headSprite(AssetManager::getInstance().getTexture(PLAYER_HEAD)),
       upperBodySprite(states.idle.idle_upper_texture), currentState(&states.idle)
 {

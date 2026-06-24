@@ -17,6 +17,7 @@ class HatProjectile {
 	static constexpr int SPIN_FRAME_COUNT = 7;
 	static constexpr float SPIN_FRAME_DUR = 0.1f;
 	static constexpr int FRAME_SIZE = 32;
+	static constexpr float HITBOX_SIZE = 18.f;
 
 	enum class Phase { Flying, Returning };
 
