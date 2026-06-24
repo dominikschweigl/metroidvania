@@ -40,6 +40,7 @@ class Player : public BaseEntity {
 	static constexpr float JUMP_SPEED = 500.f;
 
 	static constexpr int FRAME_SIZE = 32;
+	static constexpr float BODY_WIDTH = 18.f;
 	static constexpr float PEAK_THRESHOLD = 250.f;
 
 	static constexpr int MAX_HEALTH = 5;
