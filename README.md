@@ -61,14 +61,36 @@ Required tools:
 
 ## Recommended Setup
 
-MinGW (MSYS2 UCRT64) is the recommended local compiler toolchain for this workspace.
+### Windows (MinGW / MSYS2 UCRT64)
+
+MinGW (MSYS2 UCRT64) is the recommended local compiler toolchain on Windows.
 
 How MinGW fits into this setup:
 - `CMakePresets.json` provides shared project-level settings (including vcpkg toolchain usage).
 - Your local `CMakeUserPresets.json` selects MinGW compiler by setting `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` to gcc/g++.
 - The user preset must select a MinGW-compatible vcpkg triplet (for example, `x64-mingw-static`) so dependencies are built for the same toolchain.
 
-## Recommended Local MinGW User Preset
+### Linux (GCC / apt)
+
+Install the required system packages for SFML and the build tools:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential ninja-build \
+  libx11-dev libxi-dev libxrandr-dev libxcursor-dev libudev-dev libgl1-mesa-dev
+```
+
+Install vcpkg and set `VCPKG_ROOT` (add the export to `~/.bashrc` or `~/.zshrc`):
+
+```bash
+git clone https://github.com/microsoft/vcpkg.git ~/vcpkg
+~/vcpkg/bootstrap-vcpkg.sh
+export VCPKG_ROOT=~/vcpkg
+```
+
+No `CMakeUserPresets.json` is needed on Linux. GCC and G++ are found automatically on PATH, and the shared `vcpkg-linux` preset in `CMakePresets.json` handles the rest.
+
+## Local User Preset (Windows only)
 
 To setup local machine-specific settings such as a `CMakeUserPresets.json` file needs to be created.
 This file specifies, compiler paths, build type presets, the local vcpkg root environment value `VCPKG_ROOT`.
@@ -178,11 +200,18 @@ git config --local core.autocrlf false
 
 ### Terminal
 
-Run with whatever preset names exist locally, for example:
+**Windows** — run with whatever user preset names exist locally, for example:
 
 ```powershell
 cmake --preset default-debug
 cmake --build --preset default-debug
+```
+
+**Linux** — use the shared presets directly (no user preset required):
+
+```bash
+cmake --preset vcpkg-linux
+cmake --build --preset linux
 ```
 
 ## Running Tests
@@ -197,6 +226,8 @@ cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
 
 ### Build and run
 
+**Windows:**
+
 ```powershell
 # Build only the test executable
 cmake --build ./build/release --target metroidvania_tests
@@ -206,6 +237,13 @@ ctest --test-dir ./build/release
 
 # Or run directly
 ./build/release/metroidvania_tests.exe
+```
+
+**Linux:**
+
+```bash
+cmake --build --preset linux --target metroidvania_tests
+ctest --test-dir build/linux --output-on-failure
 ```
 
 ### Notes on the test setup

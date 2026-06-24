@@ -51,6 +51,6 @@ void HatProjectile::draw(sf::RenderWindow &window) const
 
 sf::FloatRect HatProjectile::getBounds() const noexcept
 {
-	constexpr float halfSize = FRAME_SIZE / 2.f;
-	return {{pos.x - halfSize, pos.y - halfSize}, {static_cast<float>(FRAME_SIZE), static_cast<float>(FRAME_SIZE)}};
+	constexpr float halfSize = HITBOX_SIZE / 2.f;
+	return {{pos.x - halfSize, pos.y - halfSize}, {HITBOX_SIZE, HITBOX_SIZE}};
 }

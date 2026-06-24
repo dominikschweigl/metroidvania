@@ -14,8 +14,9 @@ inline std::unique_ptr<MenuScene> makeMainMenu(SceneStack &stack, sf::RenderWind
 	AudioManager::getInstance().playMusic(MusicTrack::MAIN_MENU_THEME);
 
 	MenuScene::Config cfg;
-	cfg.title = "Segfault Slayer";
 	cfg.backgroundTexture = &AssetManager::getInstance().getTexture(MAIN_MENU_BACKGROUND);
+	cfg.transparentPanel = true;
+	cfg.panelImageAnchor = {0.5f, 0.67f};
 	cfg.contentFactory = MenuScene::buttonList({
 	    {"New Game",
 	     [&stack, &window]() {

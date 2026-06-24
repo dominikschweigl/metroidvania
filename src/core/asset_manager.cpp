@@ -158,7 +158,7 @@ std::string_view AssetManager::texturePath(const TextureAsset asset)
 	case GROUND:
 		return "assets/images/tiles/ground.png";
 	case MAIN_MENU_BACKGROUND:
-		return "assets/images/menus/main_menu_background.jpeg";
+		return "assets/images/menus/main_menu_background.png";
 	case SEGFAULT_FRAME_0:
 		return "assets/images/menus/segfault_frame_0.png";
 	case SEGFAULT_FRAME_1:
