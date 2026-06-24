@@ -111,7 +111,7 @@ TEST_CASE("Player: getBounds has correct body width and height anchored at the f
 	const sf::FloatRect b = p.getBounds();
 	REQUIRE(b.size.x == Player::BODY_WIDTH);
 	REQUIRE(b.size.y == static_cast<float>(Player::FRAME_SIZE));
-	REQUIRE(b.position.x == 400.f - Player::BODY_WIDTH / 2.f);              // pos.x - BODY_WIDTH/2
+	REQUIRE(b.position.x == 400.f - Player::BODY_WIDTH / 2.f);               // pos.x - BODY_WIDTH/2
 	REQUIRE(b.position.y == 200.f - static_cast<float>(Player::FRAME_SIZE)); // pos.y - FRAME_SIZE (foot-anchored)
 }
 
