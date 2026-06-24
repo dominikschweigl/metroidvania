@@ -104,15 +104,15 @@ TEST_CASE("Player: setPosition then getPosition round-trips")
 	REQUIRE(p.getPosition() == target);
 }
 
-TEST_CASE("Player: getBounds is a 32x32 rectangle anchored at the feet")
+TEST_CASE("Player: getBounds has correct body width and height anchored at the feet")
 {
 	Player p;
 	p.setPosition({400.f, 200.f});
 	const sf::FloatRect b = p.getBounds();
-	REQUIRE(b.size.x == 32.f);
-	REQUIRE(b.size.y == 32.f);
-	REQUIRE(b.position.x == 400.f - 16.f); // pos.x - FRAME_SIZE/2
-	REQUIRE(b.position.y == 200.f - 32.f); // pos.y - FRAME_SIZE (foot-anchored)
+	REQUIRE(b.size.x == Player::BODY_WIDTH);
+	REQUIRE(b.size.y == static_cast<float>(Player::FRAME_SIZE));
+	REQUIRE(b.position.x == 400.f - Player::BODY_WIDTH / 2.f);              // pos.x - BODY_WIDTH/2
+	REQUIRE(b.position.y == 200.f - static_cast<float>(Player::FRAME_SIZE)); // pos.y - FRAME_SIZE (foot-anchored)
 }
 
 TEST_CASE("Player: default direction is Left and default state is grounded")

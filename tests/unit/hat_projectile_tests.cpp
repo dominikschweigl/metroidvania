@@ -106,14 +106,14 @@ TEST_CASE("HatProjectile reverses at wall before MAX_TRAVEL")
 {
 	sf::Texture dummyTexture;
 	World world = makeWalledWorld();
-	// Start near the right wall; wall is at column 9 (x=288). Hat is 32px wide.
+	// Start near the right wall; wall is at column 9 (x=288).
 	const sf::Vector2f startPos{8.f * TILE, 2.f * TILE};
 	const sf::Vector2f playerPos = startPos;
 
 	HatProjectile hat(startPos, Direction::Right, {0.f, 0.f}, dummyTexture);
 
 	// One small tick: should not have travelled MAX_TRAVEL yet, but hits the wall.
-	hat.update(0.05f, playerPos, world);
+	hat.update(0.1f, playerPos, world);
 
 	// Now provide enough time for the hat to return to the player.
 	const bool caught = hat.update(1.0f, playerPos, world);
