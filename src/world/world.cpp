@@ -69,7 +69,6 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 	Room room;
 	room.width = map->getSize().x;
 	room.height = map->getSize().y;
-	room.needsToClearAllEnemies = map->get<bool>("needsToClearAllEnemies");
 	room.minimap_pixel_rect = {
 	    {float(map->get<int>("minimap_pixel_rect_x")), float(map->get<int>("minimap_pixel_rect_y"))},
 	    {float(map->get<int>("minimap_pixel_rect_w")), float(map->get<int>("minimap_pixel_rect_h"))}};
@@ -97,6 +96,9 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				door.bounds = sf::FloatRect({float(p.x), float(p.y)}, {float(obj.getSize().x), float(obj.getSize().y)});
 				door.targetRoomId = obj.getProp("targetRoomId") ? obj.get<std::string>("targetRoomId") : "";
 				door.targetSpawnIdx = obj.getProp("targetSpawnIdx") ? obj.get<int>("targetSpawnIdx") : 0;
+				door.needsToClearAllEnemies =
+				    obj.getProp("needsToClearAllEnemies") ? obj.get<bool>("needsToClearAllEnemies") : false;
+				door.locked = obj.getProp("locked") ? obj.get<bool>("locked") : false;
 				room.doors.push_back(door);
 			} else if (name == "RaceConditionEnemy") {
 				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));

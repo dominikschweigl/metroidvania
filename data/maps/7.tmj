@@ -195,6 +195,11 @@
                  "opacity":1,
                  "properties":[
                         {
+                         "name":"locked",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"11"
@@ -259,11 +264,6 @@
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":47
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

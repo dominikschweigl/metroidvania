@@ -150,7 +150,7 @@
                 {
                  "height":0,
                  "id":5,
-                 "name":"HealingPotionItem",
+                 "name":"UsbKeyItem",
                  "opacity":1,
                  "point":true,
                  "rotation":0,
@@ -280,11 +280,6 @@
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":213
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -322,11 +322,6 @@
          "value":112
         }, 
         {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
-        }, 
-        {
          "name":"world_index",
          "type":"int",
          "value":1

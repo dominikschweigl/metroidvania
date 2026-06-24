@@ -118,6 +118,29 @@ void Inventory::moveToEquipmentSlot(const SlotRef from)
 	std::swap(slotRef({*equipmentSlot, 0}), srcItem);
 }
 
+std::vector<Item *> Inventory::flatten() const
+{
+	std::vector<Item *> out;
+	out.reserve(GRID_SIZE + HOTBAR_SIZE + EQUIPMENT_SIZE);
+
+	auto push = [&](const std::unique_ptr<Item> &ptr) {
+		if (ptr)
+			out.push_back(ptr.get());
+	};
+
+	push(hatSlot);
+	push(gumSlot);
+	push(backupSlot);
+
+	for (auto &i : grid)
+		push(i);
+
+	for (auto &i : hotbar)
+		push(i);
+
+	return out;
+}
+
 json Inventory::serialize() const
 {
 	json j;

@@ -100,6 +100,14 @@ void GameScene::update(float deltaTime)
 
 	for (int i = 0; i < Inventory::HOTBAR_SIZE; ++i) {
 		if (input.wasPressed(InputManager::hotbarSlotActions()[i])) {
+			if (player_.inventory().hotbar[i] && player_.inventory().hotbar[i]->info().name == "Damaged USB Key") {
+				Door *touchingDoor = world_.getTouchingDoor(player_.getBounds());
+				if (touchingDoor) {
+					touchingDoor->locked = false;
+				} else {
+					continue;
+				}
+			}
 			hotbarHud_.flashSlot(i);
 			player_.useHotbarSlot(i);
 		}
@@ -186,16 +194,18 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
 	}
 
-	if (input.wasPressed(GameAction::Interact) && world_.getCurrentRoom()->isAllowedLeaving()) {
-		std::optional<std::pair<std::string, int>> touchingDoorTargetRoom =
-		    world_.getTouchingDoorTargetRoom(player_.getBounds());
-		if (touchingDoorTargetRoom && world_.getCurrentRoom()->isAllowedLeaving()) {
-			world_.setCurrentRoom(touchingDoorTargetRoom.value().first);
-			player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoorTargetRoom.value().second]);
-			if (world_.getCurrentRoomId() == "boss_room") {
-				AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
-			} else {
-				AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+	if (input.wasPressed(GameAction::Interact)) {
+		Door *touchingDoor = world_.getTouchingDoor(player_.getBounds());
+		if (touchingDoor) {
+			// A door needs to be unlocked and maybe all Enemies in the room need to be cleared.
+			if (!touchingDoor->locked) {
+				world_.setCurrentRoom(touchingDoor->targetRoomId);
+				player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoor->targetSpawnIdx]);
+				if (world_.getCurrentRoomId() == "boss_room") {
+					AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
+				} else {
+					AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
+				}
 			}
 		} else if (world_.isTouchingSavepoint(player_.getBounds())) {
 			world_.saveWorldData(player_);

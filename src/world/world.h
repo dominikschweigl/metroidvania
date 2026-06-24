@@ -52,10 +52,7 @@ class World {
 
 	void update(float deltaTime, sf::FloatRect playerBounds);
 
-	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
-	{
-		return getCurrentRoom()->getTouchingDoorTargetRoom(entityBounds);
-	}
+	Door *getTouchingDoor(const sf::FloatRect &entityBounds) { return getCurrentRoom()->getTouchingDoor(entityBounds); }
 
 	bool isTouchingSavepoint(const sf::FloatRect &entityBounds)
 	{
