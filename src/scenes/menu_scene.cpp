@@ -21,10 +21,10 @@ MenuScene::MenuScene(sf::Vector2u windowSize, Config config) : config_(std::move
 
 	theme_.emplace(Theme{AssetManager::getInstance().getFont(UI_FONT)});
 	if (config_.transparentPanel) {
-		theme_->panelFill            = sf::Color::Transparent;
-		theme_->panelBorder          = sf::Color::Transparent;
+		theme_->panelFill = sf::Color::Transparent;
+		theme_->panelBorder = sf::Color::Transparent;
 		theme_->panelBorderThickness = 0.f;
-		theme_->panelPadding         = 0.f;
+		theme_->panelPadding = 0.f;
 	}
 	buildPanel();
 	layoutForSize(windowSize);
@@ -56,15 +56,15 @@ void MenuScene::layoutForSize(sf::Vector2u size)
 
 	float imageOriginX = 0.f;
 	float imageOriginY = 0.f;
-	float imageWidth   = static_cast<float>(size.x);
-	float imageHeight  = static_cast<float>(size.y);
+	float imageWidth = static_cast<float>(size.x);
+	float imageHeight = static_cast<float>(size.y);
 
 	if (backgroundSprite_) {
 		const auto tex = config_.backgroundTexture->getSize();
 		if (tex.x > 0 && tex.y > 0) {
 			const float scale = std::min(static_cast<float>(size.x) / tex.x, static_cast<float>(size.y) / tex.y);
 			backgroundSprite_->setScale({scale, scale});
-			imageWidth  = tex.x * scale;
+			imageWidth = tex.x * scale;
 			imageHeight = tex.y * scale;
 			imageOriginX = (static_cast<float>(size.x) - imageWidth) * 0.5f;
 			imageOriginY = (static_cast<float>(size.y) - imageHeight) * 0.5f;
@@ -81,7 +81,8 @@ void MenuScene::layoutForSize(sf::Vector2u size)
 			const float anchorY = imageOriginY + config_.panelImageAnchor->y * imageHeight;
 			panel_->setPosition({anchorX - ps.x * 0.5f, anchorY - ps.y * 0.5f});
 		} else {
-			panel_->setPosition({(static_cast<float>(size.x) - ps.x) * 0.5f, (static_cast<float>(size.y) - ps.y) * 0.5f});
+			panel_->setPosition(
+			    {(static_cast<float>(size.x) - ps.x) * 0.5f, (static_cast<float>(size.y) - ps.y) * 0.5f});
 		}
 	}
 }
