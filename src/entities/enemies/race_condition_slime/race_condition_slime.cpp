@@ -6,7 +6,12 @@
 #include <cmath>
 #include <entities/entity_physics.h>
 
-RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
+    : RaceConditionSlime::RaceConditionSlime(spawnPos, DROP_CHANCE)
+{
+}
+
+RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos, float drop_chance)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, MAX_HEALTH, drop_chance),
       idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
       movingTexture(AssetManager::getInstance().getTexture(SLIME_MOVING)),

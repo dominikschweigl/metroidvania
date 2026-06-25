@@ -70,6 +70,7 @@ class TransistorBoss : public BaseEnemy {
 	};
 	States states;
 
+	explicit TransistorBoss(sf::Vector2f spawnPos);
 	explicit TransistorBoss(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;

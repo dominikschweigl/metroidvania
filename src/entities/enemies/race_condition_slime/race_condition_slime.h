@@ -52,6 +52,7 @@ class RaceConditionSlime : public BaseEnemy {
 	};
 	States states;
 
+	explicit RaceConditionSlime(sf::Vector2f spawnPos);
 	explicit RaceConditionSlime(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;

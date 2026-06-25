@@ -33,7 +33,9 @@ namespace {
 
 SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos) : SegfaultBoss(spawnPos, false, DROP_CHANCE) {}
 
-SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone, float drop_chance = DROP_CHANCE)
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone) : SegfaultBoss(spawnPos, isClone, DROP_CHANCE) {}
+
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone, float drop_chance)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, isClone ? CLONE_HEALTH : BOSS_HEALTH, drop_chance),
       cloneProcess(isClone)
 {

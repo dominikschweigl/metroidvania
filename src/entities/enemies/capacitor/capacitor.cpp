@@ -5,7 +5,9 @@
 #include <cmath>
 #include <cstdint>
 
-Capacitor::Capacitor(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+Capacitor::Capacitor(sf::Vector2f spawnPos) : Capacitor::Capacitor(spawnPos, DROP_CHANCE) {}
+
+Capacitor::Capacitor(sf::Vector2f spawnPos, float drop_chance)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, CAPACITOR_HEALTH, drop_chance),
       hoverTexture(AssetManager::getInstance().getTexture(CAPACITOR_HOVER)), sprite(hoverTexture)
 {
