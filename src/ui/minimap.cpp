@@ -12,8 +12,10 @@ void MiniMap::draw(sf::RenderWindow &window, const sf::Vector2f playerPos, Room 
 	const sf::Vector2u texSize = minimap.getSize();
 	sf::Sprite sprite(minimap);
 	sprite.setScale({1, 1});
-	sf::Vector2f minimapPos =
-	    sf::Vector2f({window.getSize().x - texSize.x - 5.f, window.getSize().y - texSize.y - 5.f});
+	// Right Bottom
+	// sf::Vector2f minimapPos =
+	//     sf::Vector2f({window.getSize().x - texSize.x - 5.f, window.getSize().y - texSize.y + 5.f});
+	sf::Vector2f minimapPos = sf::Vector2f({5.f, 5.f});
 	sprite.setPosition(minimapPos);
 
 	sf::CircleShape playerCircle;

@@ -144,6 +144,17 @@
                  "name":"TransistorBoss",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":1
+                        }, 
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"UsbKeyItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,

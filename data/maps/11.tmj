@@ -14,7 +14,7 @@
          "visible":true,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -42,7 +42,7 @@
          "width":80,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[24, 24, 24, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 26, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 26, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 26, 24, 24,
             26, 35, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 24, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 24, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 35, 24,
@@ -70,7 +70,7 @@
          "width":80,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -94,7 +94,7 @@
                  "width":0,
                  "x":161.025568181,
                  "y":484.476325757
-                }, 
+                },
                 {
                  "height":30,
                  "id":3,
@@ -105,7 +105,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"13"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -117,7 +117,7 @@
                  "width":34,
                  "x":2430,
                  "y":466
-                }, 
+                },
                 {
                  "height":0,
                  "id":14,
@@ -136,7 +136,7 @@
                  "width":0,
                  "x":2394.666666667,
                  "y":488.333333333
-                }, 
+                },
                 {
                  "height":30,
                  "id":15,
@@ -147,7 +147,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"7"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -159,26 +159,48 @@
                  "width":34,
                  "x":95,
                  "y":466
-                }, 
+                },
                 {
                  "height":0,
                  "id":17,
                  "name":"RecursionGolem",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,ResistancePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":793.73798407031,
                  "y":458.665201867619
-                }, 
+                },
                 {
                  "height":0,
                  "id":18,
                  "name":"RecursionGolem",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,ResistancePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
@@ -200,22 +222,22 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":15
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":95
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":80
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":192
-        }, 
+        },
         {
          "name":"world_index",
          "type":"int",
@@ -228,7 +250,7 @@
         {
          "firstgid":1,
          "source":"tilesets\/tileset1.tsj"
-        }, 
+        },
         {
          "firstgid":24,
          "source":"tilesets\/tileset2.tsj"

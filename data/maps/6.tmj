@@ -15,7 +15,7 @@
          "visible":false,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -46,7 +46,7 @@
          "width":20,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[18, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 18,
             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20,
@@ -77,7 +77,7 @@
          "width":20,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -93,12 +93,12 @@
                          "name":"needsToClearAllEnemies",
                          "type":"bool",
                          "value":true
-                        }, 
+                        },
                         {
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"5"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -110,46 +110,79 @@
                  "width":6,
                  "x":28,
                  "y":559
-                }, 
+                },
                 {
                  "height":0,
                  "id":7,
                  "name":"Capacitor",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,SpeedPotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":350,
                  "y":397.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":10,
                  "name":"Capacitor",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,SpeedPotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":323,
                  "y":252.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":11,
                  "name":"Capacitor",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,SpeedPotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":223.666666666667,
                  "y":331.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":13,
@@ -162,7 +195,7 @@
                  "width":0,
                  "x":65.6363636363636,
                  "y":601.022727272727
-                }, 
+                },
                 {
                  "height":0,
                  "id":14,
@@ -190,17 +223,17 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":17
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":17
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":241
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",

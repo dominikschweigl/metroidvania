@@ -15,7 +15,7 @@
          "visible":true,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -56,7 +56,7 @@
          "width":50,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[24, 24, 24, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 24, 24, 24,
             26, 35, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 35, 24,
@@ -97,7 +97,7 @@
          "width":50,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -113,12 +113,12 @@
                          "name":"needsToClearAllEnemies",
                          "type":"bool",
                          "value":true
-                        }, 
+                        },
                         {
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"14"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -130,7 +130,7 @@
                  "width":34,
                  "x":96,
                  "y":880
-                }, 
+                },
                 {
                  "height":0,
                  "id":26,
@@ -143,7 +143,7 @@
                  "width":0,
                  "x":162.049861495845,
                  "y":900.277008310249
-                }, 
+                },
                 {
                  "height":0,
                  "id":27,
@@ -156,26 +156,48 @@
                  "width":0,
                  "x":807.109082015327,
                  "y":890.265775313876
-                }, 
+                },
                 {
                  "height":0,
                  "id":28,
                  "name":"RecursionGolem",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,ResistancePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":535.073409461664,
                  "y":884.176182707994
-                }, 
+                },
                 {
                  "height":0,
                  "id":29,
                  "name":"RecursionGolem",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,ResistancePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
@@ -197,22 +219,22 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":29
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":61
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":97
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":33
-        }, 
+        },
         {
          "name":"world_index",
          "type":"int",
@@ -225,7 +247,7 @@
         {
          "firstgid":1,
          "source":"tilesets\/tileset1.tsj"
-        }, 
+        },
         {
          "firstgid":24,
          "source":"tilesets\/tileset2.tsj"

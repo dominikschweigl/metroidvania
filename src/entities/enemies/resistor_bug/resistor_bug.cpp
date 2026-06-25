@@ -77,11 +77,6 @@ void ResistorBug::setAnimation(BugAnimation anim, int frame)
 	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
 }
 
-std::vector<std::unique_ptr<Item>> ResistorBug::rollDrops()
-{
-	return {};
-}
-
 json ResistorBug::serialize() const
 {
 	json j = BaseEnemy::serialize();

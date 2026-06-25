@@ -72,8 +72,6 @@ class ResistorBug : public BaseEnemy {
 	float getJumpCooldown() const { return jumpCooldown; }
 	void setJumpCooldown(float v) { jumpCooldown = v; }
 
-	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
-
 	// Set current animation state. Manages sprite and texture updates.
 	void setAnimation(BugAnimation anim, int frame);
 

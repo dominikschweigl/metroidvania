@@ -15,7 +15,7 @@
          "visible":true,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -56,7 +56,7 @@
          "width":50,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[24, 24, 24, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 24, 24, 24,
             26, 35, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 35, 24,
@@ -97,7 +97,7 @@
          "width":50,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -121,7 +121,7 @@
                  "width":0,
                  "x":1423.49194944517,
                  "y":911.439307373721
-                }, 
+                },
                 {
                  "height":30,
                  "id":15,
@@ -132,7 +132,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"11"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -144,111 +144,199 @@
                  "width":34,
                  "x":1470,
                  "y":882
-                }, 
+                },
                 {
                  "height":0,
                  "id":17,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":616,
                  "y":684
-                }, 
+                },
                 {
                  "height":0,
                  "id":18,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":1066,
                  "y":660
-                }, 
+                },
                 {
                  "height":0,
                  "id":19,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":620,
                  "y":864
-                }, 
+                },
                 {
                  "height":0,
                  "id":20,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":1018,
                  "y":870
-                }, 
+                },
                 {
                  "height":0,
                  "id":21,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":1028,
                  "y":476
-                }, 
+                },
                 {
                  "height":0,
                  "id":22,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":626,
                  "y":466
-                }, 
+                },
                 {
                  "height":0,
                  "id":23,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":1006,
                  "y":296
-                }, 
+                },
                 {
                  "height":0,
                  "id":24,
                  "name":"RaceConditionEnemy",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,DamagePotionItem"
+                        }],
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":708,
                  "y":294
-                }, 
+                },
                 {
                  "height":30,
                  "id":25,
@@ -259,7 +347,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"14"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -271,7 +359,7 @@
                  "width":34,
                  "x":96,
                  "y":401
-                }, 
+                },
                 {
                  "height":0,
                  "id":26,
@@ -305,22 +393,22 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":47
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":79
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":160
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":112
-        }, 
+        },
         {
          "name":"world_index",
          "type":"int",
@@ -333,7 +421,7 @@
         {
          "firstgid":1,
          "source":"tilesets\/tileset1.tsj"
-        }, 
+        },
         {
          "firstgid":24,
          "source":"tilesets\/tileset2.tsj"

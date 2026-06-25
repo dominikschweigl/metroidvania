@@ -207,10 +207,7 @@ void TransistorBoss::setAnimation(TransistorBossAnimation anim, int frame)
 std::vector<std::unique_ptr<Item>> TransistorBoss::rollDrops()
 {
 	lootDropped = true;
-	std::cout << "rollDrops" << std::endl;
-	std::vector<std::unique_ptr<Item>> drops;
-	drops.push_back(std::make_unique<UsbKeyItem>());
-	return drops;
+	return BaseEnemy::rollDrops();
 }
 
 json TransistorBoss::serialize() const
