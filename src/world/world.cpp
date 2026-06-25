@@ -18,7 +18,22 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <tileson.hpp>
+
+std::vector<std::string> split(const std::string &str, char delimiter)
+{
+	std::vector<std::string> result;
+	std::stringstream ss(str);
+	std::string token;
+
+	while (std::getline(ss, token, delimiter)) {
+		result.push_back(token);
+	}
+
+	return result;
+}
 
 World::World(const std::string worldName)
 {
@@ -83,6 +98,10 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			const tson::Vector2i p = obj.getPosition();
 			const std::string &name = obj.getName();
 
+			std::unique_ptr<BaseEnemy> enemy = nullptr;
+			float drop_chance =
+			    obj.getProperties().hasProperty("drop_chance") ? obj.get<float>("drop_chance") : BaseEnemy::DROP_CHANCE;
+
 			if (name == "PlayerSpawn") {
 				room.playerSpawns.push_back({float(p.x), float(p.y)});
 				std::string direction = obj.get<std::string>("dir");
@@ -101,18 +120,18 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 				door.locked = obj.getProp("locked") ? obj.get<bool>("locked") : false;
 				room.doors.push_back(door);
 			} else if (name == "RaceConditionEnemy") {
-				room.enemies_.push_back(std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}));
+				enemy = std::make_unique<RaceConditionSlime>(sf::Vector2f{float(p.x), float(p.y)}, drop_chance);
 			} else if (name == "TransistorBoss") {
-				room.enemies_.push_back(std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}));
+				enemy = std::make_unique<TransistorBoss>(sf::Vector2f{float(p.x), float(p.y)}, drop_chance);
 			} else if (name == "SegfaultBoss") {
-				room.enemies_.push_back(std::make_unique<SegfaultBoss>(sf::Vector2f{float(p.x), float(p.y)}));
+				enemy = std::make_unique<SegfaultBoss>(sf::Vector2f{float(p.x), float(p.y)});
 			} else if (name == "Capacitor") {
-				room.enemies_.push_back(std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}));
+				enemy = std::make_unique<Capacitor>(sf::Vector2f{float(p.x), float(p.y)}, drop_chance);
 			} else if (name == "ResistorBug") {
-				room.enemies_.push_back(std::make_unique<ResistorBug>(sf::Vector2f{float(p.x), float(p.y)}));
+				enemy = std::make_unique<ResistorBug>(sf::Vector2f{float(p.x), float(p.y)}, drop_chance);
 			} else if (name == "RecursionGolem") {
-				room.enemies_.push_back(std::make_unique<RecursionGolem>(sf::Vector2f{float(p.x), float(p.y)},
-				                                                         RecursionGolem::DEFAULT_SIZE));
+				enemy = std::make_unique<RecursionGolem>(sf::Vector2f{float(p.x), float(p.y)},
+				                                         RecursionGolem::DEFAULT_SIZE, drop_chance);
 			} else if (name == "ChewingGumItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<ChewingGumItem>()));
@@ -140,6 +159,31 @@ void World::loadRoom(const std::string &roomId, const std::string &file)
 			} else if (name == "BackupDiskItem") {
 				room.items_.push_back(std::make_unique<WorldItem>(sf::Vector2f{float(p.x), float(p.y)},
 				                                                  std::make_unique<BackupDiskItem>()));
+			}
+
+			if (enemy) {
+				std::string dropItems =
+				    obj.getProperties().hasProperty("drop_items") ? obj.get<std::string>("drop_items") : "";
+
+				auto parts = split(dropItems, ',');
+
+				for (const auto &part : parts) {
+					if (part.empty())
+						continue;
+
+					json itemJson;
+					itemJson["type"] = part;
+
+					auto item = ItemFactory::create(itemJson);
+
+					if (item) {
+						enemy->drop_items.push_back(std::move(item));
+					} else {
+						std::cerr << "Unknown item: '" << part << "'\n";
+					}
+				}
+
+				room.enemies_.push_back(std::move(enemy));
 			}
 		}
 	}

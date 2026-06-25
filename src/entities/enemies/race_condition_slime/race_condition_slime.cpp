@@ -5,15 +5,14 @@
 #include <algorithm>
 #include <cmath>
 #include <entities/entity_physics.h>
-#include <random>
 
-RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT), idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
+RaceConditionSlime::RaceConditionSlime(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, MAX_HEALTH, drop_chance),
+      idleTexture(AssetManager::getInstance().getTexture(SLIME_IDLE)),
       movingTexture(AssetManager::getInstance().getTexture(SLIME_MOVING)),
       windupTexture(AssetManager::getInstance().getTexture(SLIME_WIND_UP)),
       attackTexture(AssetManager::getInstance().getTexture(SLIME_ATTACK)),
-      recoverTexture(AssetManager::getInstance().getTexture(SLIME_RECOVER)), sprite(idleTexture),
-      rng(std::random_device{}())
+      recoverTexture(AssetManager::getInstance().getTexture(SLIME_RECOVER)), sprite(idleTexture)
 {
 	sprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	resetTeleportTimer();
@@ -126,18 +125,6 @@ void RaceConditionSlime::glitchTeleport(const World &world, sf::Vector2f playerP
 			return;
 		}
 	}
-}
-
-std::vector<std::unique_ptr<Item>> RaceConditionSlime::rollDrops()
-{
-	static constexpr float DROP_CHANCE = 0.4f;
-	std::bernoulli_distribution dist(DROP_CHANCE);
-	if (dist(rng)) {
-		std::vector<std::unique_ptr<Item>> drops;
-		drops.push_back(std::make_unique<HealingPotionItem>());
-		return drops;
-	}
-	return {};
 }
 
 bool RaceConditionSlime::isValidTeleportDest(const World &world, float newX, float newY) const

@@ -15,9 +15,11 @@ float RecursionGolem::heightForSize(int size) noexcept
 	// Golems are roughly square; keep height in step with width.
 	return BASE_WIDTH + static_cast<float>(size) * WIDTH_PER_SIZE;
 }
+RecursionGolem::RecursionGolem(sf::Vector2f spawnPos)
+    : RecursionGolem(spawnPos, RecursionGolem::DEFAULT_SIZE, DROP_CHANCE) {};
 
-RecursionGolem::RecursionGolem(sf::Vector2f spawnPos, int size)
-    : BaseEnemy(spawnPos, widthForSize(size), heightForSize(size), std::max(1, size)), size_(size),
+RecursionGolem::RecursionGolem(sf::Vector2f spawnPos, int size, float drop_chance = DROP_CHANCE)
+    : BaseEnemy(spawnPos, widthForSize(size), heightForSize(size), std::max(1, size), drop_chance), size_(size),
       idleTexture(AssetManager::getInstance().getTexture(GOLEM_IDLE)),
       movingTexture(AssetManager::getInstance().getTexture(GOLEM_MOVING)),
       windupTexture(AssetManager::getInstance().getTexture(GOLEM_WIND_UP)),

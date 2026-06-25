@@ -15,7 +15,7 @@
          "visible":true,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,7 +50,7 @@
          "width":40,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "data":[18, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 18,
             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20,
@@ -85,7 +85,7 @@
          "width":40,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "draworder":"topdown",
          "id":3,
@@ -109,7 +109,7 @@
                  "width":0,
                  "x":69.9090909087576,
                  "y":724.181818181485
-                },
+                }, 
                 {
                  "height":40,
                  "id":3,
@@ -117,21 +117,22 @@
                  "opacity":1,
                  "properties":[
                         {
+                         "name":"needsToClearAllEnemies",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"2"
-                        },        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":true
-        }],
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":6,
                  "x":28,
                  "y":79
-                },
+                }, 
                 {
                  "height":0,
                  "id":4,
@@ -139,12 +140,12 @@
                  "opacity":1,
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":761.333333333333,
                  "y":385.333333333333
-                },
+                }, 
                 {
                  "height":0,
                  "id":5,
@@ -152,12 +153,12 @@
                  "opacity":1,
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":924,
                  "y":306.666666666667
-                },
+                }, 
                 {
                  "height":40,
                  "id":6,
@@ -168,7 +169,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"start_room"
-                        },
+                        }, 
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -180,7 +181,7 @@
                  "width":6,
                  "x":28,
                  "y":687
-                },
+                }, 
                 {
                  "height":0,
                  "id":7,
@@ -214,17 +215,17 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":41
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":51
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":141
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",

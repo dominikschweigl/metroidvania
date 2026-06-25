@@ -101,7 +101,7 @@ class SegfaultBoss : public BaseEnemy {
 	States states;
 
 	explicit SegfaultBoss(sf::Vector2f spawnPos);
-	SegfaultBoss(sf::Vector2f spawnPos, bool isClone);
+	SegfaultBoss(sf::Vector2f spawnPos, bool isClone, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;
 

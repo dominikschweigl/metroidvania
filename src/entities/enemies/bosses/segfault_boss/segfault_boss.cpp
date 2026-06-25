@@ -31,10 +31,11 @@ namespace {
 }
 } // namespace
 
-SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos) : SegfaultBoss(spawnPos, false) {}
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos) : SegfaultBoss(spawnPos, false, DROP_CHANCE) {}
 
-SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, isClone ? CLONE_HEALTH : BOSS_HEALTH), cloneProcess(isClone)
+SegfaultBoss::SegfaultBoss(sf::Vector2f spawnPos, bool isClone, float drop_chance = DROP_CHANCE)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, isClone ? CLONE_HEALTH : BOSS_HEALTH, drop_chance),
+      cloneProcess(isClone)
 {
 	currentState = &states.roaming;
 }
@@ -195,10 +196,10 @@ void SegfaultBoss::spawnSummonedProcesses()
 
 		// Mix area-1 slimes (grounded) and area-2 capacitors (airborne).
 		if (rand() % 2 == 0)
-			summonedProcesses.push_back(std::make_unique<RaceConditionSlime>(spawn));
+			summonedProcesses.push_back(std::make_unique<RaceConditionSlime>(spawn, BaseEnemy::DROP_CHANCE));
 		else
-			summonedProcesses.push_back(
-			    std::make_unique<Capacitor>(sf::Vector2f{spawn.x, spawn.y - SUMMON_AIR_HEIGHT}));
+			summonedProcesses.push_back(std::make_unique<Capacitor>(sf::Vector2f{spawn.x, spawn.y - SUMMON_AIR_HEIGHT},
+			                                                        BaseEnemy::DROP_CHANCE));
 	}
 }
 

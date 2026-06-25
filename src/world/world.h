@@ -2,6 +2,7 @@
 #include "../core/asset_manager.h"
 #include "../entities/enemies/base_enemy.h"
 #include "../items/world_item.h"
+#include "../utils/ItemFactory.hpp"
 #include "Room.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>

@@ -60,6 +60,18 @@ void BaseEnemy::collectHitboxes(std::vector<Hitbox> &hitboxes)
 		hitboxes.push_back(*hit);
 }
 
+std::vector<std::unique_ptr<Item>> BaseEnemy::rollDrops()
+{
+	std::bernoulli_distribution dist(drop_chance);
+	std::vector<std::unique_ptr<Item>> drops;
+	for (auto &item : drop_items) {
+		if (item && dist(rng))
+			drops.push_back(std::move(item));
+	}
+	drop_items.erase(std::remove(drop_items.begin(), drop_items.end(), nullptr), drop_items.end());
+	return drops;
+}
+
 json BaseEnemy::serialize() const
 {
 	json j = BaseEntity::serialize();

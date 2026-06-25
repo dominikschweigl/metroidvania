@@ -7,7 +7,8 @@
 #include <cstdint>
 #include <iostream>
 
-TransistorBoss::TransistorBoss(sf::Vector2f spawnPos) : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, BOSS_HEALTH)
+TransistorBoss::TransistorBoss(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, BOSS_HEALTH, drop_chance)
 {
 	currentState = &states.roaming;
 }
@@ -152,7 +153,7 @@ void TransistorBoss::spawnBondedCapacitors()
 	const std::array<sf::Vector2f, CAPACITOR_COUNT> offsets = {sf::Vector2f{-90.f, -70.f}, sf::Vector2f{0.f, -130.f},
 	                                                           sf::Vector2f{90.f, -70.f}};
 	for (const sf::Vector2f offset : offsets)
-		bondedCapacitors.push_back(std::make_unique<Capacitor>(core + offset));
+		bondedCapacitors.push_back(std::make_unique<Capacitor>(core + offset, BaseEnemy::DROP_CHANCE));
 }
 
 void TransistorBoss::collectHitboxes(std::vector<Hitbox> &hitboxes)

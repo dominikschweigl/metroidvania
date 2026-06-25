@@ -52,7 +52,7 @@ class RaceConditionSlime : public BaseEnemy {
 	};
 	States states;
 
-	explicit RaceConditionSlime(sf::Vector2f spawnPos);
+	explicit RaceConditionSlime(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;
 
@@ -85,8 +85,6 @@ class RaceConditionSlime : public BaseEnemy {
 	float getTeleportTimer() const { return teleportTimer; }
 	void setTeleportTimer(float v) { teleportTimer = v; }
 
-	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
-
 	// Set current animation state. Manages sprite and texture updates.
 	void setAnimation(SlimeAnimation anim, int frame);
 
@@ -115,8 +113,6 @@ class RaceConditionSlime : public BaseEnemy {
 	const sf::Texture &attackTexture;
 	const sf::Texture &recoverTexture;
 	sf::Sprite sprite;
-
-	std::mt19937 rng;
 
 	float uniformFloat(float lo, float hi) { return std::uniform_real_distribution<float>(lo, hi)(rng); }
 	void resetTeleportTimer();
