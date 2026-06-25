@@ -54,6 +54,9 @@ class Inventory {
 	void clearSlot(SlotRef slot);
 	void moveToEquipmentSlot(SlotRef from);
 
+	// Flattens the inventory into a vector
+	std::vector<Item *> flatten() const;
+
 	json serialize() const;
 	void deserialize(const json &j);
 

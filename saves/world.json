@@ -1,5 +1,5 @@
 {
-    "currentRoom": "11",
+    "currentRoom": "start_room",
     "player": {
         "direction": "Right",
         "gravity": 1200.0,
@@ -11,7 +11,28 @@
             "backupSlot": null,
             "grid": [
                 {
+                    "type": "JumpPotionItem"
+                },
+                {
+                    "type": "JumpPotionItem"
+                },
+                {
                     "type": "HealingPotionItem"
+                },
+                {
+                    "type": "JumpPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "JumpPotionItem"
+                },
+                {
+                    "type": "HealingPotionItem"
+                },
+                {
+                    "type": "JumpPotionItem"
                 },
                 {
                     "type": "HealingPotionItem"
@@ -20,31 +41,32 @@
                     "type": "HealingPotionItem"
                 },
                 {
-                    "type": "HealingPotionItem"
+                    "type": "SpeedPotionItem"
                 },
                 {
                     "type": "HealingPotionItem"
                 },
                 {
-                    "type": "HealingPotionItem"
+                    "type": "JumpPotionItem"
+                },
+                {
+                    "type": "JumpPotionItem"
                 },
                 {
                     "type": "HealingPotionItem"
                 },
                 {
+                    "type": "JumpPotionItem"
+                },
+                {
                     "type": "HealingPotionItem"
                 },
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                {
+                    "type": "SpeedPotionItem"
+                },
+                {
+                    "type": "UsbKeyItem"
+                },
                 null,
                 null,
                 null,
@@ -69,8 +91,8 @@
         },
         "isOnGround": true,
         "position": [
-            1210.501953125,
-            448.0
+            1208.950439453125,
+            288.0
         ],
         "velocity": [
             0.0,
@@ -203,7 +225,7 @@
                     },
                     "isOnGround": true,
                     "position": [
-                        900.2786254882813,
+                        941.2722778320313,
                         736.0
                     ],
                     "state": true,
@@ -226,32 +248,32 @@
                         "current": 3,
                         "max": 3
                     },
-                    "isOnGround": true,
+                    "isOnGround": false,
                     "position": [
-                        879.3491821289063,
-                        512.0
+                        793.0,
+                        458.0
                     ],
                     "size": 3,
                     "state": {
-                        "type": "GolemChaseState"
+                        "type": "GolemIdleState"
                     },
                     "type": "RecursionGolem",
                     "velocity": [
-                        112.10000610351563,
+                        0.0,
                         0.0
                     ]
                 },
                 {
-                    "direction": "Left",
+                    "direction": "Right",
                     "gravity": 1200.0,
                     "health": {
                         "current": 3,
                         "max": 3
                     },
-                    "isOnGround": true,
+                    "isOnGround": false,
                     "position": [
                         1642.0,
-                        512.0
+                        469.0
                     ],
                     "size": 3,
                     "state": {

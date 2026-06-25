@@ -68,8 +68,9 @@ class RecursionGolem : public BaseEnemy {
 	};
 	States states;
 
+	RecursionGolem(sf::Vector2f spawnPos);
 	RecursionGolem(sf::Vector2f spawnPos, int size);
-
+	RecursionGolem(sf::Vector2f spawnPos, int size, float drop_chance);
 	void draw(sf::RenderWindow &window) override;
 
 	[[nodiscard]] int getSize() const noexcept { return size_; }

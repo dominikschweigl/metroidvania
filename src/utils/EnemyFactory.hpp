@@ -18,25 +18,25 @@ struct EnemyFactory {
 		std::string type = j["type"];
 
 		if (type == "RaceConditionSlime") {
-			auto enemy = std::make_unique<RaceConditionSlime>(sf::Vector2f{0.f, 0.f});
+			auto enemy = std::make_unique<RaceConditionSlime>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
 			enemy->deserialize(j);
 			return enemy;
 		}
 
 		if (type == "Capacitor") {
-			auto enemy = std::make_unique<Capacitor>(sf::Vector2f{0.f, 0.f});
+			auto enemy = std::make_unique<Capacitor>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
 			enemy->deserialize(j);
 			return enemy;
 		}
 
 		if (type == "ResistorBug") {
-			auto enemy = std::make_unique<ResistorBug>(sf::Vector2f{0.f, 0.f});
+			auto enemy = std::make_unique<ResistorBug>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
 			enemy->deserialize(j);
 			return enemy;
 		}
 
 		if (type == "TransistorBoss") {
-			auto enemy = std::make_unique<TransistorBoss>(sf::Vector2f{0.f, 0.f});
+			auto enemy = std::make_unique<TransistorBoss>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
 			enemy->deserialize(j);
 			return enemy;
 		}
@@ -49,7 +49,7 @@ struct EnemyFactory {
 
 		if (type == "RecursionGolem") {
 			const int size = j.contains("size") ? j["size"].get<int>() : RecursionGolem::DEFAULT_SIZE;
-			auto enemy = std::make_unique<RecursionGolem>(sf::Vector2f{0.f, 0.f}, size);
+			auto enemy = std::make_unique<RecursionGolem>(sf::Vector2f{0.f, 0.f}, size, BaseEnemy::DROP_CHANCE);
 			enemy->deserialize(j);
 			return enemy;
 		}

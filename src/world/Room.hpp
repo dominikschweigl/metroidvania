@@ -14,16 +14,18 @@
 
 using json = nlohmann::json;
 
-struct SavePoint {
+struct Interactable {
 	sf::FloatRect bounds;
 	InteractionIndicator indicator;
 };
 
-struct Door {
+struct SavePoint : Interactable {};
+
+struct Door : Interactable {
 	std::string targetRoomId;
-	int targetSpawnIdx;
-	sf::FloatRect bounds;
-	InteractionIndicator indicator;
+	int targetSpawnIdx = 0;
+	bool needsToClearAllEnemies = false;
+	bool locked = false;
 };
 
 struct ImageLayer {
@@ -47,7 +49,6 @@ struct Room {
 
 	std::vector<ImageLayer> backgroundLayers;
 
-	bool needsToClearAllEnemies = false;
 	bool world_index = 0;
 	sf::FloatRect minimap_pixel_rect{};
 
@@ -69,29 +70,15 @@ struct Room {
 		return false;
 	}
 
-	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds) const
+	Door *getTouchingDoor(const sf::FloatRect &entityBounds)
 	{
-		for (const Door &door : doors) {
+		for (Door &door : doors) {
 			if (door.bounds.findIntersection(entityBounds)) {
-				return std::make_optional(std::make_pair(door.targetRoomId, door.targetSpawnIdx));
+				return &door;
 			}
 		}
-		return std::nullopt;
-	}
 
-	std::optional<sf::FloatRect> getTouchingInteractableBounds(const sf::FloatRect &entityBounds) const
-	{
-		for (const Door &door : doors) {
-			if (door.bounds.findIntersection(entityBounds)) {
-				return door.bounds;
-			}
-		}
-		for (const SavePoint &savePoint : savePoints) {
-			if (savePoint.bounds.findIntersection(entityBounds)) {
-				return savePoint.bounds;
-			}
-		}
-		return std::nullopt;
+		return nullptr;
 	}
 
 	void update(float deltaTime, const World &world)
@@ -106,19 +93,6 @@ struct Room {
 	void draw(sf::RenderWindow &window, const sf::FloatRect playerBounds, const float playerX) const
 	{
 		drawInteractionIndicators(window, playerBounds, playerX);
-	}
-
-	bool isAllowedLeaving()
-	{
-		if (!needsToClearAllEnemies)
-			return true;
-
-		for (const auto &enemy : enemies_) {
-			if (enemy->isAlive()) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	json serialize() const

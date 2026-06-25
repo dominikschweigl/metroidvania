@@ -51,6 +51,7 @@ class ResistorBug : public BaseEnemy {
 	States states;
 
 	explicit ResistorBug(sf::Vector2f spawnPos);
+	explicit ResistorBug(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;
 
@@ -71,8 +72,6 @@ class ResistorBug : public BaseEnemy {
 	void setAttackCooldown(float t) { attackCooldown = t; }
 	float getJumpCooldown() const { return jumpCooldown; }
 	void setJumpCooldown(float v) { jumpCooldown = v; }
-
-	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
 
 	// Set current animation state. Manages sprite and texture updates.
 	void setAnimation(BugAnimation anim, int frame);

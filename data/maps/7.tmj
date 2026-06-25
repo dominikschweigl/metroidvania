@@ -140,7 +140,7 @@
                  "opacity":1,
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"item",
                  "visible":true,
                  "width":0,
                  "x":642,
@@ -194,6 +194,11 @@
                  "name":"Door",
                  "opacity":1,
                  "properties":[
+                        {
+                         "name":"locked",
+                         "type":"bool",
+                         "value":true
+                        }, 
                         {
                          "name":"targetRoomId",
                          "type":"string",
@@ -259,11 +264,6 @@
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":47
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

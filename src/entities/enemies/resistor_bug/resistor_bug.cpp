@@ -2,8 +2,10 @@
 #include "../../../core/audio_manager.h"
 #include <algorithm>
 
-ResistorBug::ResistorBug(sf::Vector2f spawnPos)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT),
+ResistorBug::ResistorBug(sf::Vector2f spawnPos) : ResistorBug::ResistorBug(spawnPos, DROP_CHANCE) {}
+
+ResistorBug::ResistorBug(sf::Vector2f spawnPos, float drop_chance)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, MAX_HEALTH, drop_chance),
       idleTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
       movingTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_MOVING)),
       telegraphTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
@@ -75,11 +77,6 @@ void ResistorBug::setAnimation(BugAnimation anim, int frame)
 		break;
 	}
 	sprite.setTextureRect(sf::IntRect({frame * FRAME_SIZE, 0}, {FRAME_SIZE, FRAME_SIZE}));
-}
-
-std::vector<std::unique_ptr<Item>> ResistorBug::rollDrops()
-{
-	return {};
 }
 
 json ResistorBug::serialize() const

@@ -71,6 +71,7 @@ class TransistorBoss : public BaseEnemy {
 	States states;
 
 	explicit TransistorBoss(sf::Vector2f spawnPos);
+	explicit TransistorBoss(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;
 
@@ -109,8 +110,12 @@ class TransistorBoss : public BaseEnemy {
 	// and stays visible on its last frame, so it must report as alive throughout.
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
+	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
+
 	json serialize() const override;
 	void deserialize(const json &j) override;
+
+	bool lootDropped = false;
 
   protected:
 	void onPreUpdate(float deltaTime) override;

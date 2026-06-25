@@ -2,6 +2,7 @@
 #include "../core/asset_manager.h"
 #include "../entities/enemies/base_enemy.h"
 #include "../items/world_item.h"
+#include "../utils/ItemFactory.hpp"
 #include "Room.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
@@ -52,10 +53,7 @@ class World {
 
 	void update(float deltaTime, sf::FloatRect playerBounds);
 
-	std::optional<std::pair<std::string, int>> getTouchingDoorTargetRoom(const sf::FloatRect &entityBounds)
-	{
-		return getCurrentRoom()->getTouchingDoorTargetRoom(entityBounds);
-	}
+	Door *getTouchingDoor(const sf::FloatRect &entityBounds) { return getCurrentRoom()->getTouchingDoor(entityBounds); }
 
 	bool isTouchingSavepoint(const sf::FloatRect &entityBounds)
 	{

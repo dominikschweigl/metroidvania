@@ -146,110 +146,6 @@
                  "width":0,
                  "x":1202.58333333333,
                  "y":120.583333333334
-                }, 
-                {
-                 "height":0,
-                 "id":5,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":586.666666666667,
-                 "y":542.666666666667
-                }, 
-                {
-                 "height":0,
-                 "id":6,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":7,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":8,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":9,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":10,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":11,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
-                }, 
-                {
-                 "height":0,
-                 "id":12,
-                 "name":"HealingPotionItem",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":592,
-                 "y":548
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -258,7 +154,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":13,
+ "nextobjectid":20,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -280,11 +176,6 @@
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":213
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

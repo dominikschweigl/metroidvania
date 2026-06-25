@@ -15,7 +15,7 @@
          "visible":true,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,7 +50,7 @@
          "width":40,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[18, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 18,
             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20,
@@ -85,7 +85,7 @@
          "width":40,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "id":3,
@@ -109,7 +109,7 @@
                  "width":0,
                  "x":1206.85890151482,
                  "y":733.184659090576
-                }, 
+                },
                 {
                  "height":40,
                  "id":3,
@@ -127,20 +127,31 @@
                  "width":6,
                  "x":28,
                  "y":111
-                }, 
+                },
                 {
                  "height":0,
                  "id":4,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":801.333333333333,
                  "y":400
-                }, 
+                },
                 {
                  "height":40,
                  "id":6,
@@ -158,72 +169,127 @@
                  "width":6,
                  "x":1246,
                  "y":111
-                }, 
+                },
                 {
                  "height":0,
                  "id":7,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":496,
                  "y":562.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":9,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":796,
                  "y":560
-                }, 
+                },
                 {
                  "height":0,
                  "id":10,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":504,
                  "y":398.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":11,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":506.666666666667,
                  "y":246.666666666667
-                }, 
+                },
                 {
                  "height":0,
                  "id":12,
                  "name":"ResistorBug",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":0.4
+                        },
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"HealingPotionItem,JumpPotionItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":784,
                  "y":241.333333333333
-                }, 
+                },
                 {
                  "height":0,
                  "id":13,
@@ -242,7 +308,7 @@
                  "width":0,
                  "x":1208.33333333334,
                  "y":151.333333333334
-                }, 
+                },
                 {
                  "height":0,
                  "id":14,
@@ -261,7 +327,7 @@
                  "width":0,
                  "x":75.9999999999999,
                  "y":145.333333333333
-                }, 
+                },
                 {
                  "height":40,
                  "id":15,
@@ -272,7 +338,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"1"
-                        }, 
+                        },
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -299,26 +365,21 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":37
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":65
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":67
-        }, 
+        },
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":143
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

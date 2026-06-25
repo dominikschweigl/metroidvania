@@ -117,6 +117,11 @@
                  "opacity":1,
                  "properties":[
                         {
+                         "name":"needsToClearAllEnemies",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"4"
@@ -139,8 +144,19 @@
                  "name":"TransistorBoss",
                  "opacity":1,
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"drop_chance",
+                         "type":"float",
+                         "value":1
+                        }, 
+                        {
+                         "name":"drop_items",
+                         "type":"string",
+                         "value":"UsbKeyItem"
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"enemy",
                  "visible":true,
                  "width":0,
                  "x":925,
@@ -175,11 +191,6 @@
          "name":"minimap_pixel_rect_y",
          "type":"int",
          "value":23
-        }, 
-        {
-         "name":"needsToClearAllEnemies",
-         "type":"bool",
-         "value":false
         }],
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -1,6 +1,10 @@
 #include "usb_key_item.h"
+#include "../entities/player/inventory.h"
 
-void UsbKeyItem::activate(Player & /*player*/, Inventory & /*inventory*/, const SlotRef /*ownSlot*/) {}
+void UsbKeyItem::activate(Player & /*player*/, Inventory &inventory, const SlotRef ownSlot)
+{
+	inventory.clearSlot(ownSlot);
+}
 
 ItemInfo UsbKeyItem::info() const
 {

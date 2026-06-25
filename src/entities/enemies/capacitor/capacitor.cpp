@@ -5,8 +5,10 @@
 #include <cmath>
 #include <cstdint>
 
-Capacitor::Capacitor(sf::Vector2f spawnPos)
-    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, CAPACITOR_HEALTH),
+Capacitor::Capacitor(sf::Vector2f spawnPos) : Capacitor::Capacitor(spawnPos, DROP_CHANCE) {}
+
+Capacitor::Capacitor(sf::Vector2f spawnPos, float drop_chance)
+    : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, CAPACITOR_HEALTH, drop_chance),
       hoverTexture(AssetManager::getInstance().getTexture(CAPACITOR_HOVER)), sprite(hoverTexture)
 {
 	gravity = 0.f; // no gravitiy for flyers

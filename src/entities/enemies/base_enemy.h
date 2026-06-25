@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../../combat/hitbox.h"
+#include "../../items/healing_potion_item.h"
 #include "../../items/item.h"
 #include "../base_entity.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <random>
 #include <vector>
 
 class EnemyState;
@@ -23,6 +25,7 @@ class BaseEnemy : public BaseEntity {
 	virtual void draw(sf::RenderWindow &window) = 0;
 
 	static constexpr int MAX_HEALTH = 5;
+	static constexpr float DROP_CHANCE = 1.0f;
 
 	EnemyState *getState() const { return currentState; }
 	void setState(EnemyState *s) { currentState = s; }
@@ -31,7 +34,7 @@ class BaseEnemy : public BaseEntity {
 	[[nodiscard]] virtual std::optional<Hitbox> getHitbox() noexcept { return std::nullopt; }
 
 	// Returns items to drop when this enemy dies. Override per enemy to configure drops.
-	[[nodiscard]] virtual std::vector<std::unique_ptr<Item>> rollDrops() { return {}; }
+	[[nodiscard]] virtual std::vector<std::unique_ptr<Item>> rollDrops();
 
 	virtual void drainSpawns(std::vector<std::unique_ptr<BaseEnemy>> &out) {}
 
@@ -40,10 +43,15 @@ class BaseEnemy : public BaseEntity {
 	json serialize() const override;
 	void deserialize(const json &j) override;
 
+	float drop_chance = DROP_CHANCE;
+	std::vector<std::unique_ptr<Item>> drop_items = {};
+
   protected:
-	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH)
-	    : BaseEntity(spawnPos, entityWidth, entityHeight, maxHealth, Team::Enemy)
+	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH,
+	          float drop_chance = DROP_CHANCE)
+	    : BaseEntity(spawnPos, entityWidth, entityHeight, maxHealth, Team::Enemy), rng(std::random_device{}())
 	{
+		this->drop_chance = drop_chance;
 	}
 
 	virtual void applyGravity(float dt, const World &world);
@@ -61,4 +69,6 @@ class BaseEnemy : public BaseEntity {
 	// Pointer because there is no world yet before the first update() call.
 	const World *lastWorld = nullptr;
 	sf::Vector2f lastPlayerPos;
+
+	std::mt19937 rng;
 };
