@@ -72,7 +72,9 @@ class Player : public BaseEntity {
 
 	[[nodiscard]] float getIframes() const noexcept { return iframes; }
 
-	[[nodiscard]] bool isInvulnerable() const noexcept override { return iframes > 0.f; }
+	[[nodiscard]] bool isInvulnerable() const noexcept override { return iframes > 0.f || debugInvincible_; }
+
+	void setDebugInvincible(bool value) noexcept { debugInvincible_ = value; }
 
 	void heal(int amount) noexcept { health.heal(amount); }
 	void takeDamage(int amount) noexcept override;
@@ -107,6 +109,7 @@ class Player : public BaseEntity {
 	float wallJumpTimer = 0.f;
 
 	float iframes = 0.f;
+	bool debugInvincible_ = false;
 	int previousHealth = MAX_HEALTH;
 
 	// Set by onHit when a hit carries a Slow tag

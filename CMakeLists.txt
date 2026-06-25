@@ -133,6 +133,7 @@ add_executable(metroidvania_tests
     tests/unit/melee_attack_tests.cpp
     tests/unit/inventory_tests.cpp
     tests/unit/effect_tests.cpp
+    tests/unit/debug_features_tests.cpp
     tests/unit/interaction_indicator_tests.cpp
     tests/unit/entity_physics_tests.cpp
     ${GAME_SOURCES})

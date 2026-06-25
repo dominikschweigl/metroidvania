@@ -91,6 +91,18 @@ void GameScene::update(float deltaTime)
 		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
 	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
 		showDebugHitboxes_ = !showDebugHitboxes_;
+	if (input.wasPressed(GameAction::ToggleDebugInvincibility)) {
+		debugInvincibility_ = !debugInvincibility_;
+		player_.setDebugInvincible(debugInvincibility_);
+	}
+	if (input.wasPressed(GameAction::ToggleDebugBuffs))
+		debugBuffs_ = !debugBuffs_;
+	if (debugBuffs_) {
+		player_.addEffect(Effect::speed());
+		player_.addEffect(Effect::damage());
+		player_.addEffect(Effect::resistance());
+		player_.addEffect(Effect::jumpBoost());
+	}
 	if (input.wasPressed(GameAction::ToggleMinimap))
 		showMinimap_ = !showMinimap_;
 	if (input.wasPressed(GameAction::OpenInventory))
