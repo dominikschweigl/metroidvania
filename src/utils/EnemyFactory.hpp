@@ -15,7 +15,7 @@ struct EnemyFactory {
 	{
 		if (j.empty())
 			return nullptr;
-		std::string type = j["type"];
+		const std::string type = j["type"];
 
 		if (type == "RaceConditionSlime") {
 			auto enemy = std::make_unique<RaceConditionSlime>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);

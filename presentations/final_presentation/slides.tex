@@ -23,6 +23,25 @@
 \subsection{Overview}
 
 
+\begin{frame}{Used Tools}
+
+	\small
+	\textbf{Build Tools}
+	\begin{itemize}
+		\item SFML
+		\item Tileson + Tiled
+		\item Catch2
+	\end{itemize}
+
+	\bigskip
+
+	\textbf{Asset Sources}
+	\begin{itemize}
+		\item Pixel art: Pixellab
+		\item Audio: Pixabay (Sounds), itch.io (Music)
+	\end{itemize}
+\end{frame}
+
 \begin{frame}
 	\frametitle{Game Overview}
 
@@ -43,26 +62,112 @@
 	\end{itemize}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Minimaps }
 
-\begin{frame}{Used Tools}
+	\textbf{Initial Scribbles:}
 
-	\small
-	\textbf{Build Tools}
-	\begin{itemize}
-		\item SFML
-		\item Tileson + Tiled
-		\item Catch2
-	\end{itemize}
-
-	\bigskip
-
-	\textbf{Asset Sources}
-	\begin{itemize}
-		\item Pixel art: Pixellab
-		\item Audio: Pixabay (Sounds), itch.io (Music)
-	\end{itemize}
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/first_area_scribble.png}
+			\end{center}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/second_area_scribble.png}
+			\end{center}
+		\end{column}
+	\end{columns}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Minimaps }
+
+	\textbf{current: }
+
+	\text{(work in progress)}
+	\vspace{-1em}
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/minimap1.png}
+			\end{center}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/minimap2.png}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Data Design}
+
+	\textbf{Flexibility \& Extensibility}
+
+	\text{some examples:}
+	\begin{itemize}
+		\item Loot Drops
+		\item Door Locked
+		\item Room Minimap FloatRect
+	\end{itemize}
+
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+
+				\includegraphics{_images/Tiled_props_room.png}
+			\end{center}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+
+				\includegraphics{_images/Tiled_props_enemy.png}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Saving and Loading World}
+
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/saveWorldData.png}
+			\end{center}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+				\includegraphics{_images/loadWorldData.png}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Serialization}
+
+	\emph{Peter Thoman: Handle serialization continuously instead of implementing everything at once at the end.}
+
+	\begin{center}
+		\includegraphics[width = 0.5\linewidth]{_images/EntityStructure.png}
+	\end{center}
+
+	\begin{center}
+		\includegraphics[width = 0.5\linewidth]{_images/base_entity.png}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Factory Pattern}
+
+	\begin{center}
+		\includegraphics[width = \linewidth]{_images/factory_pattern.png}
+	\end{center}
+\end{frame}
 
 \begin{frame}{Boss Design}
 	\begin{columns}[T]
