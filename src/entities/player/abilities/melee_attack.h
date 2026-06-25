@@ -15,9 +15,6 @@ struct AttackDef {
 
 class MeleeAttack {
   public:
-	static constexpr int DAMAGE = 1;
-	static constexpr float HITBOX_SIZE = 32.f;
-
 	const sf::Texture &swing_texture;
 	const sf::Texture &overhead_texture;
 
@@ -25,6 +22,7 @@ class MeleeAttack {
 
 	[[nodiscard]] bool isMeleeActive() const noexcept { return comboIndex >= 0; }
 	[[nodiscard]] std::uint32_t getSourceId() const noexcept { return sourceId; }
+	[[nodiscard]] int getDamage() const noexcept { return DAMAGE; }
 
 	void reset() noexcept;
 	void trigger();
@@ -40,6 +38,11 @@ class MeleeAttack {
 	[[nodiscard]] std::optional<Hitbox> getHitbox(sf::Vector2f playerPos, Direction facing) const noexcept;
 
   private:
+	static constexpr int DAMAGE = 1;
+	static constexpr float HITBOX_SIZE_Y = 32.f;
+	static constexpr float HITBOX_SIZE_X = 20.f;
+	static constexpr float HITBOX_INWARD_OFFSET = 8.f;
+
 	std::vector<AttackDef> comboChain;
 
 	int comboIndex = -1;

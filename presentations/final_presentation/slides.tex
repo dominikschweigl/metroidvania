@@ -1,0 +1,429 @@
+%% Begin slides template file
+\documentclass[11pt,t,usepdftitle=false,aspectratio=169]{beamer}
+%% ------------------------------------------------------------------
+%% - aspectratio=43: Set paper aspect ratio to 4:3.
+%% - aspectratio=169: Set paper aspect ratio to 16:9.
+%% ------------------------------------------------------------------
+
+\usetheme[nototalframenumber,foot,logo]{uibk}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning}
+\usepackage{listings}
+
+\title[]{Final presentation: Segfault Slayer}
+
+\author[Schmölz Lukas, Schöpf Emanuel, Schweigl Dominik]{Schmölz Lukas, Schöpf Emanuel, Schweigl Dominik}
+
+\headerimage{3}
+
+\begin{document}
+
+\section{Bookmark Title}
+\subsection{Overview}
+
+
+\begin{frame}
+	\frametitle{Game Overview}
+
+	\small
+	\textbf{Game Idea}
+	\begin{itemize}
+		\item Metroidvania-style 2D side-scroller
+		\item Player fights programming concepts and bugs
+		\item Playful, Pixel-theme
+	\end{itemize}
+
+	\bigskip
+
+	\textbf{World Design}
+	\begin{itemize}
+		\item First Area: Hardware with electric components roaming around
+		\item Second Area: Abstract programming concepts escaped from the bosses lab
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Used Tools}
+
+	\small
+	\textbf{Build Tools}
+	\begin{itemize}
+		\item SFML
+		\item Tileson + Tiled
+		\item Catch2
+	\end{itemize}
+
+	\bigskip
+
+	\textbf{Asset Sources}
+	\begin{itemize}
+		\item Pixel art: Pixellab
+		\item Audio: Pixabay (Sounds), itch.io (Music)
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Boss Design}
+	\begin{columns}[T]
+		\begin{column}{0.4\textwidth}
+			\vspace{2em}
+			\small
+			\textbf{Transistor}
+
+			\begin{itemize}
+				\item Roams the boss roam and shoots projectiles
+				\item Shocks area around him when player too close
+				\item Spawns additional minions in phase 2
+			\end{itemize}
+
+		\end{column}
+
+		\begin{column}{0.6\textwidth}
+			\vspace{-1em}
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.6\linewidth]{_images/Transistor.png}
+				\label{fig:segfault}
+			\end{figure}
+
+		\end{column}
+
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}{Boss Design}
+	\begin{columns}[T]
+
+		\begin{column}{0.6\textwidth}
+			\vspace{-1em}
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.8\linewidth]{_images/Segfault.png}
+				\label{fig:segfault}
+			\end{figure}
+
+		\end{column}
+
+		\begin{column}{0.4\textwidth}
+			\vspace{2em}
+			\small
+			\textbf{Segfault}
+
+			\begin{itemize}
+				\item Spawns area attacks and environment blockers
+				\item Summons minions in phase 2
+				\item Glitches into 2 versions of himself in phase 3
+			\end{itemize}
+
+		\end{column}
+
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}[plain,c]
+	\begin{center}
+		\Huge{Demo \& Code Review}
+	\end{center}
+\end{frame}
+
+%% ----------------------------------------------------------------
+%% Dominik Schweigl
+%% ----------------------------------------------------------------
+
+
+%% SLIDE: Item Architecture
+\begin{frame}{Items}
+	%% Top: description text on left, class hierarchy tree on right
+	\begin{columns}[T]
+		\begin{column}{0.40\textwidth}
+			\vspace{0.5em}
+			\small
+			\begin{itemize}
+				\item \textbf{Equipment} -- wearable items occupying a fixed slot; \texttt{activate()} moves to \texttt{equipmentSlot()} returning the target \texttt{SlotKind}
+				\item \textbf{Consumable} -- single-use items; \texttt{activate()} applies the effect and removes the item from inventory
+			\end{itemize}
+		\end{column}
+
+		\begin{column}{0.57\textwidth}
+			\vspace{1.5em}
+			\scalebox{0.93}{%
+				\begin{tikzpicture}[
+						cls/.style={draw=uibkblue, fill=uibkbluel, rectangle,
+								font=\tiny\ttfamily, inner sep=2.5pt, rounded corners=1pt,
+								text width=1.75cm, align=center},
+						abs/.style={draw=uibkblue, fill=uibkbluel!40, rectangle, densely dashed,
+								font=\tiny\sffamily\bfseries, inner sep=3pt, rounded corners=1pt,
+								text width=2.1cm, align=center},
+						grp/.style={draw=uibkgraym, fill=uibkgrayl, rectangle,
+								font=\tiny\sffamily\itshape, inner sep=2.5pt, rounded corners=1pt,
+								text width=1.6cm, align=center},
+						arr/.style={->, thin, draw=uibkgraym}
+					]
+					\node[abs] (item) at (4.1, 0) {\textit{Item}};
+
+					\node[grp] (eg) at (1.9, -0.95) {Equipment};
+					\node[grp] (cg) at (6.3, -0.95) {Consumable};
+					\draw[arr] (eg.north) -- (item.south west);
+					\draw[arr] (cg.north) -- (item.south east);
+
+					\node[cls] (hat) at (0.7, -2.1) {HatItem};
+					\node[cls] (gum) at (3.0, -2.1) {ChewingGumItem};
+					\draw[arr] (hat.north) -- (eg.south west);
+					\draw[arr] (gum.north) -- (eg.south);
+
+					\node[cls, text width=1.55cm] (pot) at (5.3, -2.1) {5 Potion types};
+					\node[cls] (usb) at (7.3, -2.1) {UsbKeyItem};
+					\draw[arr] (pot.north) -- (cg.south west);
+					\draw[arr] (usb.north) -- (cg.south east);
+				\end{tikzpicture}}
+		\end{column}
+	\end{columns}
+
+	\vspace{1.3em}
+	{\color{uibkgraym}\hrule height 0.4pt}
+	\vspace{1.3em}
+
+	%% Bottom: item sprites grouped by category
+	\begin{columns}[T]
+		\begin{column}{0.01\textwidth}\end{column}
+		\begin{column}{0.27\textwidth}
+			\small\textbf{Equipment}
+
+			\vspace{0.2em}
+			\begin{tabular}{@{}ccc@{}}
+				\includegraphics[width=0.75cm]{../../assets/images/items/hat.png}            &
+				\includegraphics[width=0.75cm]{../../assets/images/items/chewing_gum_32.png} &
+				\includegraphics[width=0.75cm]{../../assets/images/items/floppy_disk/floppy_disk_blue_32.png}             \\[-4pt]
+				\small Hat                                                                   & \small Gum & \small Backup \\
+			\end{tabular}
+		\end{column}
+
+		\begin{column}{0.63\textwidth}
+			\small\textbf{Consumables}
+
+			\vspace{0.4em}
+			\begin{tabular}{@{}cccccc@{}}
+				\includegraphics[width=0.75cm]{../../assets/images/items/healing_potion_32.png}    &
+				\includegraphics[width=0.75cm]{../../assets/images/items/speed_potion_32.png}      &
+				\includegraphics[width=0.75cm]{../../assets/images/items/jump_boost_potion_32.png} &
+				\includegraphics[width=0.75cm]{../../assets/images/items/damage_potion_32.png}     &
+				\includegraphics[width=0.75cm]{../../assets/images/items/resistance_potion_32.png} &
+				\includegraphics[width=0.75cm]{../../assets/images/items/keys/usb_key_32.png}                                                                                    \\[-4pt]
+				\small Heal                                                                        & \small Speed & \small Jump & \small Damage & \small Resist & \small USB Key \\
+			\end{tabular}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+%% SLIDE: WorldItem & Inventory -- Ownership Chain
+\begin{frame}[fragile,shrink=35]{WorldItem \& Inventory: Ownership Chain}
+
+	%% Full-width ownership flow diagram
+	\begin{center}
+		\resizebox{0.82\textwidth}{!}{%
+			\begin{tikzpicture}[
+					box/.style={draw=uibkblue, fill=uibkbluel, rectangle, rounded corners=2pt,
+							font=\small, inner sep=5pt, text width=2.4cm, align=center},
+					ebox/.style={box, fill=uibkorangel, draw=uibkorange},
+					arr/.style={->, >=latex, very thick, draw=uibkblue},
+					lbl/.style={font=\tiny\ttfamily, align=center},
+					note/.style={font=\tiny\itshape, align=center, text=uibkgraym}
+				]
+				\node[ebox] (enemy)  at (0,   0) {Enemy\\drops item};
+				\node[box]  (world)  at (5.5, 0) {WorldItem\\(in Room)};
+				\node[box]  (inv)    at (11,  0) {Inventory\\(in slot)};
+
+				\draw[arr] (enemy.east) --
+				node[above, lbl] {\texttt{rollDrops()}}
+				node[below, lbl] {\textit{move} \texttt{unique\_ptr<Item>}}
+				(world.west);
+
+				\draw[arr] (world.east) --
+				node[above, lbl] {\texttt{tryCollect()}}
+				node[below, lbl] {\textit{move} \texttt{unique\_ptr<Item>}}
+				(inv.west);
+
+				\node[note, below=0.5cm of enemy]  {move into\\WorldItem ctor};
+				\node[note, below=0.5cm of world]  {physics: gravity + hover\\Room erases \textit{after} transfer};
+				\node[note, below=0.5cm of inv]    {auto-place in equipment\\slot or grid (addItem)};
+			\end{tikzpicture}}
+	\end{center}
+
+	\vspace{0.2em}
+
+	\begin{columns}[T]
+		\begin{column}{0.32\textwidth}
+			\small
+			\textbf{Transfer 1 -- drop (game\_scene.cpp)}
+			\begin{lstlisting}
+for (auto& enemy :
+        room->enemies_) {
+  if (!enemy->isAlive()) {
+    for (auto& drop :
+            enemy->rollDrops()) {
+      auto wi = make_unique<
+        WorldItem>(
+          enemy->getPosition(),
+          std::move(drop));
+      room->appendItem(wi);
+    }
+  }
+}
+			\end{lstlisting}
+		\end{column}
+
+		\begin{column}{0.32\textwidth}
+			\small
+			\textbf{Transfer 2 -- collection (game\_scene.cpp)}
+			\begin{lstlisting}
+auto collected =
+  worldItem->tryCollect(
+    player_.getBounds());
+if (collected)
+  player_.inventory()
+    .addItem(
+      std::move(collected));
+// Room erases next frame:
+items_.erase(
+  remove_if(
+    items_.begin(),
+    items_.end(),
+    [](const auto& i){
+      return i->isCollected();
+    }),
+  items_.end());
+			\end{lstlisting}
+		\end{column}
+
+		\begin{column}{0.32\textwidth}
+			\small
+			\textbf{Special case: BackupDisk}
+			\begin{lstlisting}
+// checked every frame
+if (!player_.isAlive()
+    && player_.inventory()
+         .hasBackup()) {
+  player_.heal(1);
+  player_.inventory()
+    .clearSlot(
+      {SlotKind::Backup, 0});
+  player_.triggerIframes();
+}
+			\end{lstlisting}
+			Consumed \textit{automatically} -- not through \texttt{interact()} but directly by the scene.
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+%% SLIDE: Item System Technical Design
+\begin{frame}[fragile,shrink=45]{Inventory System: Technical Design}
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\small
+			\textbf{Uniform Slot Addressing}
+			\begin{lstlisting}
+enum class SlotKind {
+    Hat, Gum, Backup, Grid, Hotbar
+};
+struct SlotRef { SlotKind kind; int index; };
+			\end{lstlisting}
+			Every slot -- equipment, grid, or hotbar -- is a single \texttt{SlotRef}.
+			\texttt{moveItem(from,~to)} and \texttt{interact(slot,~player)} are generic entry points regardless of which area is involved.
+
+			\vspace{0.4em}
+
+			\textbf{Slot-Move Validation}
+			\begin{lstlisting}
+bool isValidInSlot(const Item& item, SlotRef s) {
+    auto home = item.equipmentSlot();
+    if (s.kind == Hat || s.kind == Gum
+                      || s.kind == Backup)
+        return home.has_value()
+            && home.value() == s.kind;
+    return true; // grid + hotbar: any item
+}
+			\end{lstlisting}
+			Validation lives in the model -- UI drag-drop and keyboard shortcuts obey the same rules.
+		\end{column}
+
+		\begin{column}{0.46\textwidth}
+			\small
+			\textbf{Item Self-Activation}
+			\begin{lstlisting}
+// Equipment (e.g. HatItem)
+void activate(...) {
+    inventory.moveToEquipmentSlot(ownSlot);
+}
+// Consumable (e.g. HealingPotionItem)
+void activate(...) {
+    player.heal(amount);
+    inventory.clearSlot(ownSlot);
+}
+			\end{lstlisting}
+
+			The inventory calls \texttt{item.activate(player, *this, slot)}. The item decides what to do -- the inventory is a passive store; \textbf{logic lives in the item}.
+
+			\vspace{0.4em}
+
+			\textbf{UI Interactions}
+			\begin{itemize}
+				\item \textbf{Drag-drop}: validates via \texttt{isValidInSlot} before completing move
+				\item \textbf{Shift+click}: quick-swaps grid $\leftrightarrow$ hotbar
+				\item \textbf{Keys 1--7}: assign hovered item to hotbar slot
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Final Sprint}
+
+	\begin{columns}[T]
+		\begin{column}{0.4\textwidth}
+			\vspace{2em}
+			\small
+			\begin{itemize}
+				\item Last Music and Audio wiring
+				\item Item \& enemy placement improvement
+				\item Second Area rework
+				\item Story snippets
+				\item Refactoring
+			\end{itemize}
+
+		\end{column}
+
+		\begin{column}{0.6\textwidth}
+			\vspace{-1em}
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.6\linewidth]{_images/wall_jump.png}
+				\label{fig:segfault}
+			\end{figure}
+
+		\end{column}
+
+	\end{columns}
+
+	\vspace{1em}
+
+\end{frame}
+
+
+\begin{frame}{Lessons Learned}
+	\vspace{1em}
+
+	\small
+	\begin{itemize}
+		\item Focus on creating a MVP early
+		\item Creative Work just as important as gameplay mechanics
+		\item Better Milestone / Issue Management
+	\end{itemize}
+\end{frame}
+
+\end{document}

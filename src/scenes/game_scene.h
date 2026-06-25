@@ -42,6 +42,8 @@ class GameScene : public Scene {
 	std::vector<Hitbox> hitboxes_;
 	std::vector<Hurtbox> hurtboxes_;
 	bool showDebugHitboxes_ = false;
+	bool debugInvincibility_ = false;
+	bool debugBuffs_ = false;
 	float zoomFactor_ = 0.332188f;
 	bool isPlayerFalling = false;
 	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};

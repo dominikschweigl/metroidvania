@@ -66,9 +66,9 @@ std::optional<Hitbox> MeleeAttack::getHitbox(sf::Vector2f playerPos, Direction f
 		return std::nullopt;
 
 	const float facingSign = static_cast<float>(facing);
-	const float left =
-	    facingSign > 0.f ? playerPos.x + HITBOX_SIZE / 2.f : playerPos.x - HITBOX_SIZE / 2.f - HITBOX_SIZE;
-	const sf::FloatRect bounds{{left, playerPos.y - HITBOX_SIZE}, {HITBOX_SIZE, HITBOX_SIZE}};
+	const float left = facingSign > 0.f ? playerPos.x + HITBOX_SIZE_X / 2.f - HITBOX_INWARD_OFFSET
+	                                    : playerPos.x - HITBOX_SIZE_X / 2.f - HITBOX_SIZE_X + HITBOX_INWARD_OFFSET;
+	const sf::FloatRect bounds{{left, playerPos.y - HITBOX_SIZE_Y}, {HITBOX_SIZE_X, HITBOX_SIZE_Y}};
 	return Hitbox{bounds, DAMAGE, Team::Player, sourceId};
 }
 
