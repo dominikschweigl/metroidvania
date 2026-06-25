@@ -13,6 +13,8 @@ const std::array<Binding, InputManager::actionCount> InputManager::defaultBindin
     Binding{sf::Keyboard::Scancode::PageDown},
     Binding{sf::Mouse::Button::Left},
     Binding{sf::Keyboard::Scancode::F3},
+    Binding{sf::Keyboard::Scancode::F4},
+    Binding{sf::Keyboard::Scancode::F5},
     Binding{sf::Keyboard::Scancode::M},
     Binding{sf::Keyboard::Scancode::E},
     Binding{sf::Keyboard::Scancode::Q},

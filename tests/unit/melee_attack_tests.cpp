@@ -18,7 +18,7 @@ TEST_CASE("MeleeAttack: getHitbox is present while a swing is active")
 	const auto hit = atk.getHitbox({100.f, 100.f}, Direction::Right);
 	REQUIRE(hit.has_value());
 	REQUIRE(hit->team == Team::Player);
-	REQUIRE(hit->damage == MeleeAttack::DAMAGE);
+	REQUIRE(hit->damage == atk.getDamage());
 	REQUIRE(hit->damage > 0);
 	REQUIRE(hit->sourceId != 0u);
 }
