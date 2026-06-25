@@ -50,6 +50,7 @@ class ResistorBug : public BaseEnemy {
 	};
 	States states;
 
+	explicit ResistorBug(sf::Vector2f spawnPos);
 	explicit ResistorBug(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;

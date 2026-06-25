@@ -2,7 +2,9 @@
 #include "../../../core/audio_manager.h"
 #include <algorithm>
 
-ResistorBug::ResistorBug(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+ResistorBug::ResistorBug(sf::Vector2f spawnPos) : ResistorBug::ResistorBug(spawnPos, DROP_CHANCE) {}
+
+ResistorBug::ResistorBug(sf::Vector2f spawnPos, float drop_chance)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, MAX_HEALTH, drop_chance),
       idleTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_IDLE)),
       movingTexture(AssetManager::getInstance().getTexture(RESISTOR_BUG_MOVING)),

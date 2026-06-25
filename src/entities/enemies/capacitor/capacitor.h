@@ -58,6 +58,7 @@ class Capacitor : public BaseEnemy {
 	};
 	States states;
 
+	explicit Capacitor(sf::Vector2f spawnPos);
 	explicit Capacitor(sf::Vector2f spawnPos, float drop_chance);
 
 	void draw(sf::RenderWindow &window) override;

@@ -7,7 +7,9 @@
 #include <cstdint>
 #include <iostream>
 
-TransistorBoss::TransistorBoss(sf::Vector2f spawnPos, float drop_chance = DROP_CHANCE)
+TransistorBoss::TransistorBoss(sf::Vector2f spawnPos) : TransistorBoss::TransistorBoss(spawnPos, DROP_CHANCE) {}
+
+TransistorBoss::TransistorBoss(sf::Vector2f spawnPos, float drop_chance)
     : BaseEnemy(spawnPos, ENTITY_WIDTH, ENTITY_HEIGHT, BOSS_HEALTH, drop_chance)
 {
 	currentState = &states.roaming;
