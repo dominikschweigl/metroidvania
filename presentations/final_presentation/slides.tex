@@ -503,15 +503,6 @@ void activate(...) {
 			\end{lstlisting}
 
 			The inventory calls \texttt{item.activate(player, *this, slot)}. The item decides what to do -- the inventory is a passive store; \textbf{logic lives in the item}.
-
-			\vspace{0.4em}
-
-			\textbf{UI Interactions}
-			\begin{itemize}
-				\item \textbf{Drag-drop}: validates via \texttt{isValidInSlot} before completing move
-				\item \textbf{Shift+click}: quick-swaps grid $\leftrightarrow$ hotbar
-				\item \textbf{Keys 1--7}: assign hovered item to hotbar slot
-			\end{itemize}
 		\end{column}
 	\end{columns}
 \end{frame}
@@ -526,7 +517,6 @@ void activate(...) {
 			\small
 			\begin{itemize}
 				\item Last Music and Audio wiring
-				\item Item \& enemy placement improvement
 				\item Second Area rework
 				\item Story snippets
 				\item Refactoring

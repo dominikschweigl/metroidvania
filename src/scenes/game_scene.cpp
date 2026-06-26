@@ -18,7 +18,14 @@
 #include "menus/victory_menu.h"
 #include <algorithm>
 #include <cstdint>
+#include <random>
 #include <vector>
+
+static std::random_device rd;
+static std::mt19937 rng(rd());
+
+std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * std::numbers::pi_v<float>);
+std::uniform_real_distribution<float> speedDist(100.0f, 200.0f);
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
     : sceneStack_(sceneStack), window_(window), world_(gameName)
@@ -146,6 +153,11 @@ void GameScene::update(float deltaTime)
 		        && !dynamic_cast<TransistorBoss *>(enemy.get())->lootDropped)) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
 				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
+
+				float angle = angleDist(rng);
+				float speed = speedDist(rng);
+				droppedItem->velocity_ = {std::cos(angle) * speed, std::sin(angle) * speed};
+
 				world_.getCurrentRoom()->appendItem(droppedItem);
 			}
 			if (!enemy->isAlive()) {
@@ -214,7 +226,8 @@ void GameScene::update(float deltaTime)
 		Door *touchingDoor = world_.getTouchingDoor(player_.getBounds());
 		if (touchingDoor) {
 			// A door needs to be unlocked and maybe all Enemies in the room need to be cleared.
-			if (!touchingDoor->locked) {
+			if (!touchingDoor->locked
+			    && (!touchingDoor->needsToClearAllEnemies || world_.getCurrentRoom()->enemies_.size() == 0)) {
 				world_.setCurrentRoom(touchingDoor->targetRoomId);
 				player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoor->targetSpawnIdx]);
 				if (world_.getCurrentRoomId() == "boss_room") {

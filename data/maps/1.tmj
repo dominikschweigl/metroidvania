@@ -15,7 +15,7 @@
          "visible":true,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,7 +50,7 @@
          "width":40,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "data":[18, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 18,
             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20,
@@ -85,7 +85,7 @@
          "width":40,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "draworder":"topdown",
          "id":3,
@@ -109,7 +109,7 @@
                  "width":0,
                  "x":69.9090909087576,
                  "y":724.181818181485
-                },
+                }, 
                 {
                  "height":40,
                  "id":3,
@@ -120,7 +120,7 @@
                          "name":"needsToClearAllEnemies",
                          "type":"bool",
                          "value":true
-                        },
+                        }, 
                         {
                          "name":"targetRoomId",
                          "type":"string",
@@ -132,7 +132,7 @@
                  "width":6,
                  "x":28,
                  "y":79
-                },
+                }, 
                 {
                  "height":0,
                  "id":4,
@@ -143,8 +143,8 @@
                         {
                          "name":"drop_chance",
                          "type":"float",
-                         "value":0.4
-                        },
+                         "value":1
+                        }, 
                         {
                          "name":"drop_items",
                          "type":"string",
@@ -156,7 +156,7 @@
                  "width":0,
                  "x":761.333333333333,
                  "y":385.333333333333
-                },
+                }, 
                 {
                  "height":0,
                  "id":5,
@@ -167,8 +167,8 @@
                         {
                          "name":"drop_chance",
                          "type":"float",
-                         "value":0.4
-                        },
+                         "value":1
+                        }, 
                         {
                          "name":"drop_items",
                          "type":"string",
@@ -180,7 +180,7 @@
                  "width":0,
                  "x":924,
                  "y":306.666666666667
-                },
+                }, 
                 {
                  "height":40,
                  "id":6,
@@ -191,7 +191,7 @@
                          "name":"targetRoomId",
                          "type":"string",
                          "value":"start_room"
-                        },
+                        }, 
                         {
                          "name":"targetSpawnIdx",
                          "type":"int",
@@ -203,7 +203,7 @@
                  "width":6,
                  "x":28,
                  "y":687
-                },
+                }, 
                 {
                  "height":0,
                  "id":7,
@@ -237,17 +237,17 @@
          "name":"minimap_pixel_rect_h",
          "type":"int",
          "value":41
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_w",
          "type":"int",
          "value":51
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_x",
          "type":"int",
          "value":141
-        },
+        }, 
         {
          "name":"minimap_pixel_rect_y",
          "type":"int",

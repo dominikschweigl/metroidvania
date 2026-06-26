@@ -12,6 +12,7 @@ class WorldItem {
 	static constexpr float GRAVITY = 1200.f;
 	static constexpr float HOVER_AMPLITUDE = 2.f;
 	static constexpr float HOVER_SPEED = 0.35f;
+	static constexpr float GROUND_FRICTION = 4.0f; // higher = stops faster
 
 	WorldItem(sf::Vector2f spawnPos, std::unique_ptr<Item> item);
 	~WorldItem() = default;
@@ -31,10 +32,11 @@ class WorldItem {
 	virtual json serialize() const;
 	static std::unique_ptr<WorldItem> deserialize(const json &j);
 
+	sf::Vector2f velocity_{0.f, 0.f};
+
   private:
 	std::unique_ptr<Item> item_;
 	sf::Vector2f position_;
-	sf::Vector2f velocity_{0.f, 0.f};
 	bool isOnGround_ = false;
 	float hoverPhase_ = 0.f;
 	bool collected_ = false;

@@ -17,6 +17,8 @@ void WorldItem::update(const float deltaTime, const World &world)
 	EntityPhysics::simulateMovement(deltaTime, position_, velocity_, isOnGround_, GRAVITY, WIDTH, HEIGHT, world);
 
 	if (isOnGround_) {
+		velocity_.x *= std::exp(-WorldItem::GROUND_FRICTION * deltaTime);
+
 		hoverPhase_ += deltaTime * HOVER_SPEED * 2.f * std::numbers::pi_v<float>;
 	}
 }
