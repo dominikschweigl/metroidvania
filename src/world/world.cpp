@@ -399,10 +399,12 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 
 	for (const ImageLayer &img : room.backgroundLayers) {
 		if (img.repeatX) {
-			for (float x = img.position.x; x < roomWidth; x += img.texture->getSize().x) {
+			float x = img.position.x;
+			while (x < roomWidth) {
 				sf::Sprite sprite(*img.texture);
 				sprite.setPosition({x, img.position.y});
 				window.draw(sprite);
+				x += img.texture->getSize().x
 			}
 		} else {
 			sf::Sprite sprite(*img.texture);
