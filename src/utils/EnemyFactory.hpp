@@ -6,7 +6,9 @@
 #include "../entities/enemies/race_condition_slime/race_condition_slime.h"
 #include "../entities/enemies/recursion_golem/recursion_golem.h"
 #include "../entities/enemies/resistor_bug/resistor_bug.h"
+#include <iostream>
 #include <nlohmann/json.hpp>
+#include <unordered_map>
 
 using json = nlohmann::json;
 
@@ -15,45 +17,31 @@ struct EnemyFactory {
 	{
 		if (j.empty())
 			return nullptr;
-		const std::string type = j["type"];
 
-		if (type == "RaceConditionSlime") {
-			auto enemy = std::make_unique<RaceConditionSlime>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
-			enemy->deserialize(j);
-			return enemy;
+		using Creator = std::function<std::unique_ptr<BaseEnemy>()>;
+		static const std::unordered_map<std::string, Creator> table = {
+		    {"RaceConditionSlime",
+		     [] { return std::make_unique<RaceConditionSlime>(sf::Vector2f{}, BaseEnemy::DROP_CHANCE); }},
+		    {"Capacitor", [] { return std::make_unique<Capacitor>(sf::Vector2f{}, BaseEnemy::DROP_CHANCE); }},
+		    {"ResistorBug", [] { return std::make_unique<ResistorBug>(sf::Vector2f{}, BaseEnemy::DROP_CHANCE); }},
+		    {"TransistorBoss", [] { return std::make_unique<TransistorBoss>(sf::Vector2f{}, BaseEnemy::DROP_CHANCE); }},
+		    {"SegfaultBoss", [] { return std::make_unique<SegfaultBoss>(sf::Vector2f{}); }},
+		    {"RecursionGolem",
+		     [] {
+			     return std::make_unique<RecursionGolem>(sf::Vector2f{}, RecursionGolem::DEFAULT_SIZE,
+			                                             BaseEnemy::DROP_CHANCE);
+		     }},
+		};
+
+		const std::string type = j.value("type", "");
+		auto it = table.find(type);
+		if (it == table.end()) {
+			std::cerr << "EnemyFactory: unknown type '" << type << "'\n";
+			return nullptr;
 		}
 
-		if (type == "Capacitor") {
-			auto enemy = std::make_unique<Capacitor>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
-			enemy->deserialize(j);
-			return enemy;
-		}
-
-		if (type == "ResistorBug") {
-			auto enemy = std::make_unique<ResistorBug>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
-			enemy->deserialize(j);
-			return enemy;
-		}
-
-		if (type == "TransistorBoss") {
-			auto enemy = std::make_unique<TransistorBoss>(sf::Vector2f{0.f, 0.f}, BaseEnemy::DROP_CHANCE);
-			enemy->deserialize(j);
-			return enemy;
-		}
-
-		if (type == "SegfaultBoss") {
-			auto enemy = std::make_unique<SegfaultBoss>(sf::Vector2f{0.f, 0.f});
-			enemy->deserialize(j);
-			return enemy;
-		}
-
-		if (type == "RecursionGolem") {
-			const int size = j.contains("size") ? j["size"].get<int>() : RecursionGolem::DEFAULT_SIZE;
-			auto enemy = std::make_unique<RecursionGolem>(sf::Vector2f{0.f, 0.f}, size, BaseEnemy::DROP_CHANCE);
-			enemy->deserialize(j);
-			return enemy;
-		}
-
-		return nullptr;
+		auto enemy = it->second();
+		enemy->deserialize(j);
+		return enemy;
 	}
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "../combat/combat_system.h"
 #include "../combat/hitbox.h"
+#include "../core/input_manager.h"
 #include "../core/scene.h"
 #include "../core/scene_stack.h"
 #include "../entities/player/player.h"
@@ -10,8 +11,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-
-const float MAX_ZOOM_FACTOR = 0.332188f;
 
 // Gameplay scene. Owns the world, player, enemies and the camera view.
 class GameScene : public Scene {
@@ -29,6 +28,14 @@ class GameScene : public Scene {
 	void loadGame(sf::RenderWindow &window);
 
 	void drawDebugHitboxes(sf::RenderWindow &window);
+	void handleDebugInput(const InputManager &input);
+	void handleHotbarInput(const InputManager &input);
+	void updateEnemies(float deltaTime);
+	void processEnemyEvents(); // loot, removal, boss-specific events
+	void updateItems(float deltaTime);
+	void resolveHitboxes();
+	void updateCamera();
+	void handleRoomTransition();
 
 	SceneStack &sceneStack_;
 	sf::RenderWindow &window_;

@@ -63,7 +63,11 @@ class World {
   private:
 	std::unordered_map<std::string, Room> rooms;
 	std::string currentRoomId;
-	std::unordered_map<int, const sf::Texture> tileTextures;
+	std::unordered_map<int, std::shared_ptr<sf::Texture>> tileTextures;
+
+	void parseObjectLayer(Room &room, tson::Map &map);
+	void parseSavePoints(Room &room, tson::Map &map);
+	void parseImageLayers(Room &room, tson::Map &map);
 
 	static float getRectLeft(const sf::FloatRect &rect) { return rect.position.x; }
 	static float getRectTop(const sf::FloatRect &rect) { return rect.position.y; }

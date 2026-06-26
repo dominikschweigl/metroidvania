@@ -46,9 +46,9 @@ std::span<const char *const> AssetManager::fontCandidates(const FontAsset asset)
 	switch (asset) {
 	case UI_FONT: {
 		static constexpr std::array<const char *, 7> candidates = {
-		    // "C:\\Windows\\Fonts\\arial.ttf",
-		    // "C:\\Windows\\Fonts\\segoeui.ttf",
-		    // "C:\\Windows\\Fonts\\calibri.ttf",
+		    "C:\\Windows\\Fonts\\arial.ttf",
+		    "C:\\Windows\\Fonts\\segoeui.ttf",
+		    "C:\\Windows\\Fonts\\calibri.ttf",
 		    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",

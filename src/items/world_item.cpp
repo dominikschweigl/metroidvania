@@ -21,6 +21,9 @@ void WorldItem::update(const float deltaTime, const World &world)
 
 		hoverPhase_ += deltaTime * HOVER_SPEED * 2.f * std::numbers::pi_v<float>;
 	}
+
+	if (time_alive < PICKUP_COOLDOWN)
+		time_alive += deltaTime;
 }
 
 void WorldItem::draw(sf::RenderWindow &window)
@@ -41,6 +44,9 @@ std::unique_ptr<Item> WorldItem::tryCollect(const sf::FloatRect playerBounds)
 		return nullptr;
 	if (!playerBounds.findIntersection(getBounds()))
 		return nullptr;
+	if (time_alive < PICKUP_COOLDOWN) {
+		return nullptr;
+	}
 	collected_ = true;
 	return std::move(item_);
 }

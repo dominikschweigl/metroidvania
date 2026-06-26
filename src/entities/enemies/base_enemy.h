@@ -46,6 +46,15 @@ class BaseEnemy : public BaseEntity {
 	float drop_chance = DROP_CHANCE;
 	std::vector<std::unique_ptr<Item>> drop_items = {};
 
+	[[nodiscard]] virtual bool shouldDropLoot() const noexcept { return !health.isAlive() && !lootDropped; }
+
+	// Enemies that play death animations override this.
+	[[nodiscard]] virtual bool isReadyForRemoval() const noexcept { return !isAlive() && lootDropped; }
+
+	// BaseEnemy — no-op defaults
+	virtual bool consumeBluescreenRequest() noexcept { return false; }
+	virtual bool consumeVictoryRequest() noexcept { return false; }
+
   protected:
 	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH,
 	          float drop_chance = DROP_CHANCE)
@@ -71,4 +80,6 @@ class BaseEnemy : public BaseEntity {
 	sf::Vector2f lastPlayerPos;
 
 	std::mt19937 rng;
+
+	bool lootDropped = false;
 };

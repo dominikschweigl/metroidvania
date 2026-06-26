@@ -4,9 +4,9 @@
  "layers":[
         {
          "id":2,
-         "image":"..\/..\/assets\/images\/menus\/background4_816x544.png",
+         "image":"..\/..\/assets\/images\/menus\/background4_pixeled_816x544.png",
          "imageheight":544,
-         "imagewidth":816,
+         "imagewidth":818,
          "name":"Image Layer 1",
          "opacity":1,
          "repeatx":true,
@@ -170,7 +170,7 @@
                         {
                          "name":"drop_chance",
                          "type":"float",
-                         "value":1
+                         "value":0.4
                         }, 
                         {
                          "name":"drop_items",

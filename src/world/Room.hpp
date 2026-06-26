@@ -4,12 +4,10 @@
 #include "../ui/interaction_indicator.h"
 #include "../utils/EnemyFactory.hpp"
 #include <SFML/Graphics.hpp>
-#include <functional>
+#include <memory>
 #include <nlohmann/json.hpp>
-#include <optional>
-#include <string_view>
+#include <string>
 #include <tileson.hpp>
-#include <unordered_map>
 #include <vector>
 
 using json = nlohmann::json;
@@ -38,7 +36,7 @@ struct ImageLayer {
 struct Room {
 	int width{}, height{};
 	std::shared_ptr<tson::Map> map;
-	std::vector<std::vector<bool>> solidGrid; // used for test maps without real tilemaps, indexed by [y][x]
+	std::vector<std::vector<bool>> solidGrid;
 
 	std::vector<sf::Vector2f> playerSpawns;
 	Direction playerSpawnDirection = Direction::Right;
@@ -58,108 +56,18 @@ struct Room {
 	Room(const Room &) = delete;
 	Room &operator=(const Room &) = default;
 
-	void appendItem(std::unique_ptr<WorldItem> &newItem) { items_.push_back(std::move(newItem)); }
+	void appendItem(std::unique_ptr<WorldItem> &newItem);
 
-	bool isTouchingSavepoint(const sf::FloatRect &entityBounds) const
-	{
-		for (size_t i = 0; i < savePoints.size(); ++i) {
-			if (savePoints[i].bounds.findIntersection(entityBounds)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	bool isTouchingSavepoint(const sf::FloatRect &entityBounds) const;
+	Door *getTouchingDoor(const sf::FloatRect &entityBounds);
 
-	Door *getTouchingDoor(const sf::FloatRect &entityBounds)
-	{
-		for (Door &door : doors) {
-			if (door.bounds.findIntersection(entityBounds)) {
-				return &door;
-			}
-		}
+	void update(float deltaTime, const World &world);
+	void draw(sf::RenderWindow &window, const sf::FloatRect playerBounds, float playerX) const;
 
-		return nullptr;
-	}
-
-	void update(float deltaTime, const World &world)
-	{
-		enemies_.erase(std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return !e->isAlive(); }),
-		               enemies_.end());
-		items_.erase(std::remove_if(items_.begin(), items_.end(), [](const auto &i) { return i->isCollected(); }),
-		             items_.end());
-		updateInteractionIndicators(deltaTime);
-	}
-
-	void draw(sf::RenderWindow &window, const sf::FloatRect playerBounds, const float playerX) const
-	{
-		drawInteractionIndicators(window, playerBounds, playerX);
-	}
-
-	json serialize() const
-	{
-		json j;
-
-		j["enemies"] = json::array();
-
-		for (const auto &e : enemies_) {
-			j["enemies"].push_back(e->serialize());
-		}
-
-		j["items"] = json::array();
-
-		for (const auto &i : items_) {
-			j["items"].push_back(i->serialize());
-		}
-
-		return j;
-	}
-
-	void deserialize(const json &j)
-	{
-		width = j.value("width", width);
-		height = j.value("height", height);
-
-		if (j.contains("enemies")) {
-			enemies_.clear();
-			for (const auto &e : j["enemies"]) {
-				enemies_.push_back(EnemyFactory::create(e));
-			}
-		}
-
-		if (j.contains("items")) {
-			items_.clear();
-
-			for (const auto &i : j["items"]) {
-				items_.push_back(WorldItem::deserialize(i));
-			}
-		}
-	}
+	json serialize() const;
+	void deserialize(const json &j);
 
   private:
-	void updateInteractionIndicators(const float deltaTime)
-	{
-		for (Door &door : doors) {
-			door.indicator.update(deltaTime);
-		}
-		for (SavePoint &savePoint : savePoints) {
-			savePoint.indicator.update(deltaTime);
-		}
-	}
-
-	void drawInteractionIndicators(sf::RenderWindow &window, const sf::FloatRect playerBounds,
-	                               const float playerX) const
-	{
-		for (const Door &door : doors) {
-			if (door.bounds.findIntersection(playerBounds)) {
-				door.indicator.draw(window, door.bounds, playerX);
-				return;
-			}
-		}
-		for (const SavePoint &savePoint : savePoints) {
-			if (savePoint.bounds.findIntersection(playerBounds)) {
-				savePoint.indicator.draw(window, savePoint.bounds, playerX);
-				return;
-			}
-		}
-	}
+	void updateInteractionIndicators(float deltaTime);
+	void drawInteractionIndicators(sf::RenderWindow &window, sf::FloatRect playerBounds, float playerX) const;
 };

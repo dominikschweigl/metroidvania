@@ -115,7 +115,9 @@ class TransistorBoss : public BaseEnemy {
 	json serialize() const override;
 	void deserialize(const json &j) override;
 
-	bool lootDropped = false;
+	[[nodiscard]] bool shouldDropLoot() const noexcept override { return health.current <= 0 && !lootDropped; }
+
+	[[nodiscard]] bool isReadyForRemoval() const noexcept override { return false; }
 
   protected:
 	void onPreUpdate(float deltaTime) override;
