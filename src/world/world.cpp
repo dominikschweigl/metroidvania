@@ -404,7 +404,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 				sf::Sprite sprite(*img.texture);
 				sprite.setPosition({x, img.position.y});
 				window.draw(sprite);
-				x += img.texture->getSize().x
+				x += img.texture->getSize().x;
 			}
 		} else {
 			sf::Sprite sprite(*img.texture);
