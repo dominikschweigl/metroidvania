@@ -366,12 +366,12 @@
 							font=\small, inner sep=5pt, text width=2.4cm, align=center},
 					ebox/.style={box, fill=uibkorangel, draw=uibkorange},
 					arr/.style={->, >=latex, very thick, draw=uibkblue},
-					lbl/.style={font=\tiny\ttfamily, align=center},
-					note/.style={font=\tiny\itshape, align=center, text=uibkgraym}
+					lbl/.style={font=\small\ttfamily, align=center},
+					note/.style={font=\small\itshape, align=center, text=black}
 				]
 				\node[ebox] (enemy)  at (0,   0) {Enemy\\drops item};
-				\node[box]  (world)  at (5.5, 0) {WorldItem\\(in Room)};
-				\node[box]  (inv)    at (11,  0) {Inventory\\(in slot)};
+				\node[box]  (world)  at (7.0, 0) {WorldItem\\(in Room)};
+				\node[box]  (inv)    at (14.0, 0) {Inventory\\(in slot)};
 
 				\draw[arr] (enemy.east) --
 				node[above, lbl] {\texttt{rollDrops()}}
@@ -383,113 +383,115 @@
 				node[below, lbl] {\textit{move} \texttt{unique\_ptr<Item>}}
 				(inv.west);
 
-				\node[note, below=0.5cm of enemy]  {move into\\WorldItem ctor};
-				\node[note, below=0.5cm of world]  {physics: gravity + hover\\Room erases \textit{after} transfer};
-				\node[note, below=0.5cm of inv]    {auto-place in equipment\\slot or grid (addItem)};
+				\node[note, below=0.2cm of enemy]  {move into\\WorldItem ctor};
+				\node[note, below=0.2cm of world]  {physics: gravity + hover\\Room erases \textit{after} transfer};
+				\node[note, below=0.2cm of inv]    {auto-place in equipment\\slot or grid (addItem)};
 			\end{tikzpicture}}
 	\end{center}
 
 	\vspace{0.2em}
 
 	\begin{columns}[T]
-		\begin{column}{0.32\textwidth}
+		\begin{column}{0.42\textwidth}
 			\small
 			\textbf{Transfer 1 -- drop (game\_scene.cpp)}
 			\begin{lstlisting}
-for (auto& enemy :
-        room->enemies_) {
+for (auto& enemy : room->enemies_) {
   if (!enemy->isAlive()) {
-    for (auto& drop :
-            enemy->rollDrops()) {
-      auto wi = make_unique<
-        WorldItem>(
+    for (auto& drop : enemy->rollDrops()) {
+      	auto worldItem = make_unique<WorldItem>(
           enemy->getPosition(),
-          std::move(drop));
-      room->appendItem(wi);
+          std::move(drop)
+	);
+      	room->appendItem(worldItem);
     }
   }
 }
 			\end{lstlisting}
 		\end{column}
 
-		\begin{column}{0.32\textwidth}
+		\begin{column}{0.42\textwidth}
 			\small
 			\textbf{Transfer 2 -- collection (game\_scene.cpp)}
 			\begin{lstlisting}
-auto collected =
-  worldItem->tryCollect(
-    player_.getBounds());
+auto collected = worldItem->tryCollect(
+  player_.getBounds()
+);
 if (collected)
-  player_.inventory()
-    .addItem(
-      std::move(collected));
-// Room erases next frame:
+  auto inv = player_.inventory()
+  inv.addItem(
+    std::move(collected)
+  );
+
+// Room:
 items_.erase(
-  remove_if(
-    items_.begin(),
-    items_.end(),
-    [](const auto& i){
-      return i->isCollected();
-    }),
-  items_.end());
+  remove_if(items_.begin(), items_.end(),
+    [](const auto& i){return i->isCollected();}
+  ),
+  items_.end()
+);
 			\end{lstlisting}
 		\end{column}
 
-		\begin{column}{0.32\textwidth}
-			\small
-			\textbf{Special case: BackupDisk}
-			\begin{lstlisting}
-// checked every frame
-if (!player_.isAlive()
-    && player_.inventory()
-         .hasBackup()) {
-  player_.heal(1);
-  player_.inventory()
-    .clearSlot(
-      {SlotKind::Backup, 0});
-  player_.triggerIframes();
-}
-			\end{lstlisting}
-			Consumed \textit{automatically} -- not through \texttt{interact()} but directly by the scene.
-		\end{column}
 	\end{columns}
 \end{frame}
 
 
 %% SLIDE: Item System Technical Design
-\begin{frame}[fragile,shrink=45]{Inventory System: Technical Design}
+\begin{frame}[fragile,shrink=30]{Inventory System}
+	\lstset{basicstyle=\scriptsize\ttfamily}
 	\begin{columns}[T]
 		\begin{column}{0.5\textwidth}
 			\small
 			\textbf{Uniform Slot Addressing}
+			\begin{itemize}
+				\item Every slot is a single \texttt{SlotRef}
+				\item \texttt{moveItem(from,~to)} and \texttt{interact(slot,~player)} are generic entry points
+			\end{itemize}
+			\vspace{-0.1em}
 			\begin{lstlisting}
 enum class SlotKind {
     Hat, Gum, Backup, Grid, Hotbar
 };
 struct SlotRef { SlotKind kind; int index; };
 			\end{lstlisting}
-			Every slot -- equipment, grid, or hotbar -- is a single \texttt{SlotRef}.
-			\texttt{moveItem(from,~to)} and \texttt{interact(slot,~player)} are generic entry points regardless of which area is involved.
 
-			\vspace{0.4em}
+
+
+			\vspace{0.5em}
 
 			\textbf{Slot-Move Validation}
+			\begin{itemize}
+				\item Validation lives in the inventory model
+				\item Each item knows which slot kinds it can occupy
+				\item Inventory checks \texttt{isValidInSlot(item,~slot)}
+				\item UI drag-drop and keyboard shortcuts obeys these rules
+			\end{itemize}
+
+			\vspace{-0.1em}
 			\begin{lstlisting}
 bool isValidInSlot(const Item& item, SlotRef s) {
-    auto home = item.equipmentSlot();
-    if (s.kind == Hat || s.kind == Gum
-                      || s.kind == Backup)
-        return home.has_value()
-            && home.value() == s.kind;
-    return true; // grid + hotbar: any item
+  const auto equipment = item.equipmentSlot();
+  for (const SlotRef &s : EQUIPMENT_SLOTS_) {
+    if (s.kind == slotKind)
+    return equipment.has_value() &&
+           *equipment == slotKind;
+  }
+  return true;
 }
 			\end{lstlisting}
-			Validation lives in the model -- UI drag-drop and keyboard shortcuts obey the same rules.
+
 		\end{column}
 
 		\begin{column}{0.46\textwidth}
 			\small
 			\textbf{Item Self-Activation}
+			\begin{itemize}
+				\item Inventory calls \texttt{item.activate(...)}
+				\item Logic lives in the item
+				\item Inventory is a passive store
+			\end{itemize}
+
 			\begin{lstlisting}
 // Equipment (e.g. HatItem)
 void activate(...) {
@@ -506,7 +508,6 @@ void activate(...) {
 		\end{column}
 	\end{columns}
 \end{frame}
-
 
 
 \begin{frame}{Final Sprint}
