@@ -211,7 +211,7 @@ void GameScene::updateItems(float deltaTime)
 
 	for (auto &item : room->items_)
 		item->update(deltaTime, world_);
-  
+
 	for (const std::unique_ptr<WorldItem> &worldItem : room->items_) {
 		const std::optional<std::reference_wrapper<const Item>> peeked = worldItem->peekItem();
 		if (!peeked || !player_.inventory().canAdd(peeked->get()))
