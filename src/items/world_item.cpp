@@ -35,6 +35,13 @@ sf::FloatRect WorldItem::getBounds() const noexcept
 	return {{position_.x - WIDTH / 2.f, position_.y - HEIGHT}, {WIDTH, HEIGHT}};
 }
 
+std::optional<std::reference_wrapper<const Item>> WorldItem::peekItem() const noexcept
+{
+	if (!item_)
+		return std::nullopt;
+	return std::cref(*item_);
+}
+
 std::unique_ptr<Item> WorldItem::tryCollect(const sf::FloatRect playerBounds)
 {
 	if (collected_)

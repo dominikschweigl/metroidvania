@@ -3,14 +3,23 @@
 #include "player.h"
 #include <stdexcept>
 
+bool Inventory::isEquipmentSlot(const SlotKind slotkind) noexcept
+{
+	for (const SlotRef &s : EQUIPMENT_SLOTS_) {
+		if (s.kind == slotkind) {
+			return true;
+		}
+	}
+	return false;
+}
+
 bool Inventory::isValidInSlot(const Item &item, const SlotKind slotKind) noexcept
 {
-	const std::optional<SlotKind> equipment = item.equipmentSlot();
-	for (const SlotRef &s : EQUIPMENT_SLOTS_) {
-		if (s.kind == slotKind)
-			return equipment.has_value() && *equipment == slotKind;
+	if (!isEquipmentSlot(slotKind)) {
+		return true;
 	}
-	return true;
+	const std::optional<SlotKind> equipment = item.equipmentSlot();
+	return equipment.has_value() && *equipment == slotKind;
 }
 
 std::unique_ptr<Item> &Inventory::slotRef(const SlotRef slot)
@@ -62,6 +71,20 @@ const Item &Inventory::itemAt(const SlotRef slot) const
 	return *slotRef(slot);
 }
 
+bool Inventory::canAdd(const Item &item) const noexcept
+{
+	const std::optional<SlotKind> dest = item.equipmentSlot();
+	if (dest && !slotRef({*dest, 0}))
+		return true;
+	for (const std::unique_ptr<Item> &cell : grid)
+		if (!cell)
+			return true;
+	for (const std::unique_ptr<Item> &cell : hotbar)
+		if (!cell)
+			return true;
+	return false;
+}
+
 void Inventory::addItem(std::unique_ptr<Item> item)
 {
 	const std::optional<SlotKind> dest = item->equipmentSlot();
@@ -73,6 +96,12 @@ void Inventory::addItem(std::unique_ptr<Item> item)
 		}
 	}
 	for (std::unique_ptr<Item> &cell : grid) {
+		if (!cell) {
+			cell = std::move(item);
+			return;
+		}
+	}
+	for (std::unique_ptr<Item> &cell : hotbar) {
 		if (!cell) {
 			cell = std::move(item);
 			return;

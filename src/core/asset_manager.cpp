@@ -14,8 +14,9 @@ const sf::Texture &AssetManager::getTexture(const TextureAsset asset)
 {
 	const auto [iterator, isInserted] = textures.try_emplace(asset);
 	if (isInserted && !iterator->second.loadFromFile(std::string(texturePath(asset)))) {
-		textures.erase(iterator);
-		throw std::runtime_error(std::format("AssetManager: failed to load: {}", texturePath(asset)));
+		const sf::Image fallback(sf::Vector2u{32u, 32u}, sf::Color::Black);
+		if (!iterator->second.loadFromImage(fallback))
+			throw std::runtime_error("AssetManager: failed to create fallback texture");
 	}
 	iterator->second.setSmooth(false);
 	return iterator->second;
@@ -46,9 +47,9 @@ std::span<const char *const> AssetManager::fontCandidates(const FontAsset asset)
 	switch (asset) {
 	case UI_FONT: {
 		static constexpr std::array<const char *, 7> candidates = {
-		    // "C:\\Windows\\Fonts\\arial.ttf",
-		    // "C:\\Windows\\Fonts\\segoeui.ttf",
-		    // "C:\\Windows\\Fonts\\calibri.ttf",
+		    "C:\\Windows\\Fonts\\arial.ttf",
+		    "C:\\Windows\\Fonts\\segoeui.ttf",
+		    "C:\\Windows\\Fonts\\calibri.ttf",
 		    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",

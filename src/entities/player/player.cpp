@@ -2,6 +2,7 @@
 #include "../../core/input_manager.h"
 #include "../entity_physics.h"
 #include <algorithm>
+#include <memory>
 #include <random>
 #include <vector>
 

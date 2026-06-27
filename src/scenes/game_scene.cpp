@@ -182,6 +182,9 @@ void GameScene::update(float deltaTime)
 	for (auto &item : world_.getCurrentRoom()->items_)
 		item->update(deltaTime, world_);
 	for (const std::unique_ptr<WorldItem> &worldItem : world_.getCurrentRoom()->items_) {
+		const std::optional<std::reference_wrapper<const Item>> peeked = worldItem->peekItem();
+		if (!peeked || !player_.inventory().canAdd(peeked->get()))
+			continue;
 		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
 		if (collected)
 			player_.inventory().addItem(std::move(collected));
