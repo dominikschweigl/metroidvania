@@ -88,14 +88,49 @@ void GameScene::update(float deltaTime)
 {
 	const InputManager &input = InputManager::getInstance();
 
+	handleDebugInput(input);
+	handleHotbarInput(input);
+
 	if (input.wasPressed(GameAction::ZoomIn))
 		zoomFactor_ *= 0.9f;
-	if (input.wasPressed(GameAction::ZoomOut)) {
+	if (input.wasPressed(GameAction::ZoomOut))
 		zoomFactor_ *= 1.1f;
-		zoomFactor_ = std::min(zoomFactor_, MAX_ZOOM_FACTOR);
-	}
 	if (input.wasPressed(MenuAction::Back))
-		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makePauseMenu(stack, window); });
+		sceneStack_.push([&] { return makePauseMenu(sceneStack_, window_); });
+	if (input.wasPressed(GameAction::OpenInventory))
+		sceneStack_.push([&] { return std::make_unique<InventoryScene>(player_, sceneStack_, window_.getSize()); });
+	if (input.wasPressed(GameAction::ToggleMinimap))
+		showMinimap_ = !showMinimap_;
+	if (input.wasPressed(GameAction::Interact))
+		handleRoomTransition();
+
+	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
+	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
+	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
+
+	updateEnemies(deltaTime);
+	processEnemyEvents();
+	updateItems(deltaTime);
+
+	world_.update(deltaTime, player_.getBounds());
+
+	resolveHitboxes();
+	hotbarHud_.update(deltaTime);
+	resetPlayerIfOutOfBounds();
+
+	if (!player_.isAlive() && player_.inventory().hasBackup()) {
+		player_.heal(1);
+		player_.inventory().clearSlot({SlotKind::Backup, 0});
+		player_.triggerIframes();
+	}
+	if (!player_.isAlive())
+		sceneStack_.push([&] { return makeGameOverMenu(sceneStack_, window_); });
+
+	updateCamera();
+}
+
+void GameScene::handleDebugInput(const InputManager &input)
+{
 	if (input.wasPressed(GameAction::ToggleDebugHitboxes))
 		showDebugHitboxes_ = !showDebugHitboxes_;
 	if (input.wasPressed(GameAction::ToggleDebugInvincibility)) {
@@ -110,78 +145,74 @@ void GameScene::update(float deltaTime)
 		player_.addEffect(Effect::resistance());
 		player_.addEffect(Effect::jumpBoost());
 	}
-	if (input.wasPressed(GameAction::ToggleMinimap))
-		showMinimap_ = !showMinimap_;
-	if (input.wasPressed(GameAction::OpenInventory))
-		sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
-			return std::make_unique<InventoryScene>(player, stack, windowSize);
-		});
+}
 
+void GameScene::handleHotbarInput(const InputManager &input)
+{
 	for (int i = 0; i < Inventory::HOTBAR_SIZE; ++i) {
-		if (input.wasPressed(InputManager::hotbarSlotActions()[i])) {
-			if (player_.inventory().hotbar[i] && player_.inventory().hotbar[i]->info().name == "Damaged USB Key") {
-				Door *touchingDoor = world_.getTouchingDoor(player_.getBounds());
-				if (touchingDoor) {
-					touchingDoor->locked = false;
-				} else {
-					continue;
-				}
-			}
-			hotbarHud_.flashSlot(i);
-			player_.useHotbarSlot(i);
+		if (!input.wasPressed(InputManager::hotbarSlotActions()[i]))
+			continue;
+
+		// TODO: Check if this can be done cleaner
+		auto &slot = player_.inventory().hotbar[i];
+		if (slot && slot->info().name == "Damaged USB Key") {
+			Door *door = world_.getTouchingDoor(player_.getBounds());
+			if (!door)
+				continue;
+			door->locked = false;
 		}
+
+		hotbarHud_.flashSlot(i);
+		player_.useHotbarSlot(i);
 	}
+}
 
-	const bool attackTriggered = input.wasPressed(GameAction::AttackMelee);
-	const bool hatThrowTriggered = input.wasPressed(GameAction::ThrowHat);
+void GameScene::updateEnemies(float deltaTime)
+{
+	Room *room = world_.getCurrentRoom();
 
-	player_.update(deltaTime, world_, attackTriggered, hatThrowTriggered);
-
-	// Update all alive enemies; collect drops before removing dead ones.
-	for (auto &enemy : world_.getCurrentRoom()->enemies_)
+	for (auto &enemy : room->enemies_)
 		enemy->update(deltaTime, world_, player_.getPosition(), player_.getBounds());
 
-	std::vector<std::unique_ptr<BaseEnemy>> spawnedEnemies;
-	for (auto &enemy : world_.getCurrentRoom()->enemies_)
-		enemy->drainSpawns(spawnedEnemies);
-	for (auto &spawned : spawnedEnemies)
-		world_.getCurrentRoom()->enemies_.push_back(std::move(spawned));
+	// Drain spawns (e.g. RecursionGolem splitting)
+	std::vector<std::unique_ptr<BaseEnemy>> spawned;
+	for (auto &enemy : room->enemies_)
+		enemy->drainSpawns(spawned);
+	for (auto &s : spawned)
+		room->enemies_.push_back(std::move(s));
+}
 
+void GameScene::processEnemyEvents()
+{
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
-		if (!enemy->isAlive()
-		    || (dynamic_cast<TransistorBoss *>(enemy.get()) != nullptr && enemy->health.current <= 0
-		        && !dynamic_cast<TransistorBoss *>(enemy.get())->lootDropped)) {
+		if (enemy->shouldDropLoot()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
-				auto droppedItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
-
-				float angle = angleDist(rng);
-				float speed = speedDist(rng);
-				droppedItem->velocity_ = {std::cos(angle) * speed, std::sin(angle) * speed};
-
-				world_.getCurrentRoom()->appendItem(droppedItem);
-			}
-			if (!enemy->isAlive()) {
-				combat_.clearVictim(&enemy->health);
+				auto worldItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
+				worldItem->velocity_ = {std::cos(angleDist(rng)) * speedDist(rng),
+				                        std::sin(angleDist(rng)) * speedDist(rng)};
+				world_.getCurrentRoom()->appendItem(worldItem);
 			}
 		}
-	}
 
-	// The segfault boss interrupts the fight with a "bluescreen" between stages,
-	// and raises a victory request once the death animation finishes.
-	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
-		auto *segfaultBoss = dynamic_cast<SegfaultBoss *>(enemy.get());
-		if (segfaultBoss == nullptr)
-			continue;
-		if (segfaultBoss->consumeBluescreenRequest())
-			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeBluescreenMenu(stack, window); });
-		if (segfaultBoss->consumeVictoryRequest())
-			sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeVictoryMenu(stack, window); });
-	}
+		if (enemy->isReadyForRemoval())
+			combat_.clearVictim(&enemy->health);
 
-	// Update world items and check for player pickup.
-	for (auto &item : world_.getCurrentRoom()->items_)
+		// Virtual — SegfaultBoss implements, BaseEnemy returns false
+		if (enemy->consumeBluescreenRequest())
+			sceneStack_.push([&] { return makeBluescreenMenu(sceneStack_, window_); });
+		if (enemy->consumeVictoryRequest())
+			sceneStack_.push([&] { return makeVictoryMenu(sceneStack_, window_); });
+	}
+}
+
+void GameScene::updateItems(float deltaTime)
+{
+	Room *room = world_.getCurrentRoom();
+
+	for (auto &item : room->items_)
 		item->update(deltaTime, world_);
-	for (const std::unique_ptr<WorldItem> &worldItem : world_.getCurrentRoom()->items_) {
+  
+	for (const std::unique_ptr<WorldItem> &worldItem : room->items_) {
 		const std::optional<std::reference_wrapper<const Item>> peeked = worldItem->peekItem();
 		if (!peeked || !player_.inventory().canAdd(peeked->get()))
 			continue;
@@ -189,13 +220,16 @@ void GameScene::update(float deltaTime)
 		if (collected)
 			player_.inventory().addItem(std::move(collected));
 	}
+}
 
-	world_.update(deltaTime, player_.getBounds());
-
+void GameScene::resolveHitboxes()
+{
 	hitboxes_.clear();
 	hurtboxes_.clear();
+
 	player_.collectHitboxes(hitboxes_);
 	player_.collectHurtboxes(hurtboxes_);
+
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		enemy->collectHitboxes(hitboxes_);
 		enemy->collectHurtboxes(hurtboxes_);
@@ -203,61 +237,52 @@ void GameScene::update(float deltaTime)
 
 	combat_.resolve(hitboxes_, hurtboxes_);
 
-	std::vector<std::uint32_t> endedSourceIds;
-	player_.drainEndedSourceIds(endedSourceIds);
+	std::vector<std::uint32_t> endedIds;
+	player_.drainEndedSourceIds(endedIds);
 	for (auto &enemy : world_.getCurrentRoom()->enemies_)
-		enemy->drainEndedSourceIds(endedSourceIds);
-	for (const std::uint32_t id : endedSourceIds)
+		enemy->drainEndedSourceIds(endedIds);
+	for (const std::uint32_t id : endedIds)
 		combat_.clearSource(id);
+}
 
-	hotbarHud_.update(deltaTime);
-	resetPlayerIfOutOfBounds();
+void GameScene::handleRoomTransition()
+{
+	Door *door = world_.getTouchingDoor(player_.getBounds());
+	if (door) {
+		const bool canEnter =
+		    !door->locked && (!door->needsToClearAllEnemies || world_.getCurrentRoom()->enemies_.empty());
+		if (!canEnter)
+			return;
 
-	// Backup Disk revive: intercept death before the game-over check
-	if (!player_.isAlive() && player_.inventory().hasBackup()) {
-		player_.heal(1);
-		player_.inventory().clearSlot({SlotKind::Backup, 0});
-		player_.triggerIframes();
+		world_.setCurrentRoom(door->targetRoomId);
+		player_.setPosition(world_.getCurrentRoom()->playerSpawns[door->targetSpawnIdx]);
+
+		const MusicTrack track =
+		    (world_.getCurrentRoomId() == "boss_room") ? MusicTrack::AREA_1_BOSS_THEME : MusicTrack::GAME_THEME;
+		AudioManager::getInstance().playMusic(track);
+
+	} else if (world_.isTouchingSavepoint(player_.getBounds())) {
+		world_.saveWorldData(player_);
 	}
+}
 
-	// Check for player death
-	if (!player_.isAlive()) {
-		sceneStack_.push([&stack = sceneStack_, &window = window_]() { return makeGameOverMenu(stack, window); });
-	}
+void GameScene::updateCamera()
+{
+	const Room *room = world_.getCurrentRoom();
+	const float roomW = room->width * World::TILE_SIZE;
+	const float roomH = room->height * World::TILE_SIZE;
 
-	if (input.wasPressed(GameAction::Interact)) {
-		Door *touchingDoor = world_.getTouchingDoor(player_.getBounds());
-		if (touchingDoor) {
-			// A door needs to be unlocked and maybe all Enemies in the room need to be cleared.
-			if (!touchingDoor->locked
-			    && (!touchingDoor->needsToClearAllEnemies || world_.getCurrentRoom()->enemies_.size() == 0)) {
-				world_.setCurrentRoom(touchingDoor->targetRoomId);
-				player_.setPosition(world_.getCurrentRoom()->playerSpawns[touchingDoor->targetSpawnIdx]);
-				if (world_.getCurrentRoomId() == "boss_room") {
-					AudioManager::getInstance().playMusic(MusicTrack::AREA_1_BOSS_THEME);
-				} else {
-					AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
-				}
-			}
-		} else if (world_.isTouchingSavepoint(player_.getBounds())) {
-			world_.saveWorldData(player_);
-		}
-	}
+	const float halfW = view_.getSize().x / 2.f;
+	const float halfH = view_.getSize().y / 2.f;
 
-	float halfViewWidth = view_.getSize().x / 2.f;
-	float halfViewHeight = view_.getSize().y / 2.f;
+	// If the room is narrower than the viewport, center on the room instead of the player.
+	const float x =
+	    (roomW <= view_.getSize().x) ? roomW / 2.f : std::clamp(player_.getPosition().x, halfW, roomW - halfW);
 
-	float viewX = player_.getPosition().x;
-	float viewY = player_.getPosition().y;
+	const float y =
+	    (roomH <= view_.getSize().y) ? roomH / 2.f : std::clamp(player_.getPosition().y, halfH, roomH - halfH);
 
-	// Clamp X
-	viewX = std::max(halfViewWidth, std::min(viewX, world_.getCurrentRoom()->width * World::TILE_SIZE - halfViewWidth));
-
-	// Clamp Y
-	viewY =
-	    std::max(halfViewHeight, std::min(viewY, world_.getCurrentRoom()->height * World::TILE_SIZE - halfViewHeight));
-
-	view_.setCenter({viewX, viewY});
+	view_.setCenter({x, y});
 }
 
 void GameScene::draw(sf::RenderWindow &window)

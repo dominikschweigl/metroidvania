@@ -72,10 +72,9 @@ float resolveVertical(sf::Vector2f pos, float &velY, bool &isOnGround, float wid
 void simulateMovement(float deltaTime, sf::Vector2f &position, sf::Vector2f &velocity, bool &isOnGround, float gravity,
                       float width, float height, const World &world)
 {
-	static constexpr float step = 0.00001f;
 	float counter = 0.f;
 	while (counter < deltaTime) {
-		float s = std::min(step, deltaTime - counter);
+		float s = std::min(EntityPhysics::PHYSICS_STEP, deltaTime - counter);
 		position.x = resolveHorizontal(position, velocity.x, width, height, s, world);
 		position.y = resolveVertical(position, velocity.y, isOnGround, width, height, s, world);
 		applyGravity(velocity.y, isOnGround, s, gravity,
