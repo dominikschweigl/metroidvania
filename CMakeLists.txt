@@ -33,6 +33,7 @@ set(GAME_SOURCES
     src/scenes/victory_scene.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
+    src/world/Room.cpp
     src/world/world.cpp
     src/combat/combat_system.cpp
     src/entities/base_entity.cpp

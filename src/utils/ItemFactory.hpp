@@ -9,7 +9,10 @@
 #include "../items/resistance_potion_item.h"
 #include "../items/speed_potion_item.h"
 #include "../items/usb_key_item.h"
+#include <functional>
+#include <iostream>
 #include <nlohmann/json.hpp>
+#include <unordered_map>
 
 using json = nlohmann::json;
 
@@ -18,44 +21,27 @@ struct ItemFactory {
 	{
 		if (j.empty())
 			return nullptr;
-		std::string type = j["type"];
 
-		if (type == "ChewingGumItem") {
-			return std::make_unique<ChewingGumItem>();
+		using Creator = std::function<std::unique_ptr<Item>()>;
+		static const std::unordered_map<std::string, Creator> table = {
+		    {"ChewingGumItem", [] { return std::make_unique<ChewingGumItem>(); }},
+		    {"HatItem", [] { return std::make_unique<HatItem>(); }},
+		    {"HealingPotionItem", [] { return std::make_unique<HealingPotionItem>(); }},
+		    {"JumpPotionItem", [] { return std::make_unique<JumpPotionItem>(); }},
+		    {"ResistancePotionItem", [] { return std::make_unique<ResistancePotionItem>(); }},
+		    {"SpeedPotionItem", [] { return std::make_unique<SpeedPotionItem>(); }},
+		    {"DamagePotionItem", [] { return std::make_unique<DamagePotionItem>(); }},
+		    {"UsbKeyItem", [] { return std::make_unique<UsbKeyItem>(); }},
+		    {"BackupDiskItem", [] { return std::make_unique<BackupDiskItem>(); }},
+		};
+
+		const std::string type = j.value("type", "");
+		auto it = table.find(type);
+		if (it == table.end()) {
+			std::cerr << "ItemFactory: unknown type '" << type << "'\n";
+			return nullptr;
 		}
 
-		if (type == "HatItem") {
-			return std::make_unique<HatItem>();
-		}
-
-		if (type == "HealingPotionItem") {
-			return std::make_unique<HealingPotionItem>();
-		}
-
-		if (type == "JumpPotionItem") {
-			return std::make_unique<JumpPotionItem>();
-		}
-
-		if (type == "ResistancePotionItem") {
-			return std::make_unique<ResistancePotionItem>();
-		}
-
-		if (type == "SpeedPotionItem") {
-			return std::make_unique<SpeedPotionItem>();
-		}
-
-		if (type == "DamagePotionItem") {
-			return std::make_unique<DamagePotionItem>();
-		}
-
-		if (type == "UsbKeyItem") {
-			return std::make_unique<UsbKeyItem>();
-		}
-
-		if (type == "BackupDiskItem") {
-			return std::make_unique<BackupDiskItem>();
-		}
-
-		return nullptr;
+		return it->second();
 	}
 };

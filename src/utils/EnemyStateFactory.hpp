@@ -1,7 +1,8 @@
 #pragma once
-#include <memory>
+#include <functional>
+#include <iostream>
 #include <nlohmann/json.hpp>
-#include <string>
+#include <unordered_map>
 
 using json = nlohmann::json;
 
@@ -52,123 +53,67 @@ using json = nlohmann::json;
 #include "../entities/enemies/recursion_golem/states/windup_state.h"
 
 struct EnemyStateFactory {
-	static EnemyState *create(const json &j)
+	static std::unique_ptr<EnemyState> create(const json &j)
 	{
 		if (j.empty() || !j.contains("type"))
 			return nullptr;
 
-		const std::string type = j["type"];
+		using Creator = std::function<std::unique_ptr<EnemyState>()>;
+		static const std::unordered_map<std::string, Creator> table = {
+		    // Segfault Boss
+		    {"SegfaultRoamingState", [] { return std::make_unique<segfault_boss::RoamingState>(); }},
+		    {"NullSpearAttackState", [] { return std::make_unique<segfault_boss::NullSpearAttackState>(); }},
+		    {"SegfaultRecoverState", [] { return std::make_unique<segfault_boss::RecoverState>(); }},
+		    {"SegfaultDeathState", [] { return std::make_unique<segfault_boss::DeathState>(); }},
+		    {"SegfaultStage2TransitionState", [] { return std::make_unique<segfault_boss::Stage2TransitionState>(); }},
+		    {"SegfaultSummonState", [] { return std::make_unique<segfault_boss::SummonState>(); }},
+		    {"SegfaultStage3TransitionState", [] { return std::make_unique<segfault_boss::Stage3TransitionState>(); }},
+		    {"SegfaultForkState", [] { return std::make_unique<segfault_boss::ForkState>(); }},
 
-		std::unique_ptr<EnemyState> state;
+		    // Transistor Boss
+		    {"ChargeAttackState", [] { return std::make_unique<transistor_boss::ChargeAttackState>(); }},
+		    {"ChargeAttackWindupState", [] { return std::make_unique<transistor_boss::ChargeAttackWindupState>(); }},
+		    {"DeathState", [] { return std::make_unique<transistor_boss::DeathState>(); }},
+		    {"RecoverState", [] { return std::make_unique<transistor_boss::RecoverState>(); }},
+		    {"RoamingState", [] { return std::make_unique<transistor_boss::RoamingState>(); }},
+		    {"ShootAttackState", [] { return std::make_unique<transistor_boss::ShootAttackState>(); }},
+		    {"Stage2RecoverState", [] { return std::make_unique<transistor_boss::Stage2RecoverState>(); }},
+		    {"SummonState", [] { return std::make_unique<transistor_boss::SummonState>(); }},
 
-		// Segfault Boss States
-		if (type == "SegfaultRoamingState")
-			state = std::make_unique<segfault_boss::RoamingState>();
+		    // Capacitor
+		    {"FleeState", [] { return std::make_unique<capacitor::FleeState>(); }},
+		    {"HoverState", [] { return std::make_unique<capacitor::HoverState>(); }},
+		    {"ShootState", [] { return std::make_unique<capacitor::ShootState>(); }},
+		    {"SwoopState", [] { return std::make_unique<capacitor::SwoopState>(); }},
 
-		if (type == "NullSpearAttackState")
-			state = std::make_unique<segfault_boss::NullSpearAttackState>();
+		    // Race Condition Slime
+		    {"AttackState", [] { return std::make_unique<rc_slime::AttackState>(); }},
+		    {"ChaseState", [] { return std::make_unique<rc_slime::ChaseState>(); }},
+		    {"IdleState", [] { return std::make_unique<rc_slime::IdleState>(); }},
+		    {"RecoverState", [] { return std::make_unique<rc_slime::RecoverState>(); }},
+		    {"WindUpState", [] { return std::make_unique<rc_slime::WindUpState>(); }},
 
-		if (type == "SegfaultRecoverState")
-			state = std::make_unique<segfault_boss::RecoverState>();
+		    // Resistor Bug
+		    {"ResistorIdleState", [] { return std::make_unique<resistor_bug::IdleState>(); }},
+		    {"ResistorChaseState", [] { return std::make_unique<resistor_bug::ChaseState>(); }},
+		    {"ResistorJumpAttackState", [] { return std::make_unique<resistor_bug::JumpAttackState>(); }},
+		    {"ResistorRecoverState", [] { return std::make_unique<resistor_bug::RecoverState>(); }},
 
-		if (type == "SegfaultDeathState")
-			state = std::make_unique<segfault_boss::DeathState>();
+		    // Recursion Golem
+		    {"GolemIdleState", [] { return std::make_unique<recursion_golem::IdleState>(); }},
+		    {"GolemChaseState", [] { return std::make_unique<recursion_golem::ChaseState>(); }},
+		    {"GolemWindUpState", [] { return std::make_unique<recursion_golem::WindUpState>(); }},
+		    {"GolemAttackState", [] { return std::make_unique<recursion_golem::AttackState>(); }},
+		    {"GolemExplodeState", [] { return std::make_unique<recursion_golem::ExplodeState>(); }},
+		};
 
-		if (type == "SegfaultStage2TransitionState")
-			state = std::make_unique<segfault_boss::Stage2TransitionState>();
+		const std::string type = j.value("type", "");
+		auto it = table.find(type);
+		if (it == table.end()) {
+			std::cerr << "EnemyStateFactory: unknown type '" << type << "'\n";
+			return nullptr;
+		}
 
-		if (type == "SegfaultSummonState")
-			state = std::make_unique<segfault_boss::SummonState>();
-
-		if (type == "SegfaultStage3TransitionState")
-			state = std::make_unique<segfault_boss::Stage3TransitionState>();
-
-		if (type == "SegfaultForkState")
-			state = std::make_unique<segfault_boss::ForkState>();
-
-		// Transistor Boss States
-		if (type == "ChargeAttackState")
-			state = std::make_unique<transistor_boss::ChargeAttackState>();
-
-		if (type == "ChargeAttackWindupState")
-			state = std::make_unique<transistor_boss::ChargeAttackWindupState>();
-
-		if (type == "DeathState")
-			state = std::make_unique<transistor_boss::DeathState>();
-
-		if (type == "RecoverState")
-			state = std::make_unique<transistor_boss::RecoverState>();
-
-		if (type == "RoamingState")
-			state = std::make_unique<transistor_boss::RoamingState>();
-
-		if (type == "ShootAttackState")
-			state = std::make_unique<transistor_boss::ShootAttackState>();
-
-		if (type == "Stage2RecoverState")
-			state = std::make_unique<transistor_boss::Stage2RecoverState>();
-
-		if (type == "SummonState")
-			state = std::make_unique<transistor_boss::SummonState>();
-
-		// Capacitor States
-		if (type == "FleeState")
-			state = std::make_unique<capacitor::FleeState>();
-
-		if (type == "HoverState")
-			state = std::make_unique<capacitor::HoverState>();
-
-		if (type == "ShootState")
-			state = std::make_unique<capacitor::ShootState>();
-
-		if (type == "SwoopState")
-			state = std::make_unique<capacitor::SwoopState>();
-
-		// Race Condition Slime
-		if (type == "AttackState")
-			state = std::make_unique<rc_slime::AttackState>();
-
-		if (type == "ChaseState")
-			state = std::make_unique<rc_slime::ChaseState>();
-
-		if (type == "IdleState")
-			state = std::make_unique<rc_slime::IdleState>();
-
-		if (type == "RecoverState")
-			state = std::make_unique<rc_slime::RecoverState>();
-
-		if (type == "WindUpState")
-			state = std::make_unique<rc_slime::WindUpState>();
-
-		// Resistor Bug States
-		if (type == "ResistorIdleState")
-			state = std::make_unique<resistor_bug::IdleState>();
-
-		if (type == "ResistorChaseState")
-			state = std::make_unique<resistor_bug::ChaseState>();
-
-		if (type == "ResistorJumpAttackState")
-			state = std::make_unique<resistor_bug::JumpAttackState>();
-
-		if (type == "ResistorRecoverState")
-			state = std::make_unique<resistor_bug::RecoverState>();
-
-		// Recursion Golem
-		if (type == "GolemIdleState")
-			state = std::make_unique<recursion_golem::IdleState>();
-
-		if (type == "GolemChaseState")
-			state = std::make_unique<recursion_golem::ChaseState>();
-
-		if (type == "GolemWindUpState")
-			state = std::make_unique<recursion_golem::WindUpState>();
-
-		if (type == "GolemAttackState")
-			state = std::make_unique<recursion_golem::AttackState>();
-
-		if (type == "GolemExplodeState")
-			state = std::make_unique<recursion_golem::ExplodeState>();
-
-		return state.release();
+		return it->second();
 	}
 };

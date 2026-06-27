@@ -69,6 +69,7 @@ std::vector<std::unique_ptr<Item>> BaseEnemy::rollDrops()
 			drops.push_back(std::move(item));
 	}
 	drop_items.erase(std::remove(drop_items.begin(), drop_items.end(), nullptr), drop_items.end());
+	lootDropped = true;
 	return drops;
 }
 
@@ -77,6 +78,11 @@ json BaseEnemy::serialize() const
 	json j = BaseEntity::serialize();
 
 	j["state"] = currentState->serialize();
+	j["lootDropped"] = lootDropped;
+	j["drop_chance"] = drop_chance;
+	j["drop_items"] = json::array();
+	for (const auto &item : drop_items)
+		j["drop_items"].push_back(item->serialize());
 
 	return j;
 }
@@ -86,6 +92,14 @@ void BaseEnemy::deserialize(const json &j)
 	BaseEntity::deserialize(j);
 
 	if (j.contains("currentState")) {
-		currentState = EnemyStateFactory::create(j["currentState"]);
+		currentState = EnemyStateFactory::create(j["currentState"]).release();
+	}
+	lootDropped = j.value("lootDropped", false);
+	drop_chance = j.value("drop_chance", DROP_CHANCE);
+	if (j.contains("drop_items")) {
+		drop_items.clear();
+		for (const auto &itemJson : j["drop_items"])
+			if (auto item = ItemFactory::create(itemJson))
+				drop_items.push_back(std::move(item));
 	}
 }

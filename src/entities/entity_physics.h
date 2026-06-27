@@ -5,6 +5,8 @@
 
 namespace EntityPhysics {
 
+static constexpr float PHYSICS_STEP = 1.f / 240.f;
+
 // Checks if solid ground exists directly below the given bounds
 bool isGroundBelow(sf::FloatRect bounds, const World &world);
 
