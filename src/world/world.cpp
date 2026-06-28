@@ -280,28 +280,51 @@ bool World::isSolidAtRect(const sf::FloatRect &rect) const
 		return false;
 	const Room &room = rooms.at(currentRoomId);
 
-	const int left = static_cast<int>(rect.position.x / TILE_SIZE);
-	const int right = static_cast<int>((rect.position.x + rect.size.x) / TILE_SIZE);
-	const int top = static_cast<int>(rect.position.y / TILE_SIZE);
-	const int bottom = static_cast<int>((rect.position.y + rect.size.y) / TILE_SIZE);
+	constexpr float epsilon = 0.001f;
+
+	const int left = static_cast<int>(std::floor(rect.position.x / TILE_SIZE));
+	const int right = static_cast<int>(std::floor((rect.position.x + rect.size.x - epsilon) / TILE_SIZE));
+	const int top = static_cast<int>(std::floor(rect.position.y / TILE_SIZE));
+	const int bottom = static_cast<int>(std::floor((rect.position.y + rect.size.y - epsilon) / TILE_SIZE));
+
+	const int clampedLeft = std::max(left, 0);
+	const int clampedRight = std::min(right, room.width - 1);
+	const int clampedTop = std::max(top, 0);
+	const int clampedBottom = std::min(bottom, room.height - 1);
 
 	if (room.map) {
 		tson::Layer *layer = room.map->getLayer("Solid");
 		if (!layer)
 			return false;
 
-		for (int y = top; y <= bottom; ++y)
-			for (int x = left; x <= right; ++x)
+		for (int y = clampedTop; y <= clampedBottom; ++y)
+			for (int x = clampedLeft; x <= clampedRight; ++x)
 				if (layer->getTileData(x, y))
 					return true;
 		return false;
 	}
 
-	for (int y = std::max(top, 0); y <= std::min(bottom, room.height - 1); ++y)
-		for (int x = std::max(left, 0); x <= std::min(right, room.width - 1); ++x)
+	for (int y = clampedTop; y <= clampedBottom; ++y)
+		for (int x = clampedLeft; x <= clampedRight; ++x)
 			if (room.solidGrid[y][x])
 				return true;
 	return false;
+}
+
+bool World::isSolidTile(int tileX, int tileY) const
+{
+	if (currentRoomId.empty())
+		return false;
+	const Room &room = rooms.at(currentRoomId);
+
+	if (tileX < 0 || tileY < 0 || tileX >= room.width || tileY >= room.height)
+		return false;
+
+	if (room.map) {
+		tson::Layer *layer = room.map->getLayer("Solid");
+		return layer && layer->getTileData(tileX, tileY) != nullptr;
+	}
+	return room.solidGrid[tileY][tileX];
 }
 
 void World::loadFromGrid(const std::vector<std::vector<int>> &grid)

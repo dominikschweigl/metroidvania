@@ -5,7 +5,13 @@
 
 namespace EntityPhysics {
 
+struct SweepResult {
+	bool hit = false;
+	float fraction = 1.f;
+};
+
 static constexpr float PHYSICS_STEP = 1.f / 240.f;
+static constexpr float INSET = 2.f;
 
 // Checks if solid ground exists directly below the given bounds
 bool isGroundBelow(sf::FloatRect bounds, const World &world);
