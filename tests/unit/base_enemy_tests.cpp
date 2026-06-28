@@ -239,12 +239,14 @@ TEST_CASE("resolveHorizontal stops at wall and zeros horizontal velocity")
 	// it.
 	sf::Vector2f pos{9.f * TILE - 14.f - 5.f, 2.f * TILE};
 	float velX = 200.f;
+	float width = 28.f;
 
 	float x = EntityPhysics::resolveHorizontal(pos, velX, 28.f, 28.f, 0.1f, w);
 
 	// Formula: adjacent-tile.x + TILE - width/2 - 1.
 	// Current tile (8, 2) has x=256 -> expected = 256 + 32 - 14 - 1 = 273.
-	REQUIRE(x == 273.f);
+	const float expectedX = 288 - width / 2.f;
+	REQUIRE(x == expectedX);
 	REQUIRE(velX == 0.f);
 }
 

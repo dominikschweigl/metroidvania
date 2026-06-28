@@ -3,7 +3,7 @@
 namespace EntityPhysics {
 
 // Small inset on perpendicular axis so corner tiles don't catch the sweep
-constexpr float CORNER_INSET = 0.5f;
+constexpr float CORNER_INSET = 0.1f;
 
 std::pair<int, int> tileRowRange(float top, float bottom)
 {
@@ -66,7 +66,7 @@ SweepResult sweepHorizontal(sf::FloatRect body, float deltaX, const World &world
 			for (int row = rowMin; row <= rowMax; ++row) {
 				if (world.isSolidTile(col, row)) {
 					const float tileLeft = col * World::TILE_SIZE;
-					return {true, (tileLeft - right) / deltaX, {-1.f, 0.f}};
+					return {true, (tileLeft - right) / deltaX};
 				}
 			}
 		}
@@ -79,7 +79,7 @@ SweepResult sweepHorizontal(sf::FloatRect body, float deltaX, const World &world
 			for (int row = rowMin; row <= rowMax; ++row) {
 				if (world.isSolidTile(col, row)) {
 					const float tileRight = (col + 1) * World::TILE_SIZE;
-					return {true, (tileRight - left) / deltaX, {1.f, 0.f}};
+					return {true, (tileRight - left) / deltaX};
 				}
 			}
 		}
@@ -108,7 +108,7 @@ SweepResult sweepVertical(sf::FloatRect body, float deltaY, const World &world)
 			for (int col = colMin; col <= colMax; ++col) {
 				if (world.isSolidTile(col, row)) {
 					const float tileTop = row * World::TILE_SIZE;
-					return {true, (tileTop - bottom) / deltaY, {0.f, -1.f}};
+					return {true, (tileTop - bottom) / deltaY};
 				}
 			}
 		}
@@ -121,7 +121,7 @@ SweepResult sweepVertical(sf::FloatRect body, float deltaY, const World &world)
 			for (int col = colMin; col <= colMax; ++col) {
 				if (world.isSolidTile(col, row)) {
 					const float tileBottom = (row + 1) * World::TILE_SIZE;
-					return {true, (tileBottom - top) / deltaY, {0.f, 1.f}};
+					return {true, (tileBottom - top) / deltaY};
 				}
 			}
 		}
