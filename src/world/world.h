@@ -40,6 +40,7 @@ class World {
 	tson::Tile *getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const;
 	// Return true if any solid tile intersects with the given rectangle
 	bool isSolidAtRect(const sf::FloatRect &rect) const;
+	bool isSolidTile(int tileX, int tileY) const;
 
 	void loadFromGrid(const std::vector<std::vector<int>> &grid);
 
