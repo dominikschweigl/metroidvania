@@ -1,7 +1,9 @@
 #pragma once
 #include "item.h"
 #include <SFML/Graphics.hpp>
+#include <functional>
 #include <memory>
+#include <optional>
 
 class World;
 
@@ -29,6 +31,7 @@ class WorldItem {
 	// Returns the item and transfers ownership on first intersection; nullptr otherwise.
 	[[nodiscard]] std::unique_ptr<Item> tryCollect(sf::FloatRect playerBounds);
 	[[nodiscard]] bool isCollected() const noexcept { return collected_; }
+	[[nodiscard]] std::optional<std::reference_wrapper<const Item>> peekItem() const noexcept;
 	[[nodiscard]] sf::FloatRect getBounds() const noexcept;
 	virtual json serialize() const;
 	static std::unique_ptr<WorldItem> deserialize(const json &j);

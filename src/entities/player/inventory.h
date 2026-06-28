@@ -27,6 +27,7 @@ class Inventory {
 	std::array<std::unique_ptr<Item>, HOTBAR_SIZE> hotbar;
 
 	void addItem(std::unique_ptr<Item> item);
+	[[nodiscard]] bool canAdd(const Item &item) const noexcept;
 
 	[[nodiscard]] static std::span<const SlotRef> slots() noexcept { return ALL_SLOTS_; }
 	[[nodiscard]] static std::span<const SlotRef> equipmentSlots() noexcept { return EQUIPMENT_SLOTS_; }
@@ -65,6 +66,7 @@ class Inventory {
 	[[nodiscard]] const std::unique_ptr<Item> &slotRef(SlotRef slot) const;
 
 	static bool isValidInSlot(const Item &item, SlotKind slotKind) noexcept;
+	static bool isEquipmentSlot(SlotKind slotKind) noexcept;
 
 	static constexpr std::array<SlotRef, EQUIPMENT_SIZE> EQUIPMENT_SLOTS_ = {
 	    SlotRef{SlotKind::Hat, 0},

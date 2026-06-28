@@ -137,6 +137,7 @@ add_executable(metroidvania_tests
     tests/unit/debug_features_tests.cpp
     tests/unit/interaction_indicator_tests.cpp
     tests/unit/entity_physics_tests.cpp
+    tests/unit/world_item_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)

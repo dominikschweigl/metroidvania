@@ -113,3 +113,79 @@ TEST_CASE("Inventory: item info is non-empty for all registered items", "[invent
 	for (const Item &item : registeredItems())
 		REQUIRE(!item.info().name.empty());
 }
+
+namespace {
+void fillGridAndHotbar(Inventory &inv)
+{
+	for (int i = 0; i < Inventory::GRID_SIZE + Inventory::HOTBAR_SIZE; ++i)
+		inv.addItem(std::make_unique<HealingPotionItem>());
+}
+} // namespace
+
+TEST_CASE("Inventory: addItem falls through to hotbar when grid is full", "[inventory]")
+{
+	Inventory inv;
+	for (int i = 0; i < Inventory::GRID_SIZE; ++i)
+		inv.addItem(std::make_unique<HealingPotionItem>());
+	REQUIRE(!inv.hasItem({SlotKind::Hotbar, 0}));
+	inv.addItem(std::make_unique<HealingPotionItem>());
+	REQUIRE(inv.hasItem({SlotKind::Hotbar, 0}));
+}
+
+TEST_CASE("Inventory: addItem fills all hotbar slots sequentially after grid is full", "[inventory]")
+{
+	Inventory inv;
+	fillGridAndHotbar(inv);
+	for (int i = 0; i < Inventory::HOTBAR_SIZE; ++i)
+		REQUIRE(inv.hasItem({SlotKind::Hotbar, i}));
+}
+
+TEST_CASE("Inventory: addItem does not place item when grid and hotbar are both full", "[inventory]")
+{
+	Inventory inv;
+	fillGridAndHotbar(inv);
+	REQUIRE(inv.flatten().size() == Inventory::GRID_SIZE + Inventory::HOTBAR_SIZE);
+	inv.addItem(std::make_unique<HealingPotionItem>());
+	REQUIRE(inv.flatten().size() == Inventory::GRID_SIZE + Inventory::HOTBAR_SIZE);
+}
+
+TEST_CASE("Inventory: canAdd returns true when inventory has free grid slots", "[inventory]")
+{
+	const Inventory inv;
+	const HealingPotionItem potion;
+	REQUIRE(inv.canAdd(potion));
+}
+
+TEST_CASE("Inventory: canAdd returns true for regular item when grid is full but hotbar has space", "[inventory]")
+{
+	Inventory inv;
+	for (int i = 0; i < Inventory::GRID_SIZE; ++i)
+		inv.addItem(std::make_unique<HealingPotionItem>());
+	const HealingPotionItem potion;
+	REQUIRE(inv.canAdd(potion));
+}
+
+TEST_CASE("Inventory: canAdd returns false for regular item when grid and hotbar are both full", "[inventory]")
+{
+	Inventory inv;
+	fillGridAndHotbar(inv);
+	const HealingPotionItem potion;
+	REQUIRE_FALSE(inv.canAdd(potion));
+}
+
+TEST_CASE("Inventory: canAdd returns true for Hat when hatSlot is free even if grid and hotbar are full", "[inventory]")
+{
+	Inventory inv;
+	fillGridAndHotbar(inv);
+	const HatItem hat;
+	REQUIRE(inv.canAdd(hat));
+}
+
+TEST_CASE("Inventory: canAdd returns false for Hat when hatSlot grid and hotbar are all full", "[inventory]")
+{
+	Inventory inv;
+	inv.addItem(std::make_unique<HatItem>());
+	fillGridAndHotbar(inv);
+	const HatItem hat;
+	REQUIRE_FALSE(inv.canAdd(hat));
+}
