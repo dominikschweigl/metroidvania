@@ -171,7 +171,7 @@ void InventoryScene::updateItemActions(InputManager &input, Inventory &inv)
 	}
 
 	if (input.wasPressed(GameAction::UseItem) && hovered_ && !drag_)
-		inv.interact(*hovered_, player_);
+		inv.interact(*hovered_, player_, nullptr);
 }
 
 // --- Drawing ---

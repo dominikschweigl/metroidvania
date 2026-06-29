@@ -4,10 +4,11 @@
 #include <cmath>
 #include <string>
 
-void SpeedPotionItem::activate(Player &player, Inventory &inventory, const SlotRef ownSlot)
+bool SpeedPotionItem::activate(ActivateContext &ctx)
 {
-	player.addEffect(Effect::speed());
-	inventory.clearSlot(ownSlot);
+	ctx.player.addEffect(Effect::speed());
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo SpeedPotionItem::info() const

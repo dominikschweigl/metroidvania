@@ -89,7 +89,7 @@ class Player : public BaseEntity {
 	[[nodiscard]] Inventory &inventory() noexcept;
 	[[nodiscard]] const Inventory &inventory() const noexcept;
 
-	void useHotbarSlot(int slot);
+	void useHotbarSlot(int slot, World *world);
 
 	[[nodiscard]] std::optional<Hitbox> getMeleeHitbox() const noexcept;
 

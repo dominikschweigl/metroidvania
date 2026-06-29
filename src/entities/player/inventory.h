@@ -46,7 +46,7 @@ class Inventory {
 
 	// Single entry point: calls item.activate(player, *this, slot).
 	// Handles both temporary consumption and permanent re-equip transparently.
-	void interact(SlotRef slot, Player &player);
+	void interact(SlotRef slot, Player &player, World *world);
 
 	// Move item between any two compatible slots. Returns false if invalid.
 	bool moveItem(SlotRef from, SlotRef to);

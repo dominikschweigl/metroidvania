@@ -6,7 +6,7 @@ class HatItem : public Item {
 	HatItem() = default;
 	~HatItem() = default;
 
-	void activate(Player &player, Inventory &inventory, SlotRef ownSlot) override;
+	bool activate(ActivateContext &ctx) override;
 
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return SlotKind::Hat; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_HAT; }

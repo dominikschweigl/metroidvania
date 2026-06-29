@@ -165,17 +165,8 @@ void GameScene::handleHotbarInput(const InputManager &input)
 		if (!input.wasPressed(InputManager::hotbarSlotActions()[i]))
 			continue;
 
-		// TODO: Check if this can be done cleaner
-		auto &slot = player_.inventory().hotbar[i];
-		if (slot && slot->info().name == "Damaged USB Key") {
-			Door *door = world_.getTouchingDoor(player_.getBounds());
-			if (!door)
-				continue;
-			door->locked = false;
-		}
-
 		hotbarHud_.flashSlot(i);
-		player_.useHotbarSlot(i);
+		player_.useHotbarSlot(i, &world_);
 	}
 }
 

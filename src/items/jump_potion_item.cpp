@@ -4,10 +4,11 @@
 #include <cmath>
 #include <string>
 
-void JumpPotionItem::activate(Player &player, Inventory &inventory, const SlotRef ownSlot)
+bool JumpPotionItem::activate(ActivateContext &ctx)
 {
-	player.addEffect(Effect::jumpBoost());
-	inventory.clearSlot(ownSlot);
+	ctx.player.addEffect(Effect::jumpBoost());
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo JumpPotionItem::info() const

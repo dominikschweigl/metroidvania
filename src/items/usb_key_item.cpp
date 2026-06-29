@@ -1,9 +1,20 @@
 #include "usb_key_item.h"
 #include "../entities/player/inventory.h"
+#include "../entities/player/player.h"
+#include "../world/world.h"
 
-void UsbKeyItem::activate(Player & /*player*/, Inventory &inventory, const SlotRef ownSlot)
+bool UsbKeyItem::activate(ActivateContext &ctx)
 {
-	inventory.clearSlot(ownSlot);
+	if (!ctx.world)
+		return false;
+
+	Door *door = ctx.world->getTouchingDoor(ctx.player.getBounds());
+	if (!door || !door->locked)
+		return false;
+
+	door->locked = false;
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo UsbKeyItem::info() const

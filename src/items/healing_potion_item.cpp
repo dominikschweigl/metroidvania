@@ -3,10 +3,11 @@
 #include "../entities/player/player.h"
 #include <string>
 
-void HealingPotionItem::activate(Player &player, Inventory &inventory, const SlotRef ownSlot)
+bool HealingPotionItem::activate(ActivateContext &ctx)
 {
-	player.heal(HEAL_AMOUNT);
-	inventory.clearSlot(ownSlot);
+	ctx.player.heal(HEAL_AMOUNT);
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo HealingPotionItem::info() const
