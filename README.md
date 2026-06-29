@@ -1,6 +1,6 @@
 # Metroidvania CMake Setup (vcpkg + fmt)
 
-This project uses CMake presets and vcpkg manifest mode. The repository itself does not require a specific compiler family, but local MinGW setup is recommended for this workspace.
+This project uses CMake presets and vcpkg manifest mode. Three compiler toolchains are supported: MSVC (Windows), MinGW/GCC (Windows), and GCC (Linux).
 
 ## Project Structure
 
@@ -61,9 +61,38 @@ Required tools:
 
 ## Recommended Setup
 
+### Windows (MSVC)
+
+Requires **Visual Studio Build Tools** plus two additional tools that are not bundled with it.
+
+**1. Install the Windows 10 SDK** (provides `mt.exe`, needed by the MSVC linker for manifest embedding):
+
+Open **Visual Studio Installer → Modify → Individual components**, search for and check **Windows 10 SDK** (any version ≥ 10.0.18362), then click Modify.
+
+**2. Install Ninja** (the build generator used by the CMake preset):
+
+```powershell
+winget install Ninja-build.Ninja
+```
+
+Restart your terminal after this so the updated PATH takes effect.
+
+How MSVC fits into this setup:
+- `CMakePresets.json` already contains the shared `vcpkg-windows-msvc` preset targeting the `x64-windows` vcpkg triplet.
+- No `CMakeUserPresets.json` is needed.
+
+`cl.exe` and `ninja.exe` are not in PATH in a regular PowerShell session. The workspace `.vscode/settings.json` registers an **MSVC x64** terminal profile that activates the Build Tools environment. Open a new terminal in VS Code, select **MSVC x64** from the terminal type dropdown (`+` button), then run:
+
+```cmd
+cmake --preset vcpkg-windows-msvc
+cmake --build --preset windows-msvc
+```
+
+If the profile path doesn't match your installation, adjust the year (`2019`) in the `terminal.integrated.profiles.windows` entry in `.vscode/settings.json`.
+
 ### Windows (MinGW / MSYS2 UCRT64)
 
-MinGW (MSYS2 UCRT64) is the recommended local compiler toolchain on Windows.
+MinGW (MSYS2 UCRT64) is an alternative Windows toolchain based on GCC.
 
 How MinGW fits into this setup:
 - `CMakePresets.json` provides shared project-level settings (including vcpkg toolchain usage).
@@ -90,10 +119,12 @@ export VCPKG_ROOT=~/vcpkg
 
 No `CMakeUserPresets.json` is needed on Linux. GCC and G++ are found automatically on PATH, and the shared `vcpkg-linux` preset in `CMakePresets.json` handles the rest.
 
-## Local User Preset (Windows only)
+## Local User Preset (MinGW only)
 
-To setup local machine-specific settings such as a `CMakeUserPresets.json` file needs to be created.
-This file specifies, compiler paths, build type presets, the local vcpkg root environment value `VCPKG_ROOT`.
+If you use MSVC, the shared `vcpkg-windows-msvc` preset in `CMakePresets.json` is sufficient — skip this section.
+
+To setup local machine-specific settings for MinGW, a `CMakeUserPresets.json` file needs to be created.
+This file specifies compiler paths, build type presets, and the local vcpkg root environment value `VCPKG_ROOT`.
 
 If you use MinGW (MSYS2 UCRT64), create a local `CMakeUserPresets.json` with settings similar to
 the following. The debug preset is optional.
@@ -200,7 +231,14 @@ git config --local core.autocrlf false
 
 ### Terminal
 
-**Windows** — run with whatever user preset names exist locally, for example:
+**Windows (MSVC)** — use the shared preset:
+
+```powershell
+cmake --preset vcpkg-windows-msvc
+cmake --build --preset windows-msvc
+```
+
+**Windows (MinGW)** — run with whatever user preset names exist locally, for example:
 
 ```powershell
 cmake --preset default-debug
@@ -226,17 +264,18 @@ cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
 
 ### Build and run
 
-**Windows:**
+**Windows (MSVC):**
 
 ```powershell
-# Build only the test executable
-cmake --build ./build/release --target metroidvania_tests
+cmake --build --preset windows-msvc --target metroidvania_tests
+ctest --test-dir build/windows-msvc --output-on-failure
+```
 
-# Run via CTest
-ctest --test-dir ./build/release
+**Windows (MinGW):**
 
-# Or run directly
-./build/release/metroidvania_tests.exe
+```powershell
+cmake --build --preset windows-mingw --target metroidvania_tests
+ctest --test-dir build/windows-mingw --output-on-failure
 ```
 
 **Linux:**

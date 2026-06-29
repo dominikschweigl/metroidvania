@@ -98,6 +98,40 @@ jobs:
                         - name: Run Tests
                           run: ctest --test-dir build/windows-mingw --output-on-failure
 
+        build-windows-msvc:
+                name: Build & Test (Windows MSVC)
+                runs-on: windows-latest
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p "$env:VCPKG_ROOT\installed" -ErrorAction SilentlyContinue
+
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ${{ env.VCPKG_ROOT }}\installed
+                                  key: vcpkg-msvc-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-msvc-
+
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+
+                        - name: Setup MSVC environment
+                          uses: ilammy/msvc-dev-cmd@v1
+                          with:
+                                  arch: x64
+
+                        - name: Configure CMake
+                          run: cmake --preset vcpkg-windows-msvc
+                        - name: Build Project
+                          run: cmake --build --preset windows-msvc
+                        - name: Run Tests
+                          run: ctest --test-dir build/windows-msvc --output-on-failure
+
         clang-format:
                 name: Clang-Format Check
                 runs-on: ubuntu-latest

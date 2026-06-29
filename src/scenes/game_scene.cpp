@@ -18,6 +18,7 @@
 #include "menus/victory_menu.h"
 #include <algorithm>
 #include <cstdint>
+#include <numbers>
 #include <random>
 #include <vector>
 

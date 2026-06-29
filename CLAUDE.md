@@ -5,17 +5,22 @@
 
 ## Build
 ```powershell
-# Configure (first time only)
-cmake --preset default-release   # or default-release
+# Configure (first time only — pick your target platform)
+cmake --preset vcpkg-windows-msvc    # Windows with MSVC
+cmake --preset vcpkg-windows-mingw   # Windows with MinGW/GCC
+cmake --preset vcpkg-linux           # Linux with GCC
 
 # Build
-cmake --build ./build/release
+cmake --build --preset windows-msvc
+cmake --build --preset windows-mingw
+cmake --build --preset linux
 
-# Tests
-./build/release/metroidvania_tests.exe
+# Tests (replace <preset-dir> with windows-msvc, windows-mingw, or linux)
+ctest --test-dir build/<preset-dir> --output-on-failure
 ```
 
-Dependencies are managed via **vcpkg** (sfml, fmt, nlohmann-json, tinyxml2, catch2). Compiler: MinGW/GCC x64.
+Dependencies are managed via **vcpkg** (sfml, fmt, nlohmann-json, tinyxml2, catch2).
+Supported compilers: MSVC (x64-windows), MinGW/GCC (x64-mingw-static), GCC (x64-linux).
 
 ## Project Structure
 ```
