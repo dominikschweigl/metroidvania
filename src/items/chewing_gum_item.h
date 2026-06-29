@@ -6,7 +6,7 @@ class ChewingGumItem : public Item {
 	ChewingGumItem() = default;
 	~ChewingGumItem() = default;
 
-	void activate(Player &player, Inventory &inventory, SlotRef ownSlot) override;
+	bool activate(ActivateContext &ctx) override;
 
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return SlotKind::Gum; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_CHEWING_GUM; }

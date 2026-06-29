@@ -2,9 +2,10 @@
 #include "../entities/player/inventory.h"
 #include "../entities/player/player.h"
 
-void BackupDiskItem::activate(Player & /*player*/, Inventory &inventory, const SlotRef ownSlot)
+bool BackupDiskItem::activate(ActivateContext &ctx)
 {
-	inventory.moveToEquipmentSlot(ownSlot);
+	ctx.inventory.moveToEquipmentSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo BackupDiskItem::info() const

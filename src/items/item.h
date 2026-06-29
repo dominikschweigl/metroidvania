@@ -11,6 +11,14 @@ using json = nlohmann::json;
 
 class Player;
 class Inventory;
+class World;
+
+struct ActivateContext {
+	Player &player;
+	Inventory &inventory;
+	SlotRef ownSlot;
+	World *world;
+};
 
 struct ItemInfo {
 	std::string_view name;
@@ -22,7 +30,7 @@ class Item {
   public:
 	virtual ~Item() = default;
 
-	virtual void activate(Player &player, Inventory &inventory, SlotRef ownSlot) = 0;
+	virtual bool activate(ActivateContext &ctx) = 0;
 
 	[[nodiscard]] virtual std::optional<SlotKind> equipmentSlot() const noexcept = 0;
 	[[nodiscard]] virtual ItemInfo info() const = 0;

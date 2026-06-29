@@ -4,10 +4,11 @@
 #include <cmath>
 #include <string>
 
-void ResistancePotionItem::activate(Player &player, Inventory &inventory, const SlotRef ownSlot)
+bool ResistancePotionItem::activate(ActivateContext &ctx)
 {
-	player.addEffect(Effect::resistance());
-	inventory.clearSlot(ownSlot);
+	ctx.player.addEffect(Effect::resistance());
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo ResistancePotionItem::info() const

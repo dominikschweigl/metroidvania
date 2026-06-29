@@ -23,9 +23,9 @@ const Inventory &Player::inventory() const noexcept
 	return inventory_;
 }
 
-void Player::useHotbarSlot(const int slot)
+void Player::useHotbarSlot(const int slot, World *world)
 {
-	inventory_.interact({SlotKind::Hotbar, slot}, *this);
+	inventory_.interact({SlotKind::Hotbar, slot}, *this, world);
 }
 
 Player::Player()

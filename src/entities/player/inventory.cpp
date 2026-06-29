@@ -109,10 +109,12 @@ void Inventory::addItem(std::unique_ptr<Item> item)
 	}
 }
 
-void Inventory::interact(const SlotRef slot, Player &player)
+void Inventory::interact(const SlotRef slot, Player &player, World *world)
 {
-	if (hasItem(slot))
-		itemAt(slot).activate(player, *this, slot);
+	if (hasItem(slot)) {
+		ActivateContext context{.player = player, .inventory = player.inventory(), .ownSlot = slot, .world = world};
+		itemAt(slot).activate(context);
+	}
 }
 
 bool Inventory::moveItem(const SlotRef from, const SlotRef to)

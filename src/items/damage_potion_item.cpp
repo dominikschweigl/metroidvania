@@ -4,10 +4,11 @@
 #include <cmath>
 #include <string>
 
-void DamagePotionItem::activate(Player &player, Inventory &inventory, const SlotRef ownSlot)
+bool DamagePotionItem::activate(ActivateContext &ctx)
 {
-	player.addEffect(Effect::damage());
-	inventory.clearSlot(ownSlot);
+	ctx.player.addEffect(Effect::damage());
+	ctx.inventory.clearSlot(ctx.ownSlot);
+	return true;
 }
 
 ItemInfo DamagePotionItem::info() const

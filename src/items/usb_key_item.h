@@ -1,4 +1,5 @@
 #pragma once
+#include "../world/Room.hpp"
 #include "item.h"
 
 class UsbKeyItem : public Item {
@@ -6,7 +7,7 @@ class UsbKeyItem : public Item {
 	UsbKeyItem() = default;
 	~UsbKeyItem() = default;
 
-	void activate(Player &player, Inventory &inventory, SlotRef ownSlot) override;
+	bool activate(ActivateContext &ctx) override;
 
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return std::nullopt; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_USB_KEY; }

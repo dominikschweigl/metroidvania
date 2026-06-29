@@ -6,7 +6,7 @@ class DamagePotionItem : public Item {
 	DamagePotionItem() = default;
 	~DamagePotionItem() = default;
 
-	void activate(Player &player, Inventory &inventory, SlotRef ownSlot) override;
+	bool activate(ActivateContext &ctx) override;
 
 	[[nodiscard]] std::optional<SlotKind> equipmentSlot() const noexcept override { return std::nullopt; }
 	[[nodiscard]] TextureAsset textureAsset() const noexcept override { return ITEM_DAMAGE_POTION; }
