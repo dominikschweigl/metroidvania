@@ -37,20 +37,20 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
 
-	world_.loadRoom("start_room", "data/maps/start_room.tmj");
-	world_.loadRoom("1", "data/maps/1.tmj");
-	world_.loadRoom("2", "data/maps/2.tmj");
-	world_.loadRoom("3", "data/maps/3.tmj");
-	world_.loadRoom("4", "data/maps/4.tmj");
-	world_.loadRoom("5", "data/maps/5.tmj");
-	world_.loadRoom("6", "data/maps/6.tmj");
-	world_.loadRoom("7", "data/maps/7.tmj");
-	world_.loadRoom("8", "data/maps/8.tmj");
-	world_.loadRoom("11", "data/maps/11.tmj");
-	world_.loadRoom("13", "data/maps/13.tmj");
-	world_.loadRoom("14", "data/maps/14.tmj");
-	world_.loadRoom("15", "data/maps/15.tmj");
-	world_.loadRoom("16", "data/maps/16.tmj");
+	world_.registerRoom("start_room", "data/maps/start_room.tmj", {"1"});
+	world_.registerRoom("1", "data/maps/1.tmj", {"start_room", "2"});
+	world_.registerRoom("2", "data/maps/2.tmj", {"1", "3", "4"});
+	world_.registerRoom("3", "data/maps/3.tmj", {"2", "5"});
+	world_.registerRoom("4", "data/maps/4.tmj", {"2", "7", "8"});
+	world_.registerRoom("5", "data/maps/5.tmj", {"3", "6", "7"});
+	world_.registerRoom("6", "data/maps/6.tmj", {"5"});
+	world_.registerRoom("7", "data/maps/7.tmj", {"4", "5", "11"});
+	world_.registerRoom("8", "data/maps/8.tmj", {"4"});
+	world_.registerRoom("11", "data/maps/11.tmj", {"7", "13"});
+	world_.registerRoom("13", "data/maps/13.tmj", {"11", "14"});
+	world_.registerRoom("14", "data/maps/14.tmj", {"13", "15"});
+	world_.registerRoom("15", "data/maps/15.tmj", {"14", "16"});
+	world_.registerRoom("16", "data/maps/16.tmj", {"15"});
 
 	if (makeNewGame)
 		this->newGame(window);
@@ -64,16 +64,26 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 
 void GameScene::newGame(sf::RenderWindow &window)
 {
+	world_.requireLoad("start_room");
+	world_.setCurrentRoom("start_room");
 	player_.setPosition(world_.getCurrentRoom()->playerSpawns[0]);
-
 	view_.setCenter(player_.getPosition());
+	prefetchAdjacentRooms();
 }
 
 void GameScene::loadGame(sf::RenderWindow &window)
 {
+	const std::string savedRoomId = world_.readSavedRoomId();
+	world_.requireLoad(savedRoomId);
 	world_.loadWorldData(player_);
-
 	view_.setCenter(player_.getPosition());
+	prefetchAdjacentRooms();
+}
+
+void GameScene::prefetchAdjacentRooms()
+{
+	for (const auto &id : world_.getAdjacentRoomIds(world_.getCurrentRoomId()))
+		world_.requestLoad(id);
 }
 
 void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
@@ -87,6 +97,7 @@ void GameScene::handleEvent(const sf::Event &event, sf::RenderWindow &window)
 
 void GameScene::update(float deltaTime)
 {
+	world_.pollFutures();
 	const InputManager &input = InputManager::getInstance();
 
 	handleDebugInput(input);
@@ -255,7 +266,9 @@ void GameScene::handleRoomTransition()
 		if (!canEnter)
 			return;
 
+		world_.requireLoad(door->targetRoomId);
 		world_.setCurrentRoom(door->targetRoomId);
+		prefetchAdjacentRooms();
 		player_.setPosition(world_.getCurrentRoom()->playerSpawns[door->targetSpawnIdx]);
 
 		const MusicTrack track =

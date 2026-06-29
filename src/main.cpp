@@ -32,9 +32,8 @@ int main()
 	float avgUpdateTimes = 0;
 	std::array<float, SAMPLE_COUNT> drawTimes{};
 	float avgDrawTimes = 0;
-#endif
-
 	int sampleIndex = 0;
+#endif
 
 	sf::Clock clock;
 #if defined(FRAME_RATE) || defined(DEBUG_OVERLAY)
