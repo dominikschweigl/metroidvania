@@ -26,6 +26,7 @@ class GameScene : public Scene {
   private:
 	void newGame(sf::RenderWindow &window);
 	void loadGame(sf::RenderWindow &window);
+	void prefetchAdjacentRooms();
 
 	void drawDebugHitboxes(sf::RenderWindow &window);
 	void handleDebugInput(const InputManager &input);

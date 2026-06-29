@@ -16,11 +16,13 @@
 #include "../items/speed_potion_item.h"
 #include "../items/usb_key_item.h"
 #include <algorithm>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <tileson.hpp>
 
 namespace {
+
 template <typename T>
 T getProp(tson::Object &obj, const std::string &key, T fallback = {})
 {
@@ -32,15 +34,13 @@ std::vector<std::string> split(const std::string &str)
 	std::vector<std::string> tokens;
 	std::stringstream ss(str);
 	std::string token;
-	while (std::getline(ss, token, ',')) {
+	while (std::getline(ss, token, ','))
 		if (!token.empty())
 			tokens.push_back(token);
-	}
 	return tokens;
 }
 
-// Dispatch tables — eliminates the long if/else chains
-using EnemyCreator = std::function<std::unique_ptr<BaseEnemy>(sf::Vector2f, float dropChance)>;
+using EnemyCreator = std::function<std::unique_ptr<BaseEnemy>(sf::Vector2f, float)>;
 
 const std::unordered_map<std::string, EnemyCreator> &enemyCreators()
 {
@@ -83,21 +83,125 @@ const std::unordered_map<std::string, ItemCreator> &itemCreators()
 
 } // namespace
 
-World::World(const std::string worldName) : worldName(std::move(worldName)) {}
+World::World(std::string worldName) : worldName_(std::move(worldName)) {}
+
+void World::registerRoom(const std::string &id, const std::string &filePath, std::vector<std::string> adjacent)
+{
+	RoomSlot slot;
+	slot.manifest.filePath = filePath;
+	slot.manifest.adjacentRoomIds = std::move(adjacent);
+	slot.state = RoomLoadState::Unloaded;
+	slots_.emplace(id, std::move(slot));
+}
+
+void World::requestLoad(const std::string &id)
+{
+	auto it = slots_.find(id);
+	if (it == slots_.end()) {
+		std::cerr << "requestLoad: unknown room id '" << id << "'\n";
+		return;
+	}
+	RoomSlot &slot = it->second;
+	if (slot.state != RoomLoadState::Unloaded)
+		return;
+	slot.state = RoomLoadState::Loading;
+	slot.future =
+	    std::async(std::launch::async, [this, filePath = slot.manifest.filePath]() { return parseRoom(filePath); });
+}
+
+void World::requireLoad(const std::string &id)
+{
+	auto it = slots_.find(id);
+	if (it == slots_.end()) {
+		std::cerr << "requireLoad: unknown room id '" << id << "'\n";
+		return;
+	}
+	RoomSlot &slot = it->second;
+
+	if (slot.state == RoomLoadState::Ready)
+		return;
+
+	if (slot.state == RoomLoadState::Unloaded)
+		requestLoad(id);
+
+	promoteSlot(id, slot.future.get());
+}
+
+void World::pollFutures()
+{
+	for (auto &[id, slot] : slots_) {
+		if (slot.state != RoomLoadState::Loading)
+			continue;
+		if (slot.future.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+			continue;
+		promoteSlot(id, slot.future.get());
+	}
+}
+
+void World::promoteSlot(const std::string &id, Room &&room)
+{
+	if (room.map)
+		loadTilesets(*room.map);
+	rooms_[id] = std::move(room);
+	slots_.at(id).state = RoomLoadState::Ready;
+
+	auto deltaIt = pendingRoomDeltas_.find(id);
+	if (deltaIt != pendingRoomDeltas_.end()) {
+		rooms_.at(id).deserialize(deltaIt->second);
+		pendingRoomDeltas_.erase(deltaIt);
+	}
+
+	if (currentRoomId_.empty())
+		currentRoomId_ = id;
+}
+
+void World::loadRoom(const std::string &roomId, const std::string &tmjFile)
+{
+	if (!slots_.count(roomId))
+		registerRoom(roomId, tmjFile);
+
+	Room room = parseRoom(tmjFile);
+	promoteSlot(roomId, std::move(room));
+}
+
+Room World::parseRoom(const std::string &filePath)
+{
+	tson::Tileson t;
+	auto map = t.parse(fs::path(filePath));
+
+	if (!map || map->getStatus() != tson::ParseStatus::OK) {
+		std::cerr << "Failed to parse " << filePath << ": " << (map ? map->getStatusMessage() : "null map") << "\n";
+		return {};
+	}
+
+	Room room;
+	room.width = map->getSize().x;
+	room.height = map->getSize().y;
+	room.minimap_pixel_rect = {
+	    {float(map->get<int>("minimap_pixel_rect_x")), float(map->get<int>("minimap_pixel_rect_y"))},
+	    {float(map->get<int>("minimap_pixel_rect_w")), float(map->get<int>("minimap_pixel_rect_h"))}};
+	room.world_index = static_cast<bool>(map->getProp("world_index"));
+
+	parseObjectLayer(room, *map);
+	parseSavePoints(room, *map);
+	parseImageLayers(room, *map);
+
+	room.map = std::move(map);
+	return room;
+}
 
 void World::loadTilesets(tson::Map &map)
 {
 	for (tson::Tileset &tileset : map.getTilesets()) {
 		for (tson::Tile &tile : tileset.getTiles()) {
 			const int gid = tile.getGid();
-			if (tileTextures.count(gid))
+			if (tileTextures_.count(gid))
 				continue;
 
 			fs::path imagePath = tile.getImage();
 			if (imagePath.empty())
 				continue;
 
-			// Tiled paths are relative to the .tsj file
 			imagePath = fs::absolute("data/maps/tilesets/" + imagePath.string());
 
 			auto texture = std::make_shared<sf::Texture>();
@@ -105,8 +209,7 @@ void World::loadTilesets(tson::Map &map)
 				std::cerr << "Failed to load tile texture: " << imagePath << "\n";
 				continue;
 			}
-
-			tileTextures.emplace(gid, std::move(texture));
+			tileTextures_.emplace(gid, std::move(texture));
 		}
 	}
 }
@@ -191,7 +294,6 @@ void World::parseImageLayers(Room &room, tson::Map &map)
 			continue;
 
 		auto texture = std::make_shared<sf::Texture>();
-		// Tiled paths are relative to the .tmj file
 		const fs::path path = fs::weakly_canonical(fs::absolute("data/maps/" + layer.getImage()));
 
 		if (!texture->loadFromFile(path.string(), true)) {
@@ -208,49 +310,26 @@ void World::parseImageLayers(Room &room, tson::Map &map)
 	}
 }
 
-void World::loadRoom(const std::string &roomId, const std::string &file)
-{
-	tson::Tileson t;
-	auto map = t.parse(fs::path(file));
-
-	if (!map || map->getStatus() != tson::ParseStatus::OK) {
-		std::cerr << "Failed to parse " << file << ": " << (map ? map->getStatusMessage() : "null map") << "\n";
-		return;
-	}
-
-	Room room;
-	room.width = map->getSize().x;
-	room.height = map->getSize().y;
-	room.minimap_pixel_rect = {
-	    {float(map->get<int>("minimap_pixel_rect_x")), float(map->get<int>("minimap_pixel_rect_y"))},
-	    {float(map->get<int>("minimap_pixel_rect_w")), float(map->get<int>("minimap_pixel_rect_h"))}};
-	room.world_index = static_cast<bool>(map->getProp("world_index"));
-
-	loadTilesets(*map);
-	parseObjectLayer(room, *map);
-	parseSavePoints(room, *map);
-	parseImageLayers(room, *map);
-
-	room.map = std::move(map);
-	rooms[roomId] = std::move(room);
-
-	if (currentRoomId.empty())
-		setCurrentRoom(roomId);
-}
-
 void World::setCurrentRoom(const std::string &roomId)
 {
-	if (rooms.count(roomId))
-		currentRoomId = roomId;
+	if (rooms_.count(roomId))
+		currentRoomId_ = roomId;
 	else
-		std::cerr << "Room " << roomId << " not found\n";
+		std::cerr << "setCurrentRoom: room '" << roomId << "' not ready\n";
 }
 
 Room *World::getCurrentRoom()
 {
-	if (currentRoomId.empty() || !rooms.count(currentRoomId))
+	if (currentRoomId_.empty() || !rooms_.count(currentRoomId_))
 		return nullptr;
-	return &rooms.at(currentRoomId);
+	return &rooms_.at(currentRoomId_);
+}
+
+const Room *World::getCurrentRoom() const
+{
+	if (currentRoomId_.empty() || !rooms_.count(currentRoomId_))
+		return nullptr;
+	return &rooms_.at(currentRoomId_);
 }
 
 float World::getWorldHeight()
@@ -259,72 +338,64 @@ float World::getWorldHeight()
 	return room ? room->height * TILE_SIZE : 0.f;
 }
 
+std::vector<std::string> World::getAdjacentRoomIds(const std::string &id) const
+{
+	auto it = slots_.find(id);
+	if (it == slots_.end())
+		return {};
+	return it->second.manifest.adjacentRoomIds;
+}
+
+bool World::isRoomReady(const std::string &id) const
+{
+	auto it = slots_.find(id);
+	return it != slots_.end() && it->second.state == RoomLoadState::Ready;
+}
+
 tson::Tile *World::getTileAtCoordinate(const sf::Vector2f &worldPos, const std::string &layerName) const
 {
-	if (currentRoomId.empty())
-		return nullptr;
-	const Room &room = rooms.at(currentRoomId);
-	if (!room.map)
+	const Room *room = getCurrentRoom();
+	if (!room || !room->map)
 		return nullptr;
 
 	const int x = static_cast<int>(worldPos.x / TILE_SIZE);
 	const int y = static_cast<int>(worldPos.y / TILE_SIZE);
 
-	tson::Layer *layer = room.map->getLayer(layerName);
+	tson::Layer *layer = room->map->getLayer(layerName);
 	return layer ? layer->getTileData(x, y) : nullptr;
 }
 
 bool World::isSolidAtRect(const sf::FloatRect &rect) const
 {
-	if (currentRoomId.empty())
+	const Room *room = getCurrentRoom();
+	if (!room)
 		return false;
-	const Room &room = rooms.at(currentRoomId);
-
-	constexpr float epsilon = 0.001f;
 
 	const int left = static_cast<int>(std::floor(rect.position.x / TILE_SIZE));
-	const int right = static_cast<int>(std::floor((rect.position.x + rect.size.x - epsilon) / TILE_SIZE));
+	const int right = static_cast<int>(std::floor((rect.position.x + rect.size.x) / TILE_SIZE));
 	const int top = static_cast<int>(std::floor(rect.position.y / TILE_SIZE));
-	const int bottom = static_cast<int>(std::floor((rect.position.y + rect.size.y - epsilon) / TILE_SIZE));
+	const int bottom = static_cast<int>(std::floor((rect.position.y + rect.size.y) / TILE_SIZE));
 
-	const int clampedLeft = std::max(left, 0);
-	const int clampedRight = std::min(right, room.width - 1);
-	const int clampedTop = std::max(top, 0);
-	const int clampedBottom = std::min(bottom, room.height - 1);
-
-	if (room.map) {
-		tson::Layer *layer = room.map->getLayer("Solid");
-		if (!layer)
-			return false;
-
-		for (int y = clampedTop; y <= clampedBottom; ++y)
-			for (int x = clampedLeft; x <= clampedRight; ++x)
-				if (layer->getTileData(x, y))
-					return true;
-		return false;
-	}
-
-	for (int y = clampedTop; y <= clampedBottom; ++y)
-		for (int x = clampedLeft; x <= clampedRight; ++x)
-			if (room.solidGrid[y][x])
+	for (int y = top; y <= bottom; ++y)
+		for (int x = left; x <= right; ++x)
+			if (isSolidTile(x, y))
 				return true;
 	return false;
 }
 
 bool World::isSolidTile(int tileX, int tileY) const
 {
-	if (currentRoomId.empty())
+	const Room *room = getCurrentRoom();
+	if (!room)
 		return false;
-	const Room &room = rooms.at(currentRoomId);
-
-	if (tileX < 0 || tileY < 0 || tileX >= room.width || tileY >= room.height)
+	if (tileX < 0 || tileY < 0 || tileX >= room->width || tileY >= room->height)
 		return false;
 
-	if (room.map) {
-		tson::Layer *layer = room.map->getLayer("Solid");
+	if (room->map) {
+		tson::Layer *layer = room->map->getLayer("Solid");
 		return layer && layer->getTileData(tileX, tileY) != nullptr;
 	}
-	return room.solidGrid[tileY][tileX];
+	return room->solidGrid[tileY][tileX];
 }
 
 void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
@@ -335,15 +406,28 @@ void World::loadFromGrid(const std::vector<std::vector<int>> &grid)
 	Room room;
 	room.width = static_cast<int>(grid[0].size());
 	room.height = static_cast<int>(grid.size());
-	room.solidGrid.resize(room.height, std::vector<bool>(room.width, false));
+	room.solidGrid.assign(room.height, std::vector<bool>(room.width, false));
 
 	for (int y = 0; y < room.height; ++y)
 		for (int x = 0; x < room.width; ++x)
 			room.solidGrid[y][x] = (grid[y][x] != 0);
 
-	rooms["default"] = std::move(room);
-	if (currentRoomId.empty())
-		currentRoomId = "default";
+	registerRoom("default", "");
+	promoteSlot("default", std::move(room));
+}
+
+std::string World::readSavedRoomId() const
+{
+	std::ifstream file("saves/" + worldName_ + ".json");
+	if (!file.is_open())
+		return "start_room";
+	json j;
+	try {
+		file >> j;
+	} catch (...) {
+		return "start_room";
+	}
+	return j.value("currentRoom", "start_room");
 }
 
 void World::saveWorldData(Player &player)
@@ -351,18 +435,18 @@ void World::saveWorldData(Player &player)
 	json j;
 	try {
 		j["player"] = player.serialize();
-		j["currentRoom"] = getCurrentRoomId();
+		j["currentRoom"] = currentRoomId_;
 		j["rooms"] = json::array();
 
-		for (const auto &[id, room] : rooms) {
+		for (const auto &[id, room] : rooms_) {
 			json j_room = room.serialize();
 			j_room["id"] = id;
 			j["rooms"].push_back(j_room);
 		}
 
-		std::ofstream file("saves/" + worldName + ".json");
+		std::ofstream file("saves/" + worldName_ + ".json");
 		if (!file.is_open()) {
-			std::cerr << "Failed to open save file\n";
+			std::cerr << "Failed to open save file for writing\n";
 			return;
 		}
 		file << j.dump(4);
@@ -373,7 +457,7 @@ void World::saveWorldData(Player &player)
 
 void World::loadWorldData(Player &player)
 {
-	std::ifstream file("saves/" + worldName + ".json");
+	std::ifstream file("saves/" + worldName_ + ".json");
 	if (!file.is_open()) {
 		std::cerr << "Failed to open save file\n";
 		return;
@@ -394,11 +478,14 @@ void World::loadWorldData(Player &player)
 		if (j.contains("rooms")) {
 			for (const auto &j_room : j["rooms"]) {
 				const std::string id = j_room.value("id", "");
-				if (!rooms.count(id)) {
+				if (!slots_.count(id)) {
 					std::cerr << "Unknown room id in save: " << id << "\n";
 					continue;
 				}
-				rooms[id].deserialize(j_room);
+				if (rooms_.count(id))
+					rooms_.at(id).deserialize(j_room);
+				else
+					pendingRoomDeltas_[id] = j_room;
 			}
 		}
 
@@ -410,17 +497,19 @@ void World::loadWorldData(Player &player)
 	}
 }
 
+// ── Render / update ───────────────────────────────────────────────────────────
+
 void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::FloatRect playerBounds) const
 {
-	if (currentRoomId.empty())
+	const Room *room = getCurrentRoom();
+	if (!room)
 		return;
-	const Room &room = rooms.at(currentRoomId);
 
 	const sf::Vector2f center = view.getCenter();
 	const sf::Vector2f size = view.getSize();
-	const float roomWidth = TILE_SIZE * room.width;
+	const float roomWidth = TILE_SIZE * room->width;
 
-	for (const ImageLayer &img : room.backgroundLayers) {
+	for (const ImageLayer &img : room->backgroundLayers) {
 		if (img.repeatX) {
 			float x = img.position.x;
 			while (x < roomWidth) {
@@ -442,7 +531,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	const int bottom = static_cast<int>((center.y + size.y * 0.5f) / TILE_SIZE);
 
 	for (const std::string &layerName : {"Foreground", "Solid"}) {
-		tson::Layer *layer = room.map->getLayer(layerName);
+		tson::Layer *layer = room->map->getLayer(layerName);
 		if (!layer)
 			continue;
 
@@ -455,9 +544,9 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 				sf::RectangleShape shape({float(TILE_SIZE), float(TILE_SIZE)});
 				shape.setPosition({float(x * TILE_SIZE), float(y * TILE_SIZE)});
 
-				auto it = tileTextures.find(tile->getGid());
-				if (it != tileTextures.end())
-					shape.setTexture(it->second.get()); // .get() because we now store shared_ptr
+				auto it = tileTextures_.find(tile->getGid());
+				if (it != tileTextures_.end())
+					shape.setTexture(it->second.get());
 				else
 					shape.setFillColor(sf::Color(255, 0, 255));
 
@@ -467,12 +556,12 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	}
 
 	const float playerX = playerBounds.position.x + playerBounds.size.x / 2.f;
-	room.draw(window, playerBounds, playerX);
+	room->draw(window, playerBounds, playerX);
 }
 
-void World::update(float deltaTime, sf::FloatRect playerBounds)
+void World::update(float deltaTime, sf::FloatRect /*playerBounds*/)
 {
-	if (currentRoomId.empty())
-		return;
-	rooms.at(currentRoomId).update(deltaTime, *this);
+	Room *room = getCurrentRoom();
+	if (room)
+		room->update(deltaTime, *this);
 }
