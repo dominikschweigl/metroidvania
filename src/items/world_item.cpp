@@ -5,8 +5,8 @@
 #include <cmath>
 #include <numbers>
 
-WorldItem::WorldItem(const sf::Vector2f spawnPos, std::unique_ptr<Item> item)
-    : item_(std::move(item)), position_(spawnPos),
+WorldItem::WorldItem(const sf::Vector2f spawnPos, const sf::Vector2f spawnVelocity, std::unique_ptr<Item> item)
+    : item_(std::move(item)), position_(spawnPos), velocity_(spawnVelocity),
       texture_(AssetManager::getInstance().getTexture(item_->textureAsset())), sprite_(texture_)
 {
 	sprite_.setOrigin({WIDTH / 2.f, HEIGHT});
@@ -76,17 +76,18 @@ std::unique_ptr<WorldItem> WorldItem::deserialize(const json &j)
 		position.y = j["position"][1].get<float>();
 	}
 
+	sf::Vector2f velocity;
+	if (j.contains("velocity")) {
+		velocity.x = j["velocity"][0].get<float>();
+		velocity.y = j["velocity"][1].get<float>();
+	}
+
 	std::unique_ptr<Item> item;
 	if (j.contains("item") && !j["item"].is_null()) {
 		item = ItemFactory::create(j["item"]);
 	}
 
-	std::unique_ptr<WorldItem> worldItem = std::make_unique<WorldItem>(WorldItem(position, std::move(item)));
-
-	if (j.contains("velocity")) {
-		worldItem->velocity_.x = j["velocity"][0].get<float>();
-		worldItem->velocity_.y = j["velocity"][1].get<float>();
-	}
+	std::unique_ptr<WorldItem> worldItem = std::make_unique<WorldItem>(WorldItem(position, velocity, std::move(item)));
 
 	if (j.contains("hoverPhase")) {
 		worldItem->hoverPhase_ = j["hoverPhase"].get<float>();

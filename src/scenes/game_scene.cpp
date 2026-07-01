@@ -190,9 +190,9 @@ void GameScene::processEnemyEvents()
 	for (auto &enemy : world_.getCurrentRoom()->enemies_) {
 		if (enemy->shouldDropLoot()) {
 			for (std::unique_ptr<Item> &drop : enemy->rollDrops()) {
-				auto worldItem = std::make_unique<WorldItem>(enemy->getPosition(), std::move(drop));
-				worldItem->velocity_ = {std::cos(angleDist(rng)) * speedDist(rng),
-				                        std::sin(angleDist(rng)) * speedDist(rng)};
+				const sf::Vector2f initialVelocity{std::cos(angleDist(rng)) * speedDist(rng),
+				                                   std::sin(angleDist(rng)) * speedDist(rng)};
+				auto worldItem = std::make_unique<WorldItem>(enemy->getPosition(), initialVelocity, std::move(drop));
 				world_.getCurrentRoom()->appendItem(worldItem);
 			}
 		}

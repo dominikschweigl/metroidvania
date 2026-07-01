@@ -17,7 +17,7 @@ class WorldItem {
 	static constexpr float GROUND_FRICTION = 4.0f; // higher = stops faster
 	static constexpr float PICKUP_COOLDOWN = 0.5f;
 
-	WorldItem(sf::Vector2f spawnPos, std::unique_ptr<Item> item);
+	WorldItem(const sf::Vector2f spawnPos, const sf::Vector2f spawnVelocity, std::unique_ptr<Item> item);
 	~WorldItem() = default;
 
 	WorldItem(const WorldItem &) = delete;
@@ -36,9 +36,8 @@ class WorldItem {
 	virtual json serialize() const;
 	static std::unique_ptr<WorldItem> deserialize(const json &j);
 
-	sf::Vector2f velocity_{0.f, 0.f};
-
   private:
+	sf::Vector2f velocity_{0.f, 0.f};
 	std::unique_ptr<Item> item_;
 	sf::Vector2f position_;
 	bool isOnGround_ = false;

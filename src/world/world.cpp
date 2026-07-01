@@ -56,27 +56,47 @@ const std::unordered_map<std::string, EnemyCreator> &enemyCreators()
 	return table;
 }
 
-using ItemCreator = std::function<std::unique_ptr<WorldItem>(sf::Vector2f)>;
+using ItemCreator = std::function<std::unique_ptr<WorldItem>(sf::Vector2f, sf::Vector2f)>;
 
 const std::unordered_map<std::string, ItemCreator> &itemCreators()
 {
 	static const std::unordered_map<std::string, ItemCreator> table = {
 	    {"ChewingGumItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<ChewingGumItem>()); }},
-	    {"HatItem", [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<HatItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<ChewingGumItem>());
+	     }},
+	    {"HatItem",
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<HatItem>());
+	     }},
 	    {"HealingPotionItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<HealingPotionItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<HealingPotionItem>());
+	     }},
 	    {"JumpPotionItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<JumpPotionItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<JumpPotionItem>());
+	     }},
 	    {"ResistancePotionItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<ResistancePotionItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<ResistancePotionItem>());
+	     }},
 	    {"SpeedPotionItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<SpeedPotionItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<SpeedPotionItem>());
+	     }},
 	    {"DamagePotionItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<DamagePotionItem>()); }},
-	    {"UsbKeyItem", [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<UsbKeyItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<DamagePotionItem>());
+	     }},
+	    {"UsbKeyItem",
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<UsbKeyItem>());
+	     }},
 	    {"BackupDiskItem",
-	     [](sf::Vector2f p) { return std::make_unique<WorldItem>(p, std::make_unique<BackupDiskItem>()); }},
+	     [](sf::Vector2f p, sf::Vector2f velocity) {
+		     return std::make_unique<WorldItem>(p, velocity, std::make_unique<BackupDiskItem>());
+	     }},
 	};
 	return table;
 }
@@ -243,7 +263,7 @@ void World::parseObjectLayer(Room &room, tson::Map &map)
 		}
 
 		if (auto it = itemCreators().find(name); it != itemCreators().end()) {
-			room.items_.push_back(it->second(pos));
+			room.items_.push_back(it->second(pos, sf::Vector2f{0.f, 0.f}));
 			continue;
 		}
 

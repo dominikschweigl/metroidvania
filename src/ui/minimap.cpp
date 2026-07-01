@@ -7,8 +7,9 @@ void MiniMap::draw(sf::RenderWindow &window, const sf::Vector2f playerPos, Room 
 	const sf::View previousView = window.getView();
 	window.setView(sf::View(sf::FloatRect({0.f, 0.f}, sf::Vector2f(window.getSize()))));
 
-	const sf::Texture &minimap = AssetManager::getInstance().getTexture(
-	    room.world_index < minimaps.size() ? minimaps.at(room.world_index) : minimaps.at(0));
+	const size_t worldIndex = room.world_index ? 1u : 0u;
+	const sf::Texture &minimap =
+	    AssetManager::getInstance().getTexture(worldIndex < minimaps.size() ? minimaps.at(worldIndex) : minimaps.at(0));
 	const sf::Vector2u texSize = minimap.getSize();
 	sf::Sprite sprite(minimap);
 	sprite.setScale({1, 1});
