@@ -23,7 +23,7 @@ void WallSlideState::onExit(Player &p)
 	p.gravity = originalGravity;
 }
 
-PlayerState *WallSlideState::update(float dt, Player &p)
+PlayerState *WallSlideState::update(float /*dt*/, Player &p)
 {
 	if (p.isOnGround) {
 		return &p.states.landing;
@@ -53,7 +53,7 @@ sf::Vector2f WallSlideState::getUpperBodyOffset(Player & /*p*/) const noexcept
 	return UPPER_BODY_OFFSET;
 }
 
-void WallSlideState::applyAnimation(float dt, Player &p)
+void WallSlideState::applyAnimation(float /*dt*/, Player &p)
 {
 	const sf::IntRect frameRect({0, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
 	p.lowerBodySprite.setTexture(wall_slide_lower_texture);

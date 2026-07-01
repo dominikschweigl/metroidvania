@@ -4,7 +4,7 @@
 
 namespace capacitor {
 
-EnemyState *HoverState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *HoverState::update(float /*deltaTime*/, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f playerPos)
 {
 	auto &capacitor = static_cast<Capacitor &>(enemy);
 

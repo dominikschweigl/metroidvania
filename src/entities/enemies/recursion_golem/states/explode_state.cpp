@@ -3,7 +3,8 @@
 
 namespace recursion_golem {
 
-EnemyState *ExplodeState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *ExplodeState::update(float /*deltaTime*/, BaseEnemy &enemy, const World & /*world*/,
+                                 sf::Vector2f /*playerPos*/)
 {
 	// The golem braces in place; the countdown and blast live on the golem itself.
 	static_cast<RecursionGolem &>(enemy).setVelocityX(0.f);

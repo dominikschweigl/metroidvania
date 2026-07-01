@@ -4,7 +4,7 @@
 
 namespace resistor_bug {
 
-EnemyState *RecoverState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *RecoverState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f playerPos)
 {
 	auto &bug = static_cast<ResistorBug &>(enemy);
 	bug.setVelocityX(0.f);

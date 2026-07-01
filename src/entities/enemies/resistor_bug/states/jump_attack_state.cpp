@@ -3,7 +3,7 @@
 
 namespace resistor_bug {
 
-EnemyState *JumpAttackState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *JumpAttackState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f playerPos)
 {
 	auto &bug = static_cast<ResistorBug &>(enemy);
 

@@ -3,7 +3,7 @@
 
 namespace segfault_boss {
 
-EnemyState *ForkState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *ForkState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f /*playerPos*/)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 

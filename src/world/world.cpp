@@ -559,9 +559,9 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	room->draw(window, playerBounds, playerX);
 }
 
-void World::update(float deltaTime, sf::FloatRect /*playerBounds*/)
+void World::update(float deltaTime)
 {
 	Room *room = getCurrentRoom();
 	if (room)
-		room->update(deltaTime, *this);
+		room->update(deltaTime);
 }

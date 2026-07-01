@@ -25,7 +25,7 @@ Door *Room::getTouchingDoor(const sf::FloatRect &entityBounds)
 	return nullptr;
 }
 
-void Room::update(float deltaTime, const World &world)
+void Room::update(float deltaTime)
 {
 	enemies_.erase(
 	    std::remove_if(enemies_.begin(), enemies_.end(), [](const auto &e) { return e->isReadyForRemoval(); }),

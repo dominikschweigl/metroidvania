@@ -7,7 +7,7 @@ IdleState::IdleState()
 {
 }
 
-PlayerState *IdleState::update(float dt, Player &p)
+PlayerState *IdleState::update(float /*dt*/, Player &p)
 {
 	if (!p.isOnGround)
 		return &p.states.peak;
@@ -20,7 +20,7 @@ PlayerState *IdleState::update(float dt, Player &p)
 	return this;
 }
 
-void IdleState::applyAnimation(float dt, Player &p)
+void IdleState::applyAnimation(float /*dt*/, Player &p)
 {
 	p.lowerBodySprite.setTexture(idle_lower_texture);
 	p.lowerBodySprite.setTextureRect(sf::IntRect({0, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
@@ -28,7 +28,7 @@ void IdleState::applyAnimation(float dt, Player &p)
 	p.upperBodySprite.setTextureRect(sf::IntRect({0, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE}));
 }
 
-void IdleState::onEnter(Player &p)
+void IdleState::onEnter(Player & /*p*/)
 {
 	currentFrame = 0;
 	frameTimer = 0.f;

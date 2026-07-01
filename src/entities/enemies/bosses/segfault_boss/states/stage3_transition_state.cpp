@@ -3,7 +3,8 @@
 
 namespace segfault_boss {
 
-EnemyState *Stage3TransitionState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *Stage3TransitionState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/,
+                                          sf::Vector2f /*playerPos*/)
 {
 	auto &boss = static_cast<SegfaultBoss &>(enemy);
 

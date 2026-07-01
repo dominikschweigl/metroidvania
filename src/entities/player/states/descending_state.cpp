@@ -24,7 +24,7 @@ void DescendingState::onEnter(Player &p)
 	frameTimer = 0.f;
 }
 
-PlayerState *DescendingState::update(float dt, Player &p)
+PlayerState *DescendingState::update(float /*dt*/, Player &p)
 {
 	if (p.isOnGround)
 		return &p.states.landing;
@@ -35,7 +35,7 @@ PlayerState *DescendingState::update(float dt, Player &p)
 	return this;
 }
 
-void DescendingState::applyAnimation(float dt, Player &p)
+void DescendingState::applyAnimation(float /*dt*/, Player &p)
 {
 	const sf::IntRect frameRect({4 * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
 	p.lowerBodySprite.setTexture(jump_lower_texture);

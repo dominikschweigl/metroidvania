@@ -53,16 +53,16 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 	world_.registerRoom("16", "data/maps/16.tmj", {"15"});
 
 	if (makeNewGame)
-		this->newGame(window);
+		this->newGame();
 	else
-		this->loadGame(window);
+		this->loadGame();
 
 	sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
 		return std::make_unique<InventoryScene>(player, stack, windowSize);
 	});
 }
 
-void GameScene::newGame(sf::RenderWindow &window)
+void GameScene::newGame()
 {
 	world_.requireLoad("start_room");
 	world_.setCurrentRoom("start_room");
@@ -71,7 +71,7 @@ void GameScene::newGame(sf::RenderWindow &window)
 	prefetchAdjacentRooms();
 }
 
-void GameScene::loadGame(sf::RenderWindow &window)
+void GameScene::loadGame()
 {
 	const std::string savedRoomId = world_.readSavedRoomId();
 	world_.requireLoad(savedRoomId);
@@ -124,7 +124,7 @@ void GameScene::update(float deltaTime)
 	processEnemyEvents();
 	updateItems(deltaTime);
 
-	world_.update(deltaTime, player_.getBounds());
+	world_.update(deltaTime);
 
 	resolveHitboxes();
 	hotbarHud_.update(deltaTime);

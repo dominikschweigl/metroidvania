@@ -15,7 +15,7 @@ void AscendingState::onEnter(Player &p)
 	frameTimer = 0.f;
 }
 
-PlayerState *AscendingState::update(float dt, Player &p)
+PlayerState *AscendingState::update(float /*dt*/, Player &p)
 {
 	if (p.isOnGround)
 		return &p.states.landing;
@@ -28,7 +28,7 @@ PlayerState *AscendingState::update(float dt, Player &p)
 	return this;
 }
 
-sf::Vector2f AscendingState::getHeadOffset(Player &p) const noexcept
+sf::Vector2f AscendingState::getHeadOffset(Player & /*p*/) const noexcept
 {
 	return HEAD_OFFSET;
 }
@@ -38,7 +38,7 @@ sf::Vector2f AscendingState::getUpperBodyOffset(Player &p) const noexcept
 	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSET : UPPER_BODY_OFFSET;
 }
 
-void AscendingState::applyAnimation(float dt, Player &p)
+void AscendingState::applyAnimation(float /*dt*/, Player &p)
 {
 	const sf::IntRect frameRect({2 * Player::FRAME_SIZE, 0}, {Player::FRAME_SIZE, Player::FRAME_SIZE});
 	p.lowerBodySprite.setTexture(jump_lower_texture);

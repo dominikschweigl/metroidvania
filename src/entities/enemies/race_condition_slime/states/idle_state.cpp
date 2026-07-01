@@ -4,7 +4,7 @@
 
 namespace rc_slime {
 
-EnemyState *IdleState::update(float dt, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *IdleState::update(float /*dt*/, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f playerPos)
 {
 	auto &slime = static_cast<RaceConditionSlime &>(enemy);
 

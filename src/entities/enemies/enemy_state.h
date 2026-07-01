@@ -14,8 +14,8 @@ class EnemyState {
 	[[nodiscard]] virtual EnemyState *update(float deltaTime, BaseEnemy &enemy, const World &world,
 	                                         sf::Vector2f playerPos) = 0;
 	virtual void updateAnimation(float deltaTime, BaseEnemy &enemy) = 0;
-	virtual void onEnter(BaseEnemy &enemy) {}
-	virtual void onExit(BaseEnemy &enemy) {}
+	virtual void onEnter(BaseEnemy &) {}
+	virtual void onExit(BaseEnemy &) {}
 	virtual json serialize() const { return json{}; }
 
   protected:

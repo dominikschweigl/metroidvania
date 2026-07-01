@@ -18,7 +18,7 @@ class TestEnemy : public BaseEnemy {
   public:
 	TestEnemy(sf::Vector2f spawn, float w = 32.f, float h = 32.f) : BaseEnemy(spawn, w, h) {}
 
-	void draw(sf::RenderWindow &window) override {}
+	void draw(sf::RenderWindow &) override {}
 
 	int preUpdateCalls = 0;
 	float lastPreUpdateDt = 0.f;
@@ -40,14 +40,14 @@ class TestState : public EnemyState {
 	int enterCalls = 0;
 	int exitCalls = 0;
 
-	EnemyState *update(float dt, BaseEnemy &e, const World &w, sf::Vector2f p) override
+	EnemyState *update(float /*dt*/, BaseEnemy & /*e*/, const World & /*w*/, sf::Vector2f /*p*/) override
 	{
 		++updateCalls;
 		return (nextState != nullptr) ? nextState : this;
 	}
-	void updateAnimation(float dt, BaseEnemy &e) override { ++animationCalls; }
-	void onEnter(BaseEnemy &e) override { ++enterCalls; }
-	void onExit(BaseEnemy &e) override { ++exitCalls; }
+	void updateAnimation(float /*dt*/, BaseEnemy &) override { ++animationCalls; }
+	void onEnter(BaseEnemy &) override { ++enterCalls; }
+	void onExit(BaseEnemy &) override { ++exitCalls; }
 };
 
 } // namespace

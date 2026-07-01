@@ -91,7 +91,7 @@ void RoamingState::onEnter(BaseEnemy &enemy)
 	frameTimer = 0.f;
 }
 
-void RoamingState::onExit(BaseEnemy &enemy)
+void RoamingState::onExit(BaseEnemy & /*enemy*/)
 {
 	moveTimer = 0;
 }

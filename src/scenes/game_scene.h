@@ -24,8 +24,8 @@ class GameScene : public Scene {
 	void resetPlayerIfOutOfBounds();
 
   private:
-	void newGame(sf::RenderWindow &window);
-	void loadGame(sf::RenderWindow &window);
+	void newGame();
+	void loadGame();
 	void prefetchAdjacentRooms();
 
 	void drawDebugHitboxes(sf::RenderWindow &window);

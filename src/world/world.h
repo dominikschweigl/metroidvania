@@ -100,7 +100,7 @@ class World {
 	// ── Render / update ───────────────────────────────────────────────────────
 
 	void draw(sf::RenderWindow &window, const sf::View &view, sf::FloatRect playerBounds) const;
-	void update(float deltaTime, sf::FloatRect playerBounds);
+	void update(float deltaTime);
 
 	// ── Convenience passthrough ───────────────────────────────────────────────
 

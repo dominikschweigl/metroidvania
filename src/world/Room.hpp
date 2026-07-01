@@ -61,7 +61,7 @@ struct Room {
 	bool isTouchingSavepoint(const sf::FloatRect &entityBounds) const;
 	Door *getTouchingDoor(const sf::FloatRect &entityBounds);
 
-	void update(float deltaTime, const World &world);
+	void update(float deltaTime);
 	void draw(sf::RenderWindow &window, const sf::FloatRect playerBounds, float playerX) const;
 
 	json serialize() const;

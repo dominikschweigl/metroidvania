@@ -4,8 +4,8 @@
 
 namespace transistor_boss {
 
-EnemyState *ChargeAttackWindupState::update(float deltaTime, BaseEnemy &enemy, const World &world,
-                                            sf::Vector2f playerPos)
+EnemyState *ChargeAttackWindupState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/,
+                                            sf::Vector2f /*playerPos*/)
 {
 
 	auto &transistor_boss = static_cast<TransistorBoss &>(enemy);
@@ -46,7 +46,7 @@ void ChargeAttackWindupState::onEnter(BaseEnemy &enemy)
 	AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_CHARGE_ATTACK_WINDUP);
 }
 
-void ChargeAttackWindupState::onExit(BaseEnemy &enemy)
+void ChargeAttackWindupState::onExit(BaseEnemy & /*enemy*/)
 {
 	chargeTimer = 0;
 }

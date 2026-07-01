@@ -4,7 +4,7 @@
 
 namespace transistor_boss {
 
-EnemyState *SummonState::update(float deltaTime, BaseEnemy &enemy, const World &world, sf::Vector2f playerPos)
+EnemyState *SummonState::update(float deltaTime, BaseEnemy &enemy, const World & /*world*/, sf::Vector2f /*playerPos*/)
 {
 	auto &transistor_boss = static_cast<TransistorBoss &>(enemy);
 

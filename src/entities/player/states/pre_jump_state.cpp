@@ -18,7 +18,7 @@ sf::Vector2f PreJumpState::getUpperBodyOffset(Player &p) const noexcept
 	return p.isAttackActive() ? ATTACK_UPPER_BODY_OFFSETS[currentFrame] : UPPER_BODY_OFFSETS[currentFrame];
 }
 
-PlayerState *PreJumpState::update(float dt, Player &p)
+PlayerState *PreJumpState::update(float /*dt*/, Player &p)
 {
 	if (readyToAscend)
 		return &p.states.ascending;
