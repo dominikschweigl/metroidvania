@@ -2,8 +2,8 @@
 #include <algorithm>
 
 BindingList::BindingList(const Theme &theme, const float width, RebindHandler handler)
-    : theme_(&theme), rowWidth_(width), awaitingText_(theme.font, "Press any key...", theme.itemSize),
-      rebindHandler_(std::move(handler))
+    : theme_(&theme), rowWidth_(width), rebindHandler_(std::move(handler)),
+      awaitingText_(theme.font, "Press any key...", theme.itemSize)
 {
 	const sf::Text sample(theme.font, "X", theme.itemSize);
 	rowHeight_ = sample.getLocalBounds().size.y + 2.f * theme.itemPaddingY;
