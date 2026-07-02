@@ -46,16 +46,23 @@ std::span<const char *const> AssetManager::fontCandidates(const FontAsset asset)
 {
 	switch (asset) {
 	case UI_FONT: {
-		static constexpr std::array<const char *, 7> candidates = {
+#ifdef _WIN32
+		static constexpr std::array<const char *, 3> candidates = {
 		    "C:\\Windows\\Fonts\\arial.ttf",
 		    "C:\\Windows\\Fonts\\segoeui.ttf",
 		    "C:\\Windows\\Fonts\\calibri.ttf",
+		};
+#elif defined(__linux__)
+		static constexpr std::array<const char *, 4> candidates = {
 		    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
 		    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
 		    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
 		};
-		return candidates;
+#else
+		static constexpr std::array<const char *, 1> candidates = {"assets/fonts/fallback.ttf"};
+#endif
+		return {candidates.data(), candidates.size()};
 	}
 	}
 	throw std::logic_error("fontCandidates: missing FontAsset entry");
