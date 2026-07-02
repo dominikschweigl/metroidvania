@@ -131,9 +131,7 @@ void GameScene::update(float deltaTime)
 	resetPlayerIfOutOfBounds();
 
 	if (!player_.isAlive() && player_.inventory().hasBackup()) {
-		player_.heal(1);
-		player_.inventory().clearSlot({SlotKind::Backup, 0});
-		player_.triggerIframes();
+		player_.revive();
 	}
 	if (!player_.isAlive())
 		sceneStack_.push([&] { return makeGameOverMenu(sceneStack_, window_); });

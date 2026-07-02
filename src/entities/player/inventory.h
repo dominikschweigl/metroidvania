@@ -38,22 +38,18 @@ class Inventory {
 	[[nodiscard]] bool hasGum() const noexcept { return gumSlot != nullptr; }
 	[[nodiscard]] bool hasBackup() const noexcept { return backupSlot != nullptr; }
 
-	[[nodiscard]] bool hasItem(SlotRef slot) const noexcept;
+	[[nodiscard]] bool hasItem(const SlotRef slot) const noexcept;
 
-	// Precondition: hasItem(slot) == true.
-	[[nodiscard]] Item &itemAt(SlotRef slot);
-	[[nodiscard]] const Item &itemAt(SlotRef slot) const;
+	[[nodiscard]] Item &itemAt(const SlotRef slot);
+	[[nodiscard]] const Item &itemAt(const SlotRef slot) const;
 
-	// Single entry point: calls item.activate(player, *this, slot).
-	// Handles both temporary consumption and permanent re-equip transparently.
-	void interact(SlotRef slot, Player &player, World *world);
+	void interact(const SlotRef slot, Player &player, World *world);
 
 	// Move item between any two compatible slots. Returns false if invalid.
-	bool moveItem(SlotRef from, SlotRef to);
+	bool moveItem(const SlotRef from, const SlotRef to);
 
-	// Called by item activate() implementations.
-	void clearSlot(SlotRef slot);
-	void moveToEquipmentSlot(SlotRef from);
+	void clearSlot(const SlotRef slot);
+	void moveToEquipmentSlot(const SlotRef from);
 
 	// Flattens the inventory into a vector
 	std::vector<Item *> flatten() const;
@@ -62,8 +58,8 @@ class Inventory {
 	void deserialize(const json &j);
 
   private:
-	[[nodiscard]] std::unique_ptr<Item> &slotRef(SlotRef slot);
-	[[nodiscard]] const std::unique_ptr<Item> &slotRef(SlotRef slot) const;
+	[[nodiscard]] std::unique_ptr<Item> &slotRef(const SlotRef slot);
+	[[nodiscard]] const std::unique_ptr<Item> &slotRef(const SlotRef slot) const;
 
 	static bool isValidInSlot(const Item &item, SlotKind slotKind) noexcept;
 	static bool isEquipmentSlot(SlotKind slotKind) noexcept;

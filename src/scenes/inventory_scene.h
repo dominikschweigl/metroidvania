@@ -13,10 +13,10 @@ class Player;
 
 class InventoryScene : public Scene {
   public:
-	InventoryScene(Player &player, SceneStack &stack, sf::Vector2u windowSize);
+	InventoryScene(Player &player, SceneStack &stack, const sf::Vector2u windowSize);
 
 	void handleEvent(const sf::Event &event, sf::RenderWindow &window) override;
-	void update(float deltaTime) override;
+	void update(const float deltaTime) override;
 	void draw(sf::RenderWindow &window) override;
 
 	[[nodiscard]] bool isTransparent() const override { return true; }
@@ -29,23 +29,23 @@ class InventoryScene : public Scene {
 	};
 
 	[[nodiscard]] sf::View buildUiView(const sf::RenderWindow &window) const noexcept;
-	[[nodiscard]] sf::Vector2f slotScreenPos(SlotRef slot) const noexcept;
-	[[nodiscard]] sf::FloatRect slotBounds(SlotRef slot) const noexcept;
-	[[nodiscard]] std::optional<SlotRef> slotAtPoint(sf::Vector2f point) const noexcept;
+	[[nodiscard]] sf::Vector2f slotScreenPos(const SlotRef slot) const noexcept;
+	[[nodiscard]] sf::FloatRect slotBounds(const SlotRef slot) const noexcept;
+	[[nodiscard]] std::optional<SlotRef> slotAtPoint(const sf::Vector2f point) const noexcept;
 
 	void updateItemActions(InputManager &input, Inventory &inv);
 
 	void drawBackground(sf::RenderTarget &target) const;
 	void drawPlayerPreview(sf::RenderTarget &target) const;
-	void drawSlot(sf::RenderTarget &target, SlotRef slot, bool hovered, bool isDragSource) const;
+	void drawSlot(sf::RenderTarget &target, const SlotRef slot, const bool hovered, const bool isDragSource) const;
 	void drawAllSlots(sf::RenderTarget &target) const;
-	void drawInfoCard(sf::RenderTarget &target, SlotRef slot) const;
+	void drawInfoCard(sf::RenderTarget &target, const SlotRef slot) const;
 	void drawDraggedItem(sf::RenderTarget &target) const;
 	void drawActiveEffects(sf::RenderTarget &target, const std::vector<Effect> &effects) const;
-	void drawText(sf::RenderTarget &target, const std::string &text, sf::Vector2f pos, unsigned int charSize,
-	              sf::Color color) const;
-	float drawWrappedText(sf::RenderTarget &target, const std::string &text, sf::Vector2f pos, unsigned int charSize,
-	                      sf::Color color, float maxWidth) const;
+	void drawText(sf::RenderTarget &target, const std::string &text, const sf::Vector2f pos,
+	              const unsigned int charSize, const sf::Color color) const;
+	float drawWrappedText(sf::RenderTarget &target, const std::string &text, const sf::Vector2f pos,
+	                      const unsigned int charSize, const sf::Color color, const float maxWidth) const;
 
 	Player &player_;
 	SceneStack &stack_;

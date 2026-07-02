@@ -85,6 +85,38 @@ TEST_CASE("Player: dies when health reaches zero (boundary)")
 	REQUIRE_FALSE(p.isAlive());
 }
 
+TEST_CASE("Player::revive restores one health, consumes backup, and arms i-frames")
+{
+	Player p;
+	p.health.damage(p.health.current);
+	REQUIRE_FALSE(p.isAlive());
+	REQUIRE(p.inventory().hasBackup());
+
+	p.revive();
+
+	REQUIRE(p.health.current == 1);
+	REQUIRE(p.isAlive());
+	REQUIRE_FALSE(p.inventory().hasBackup());
+	REQUIRE(p.getIframes() == Player::IFRAME_DURATION);
+	REQUIRE(p.isInvulnerable());
+}
+
+TEST_CASE("Player::revive does nothing while the player is already alive")
+{
+	Player p;
+	const int initialHealth = p.health.current;
+	REQUIRE(initialHealth == Player::MAX_HEALTH);
+	REQUIRE(p.inventory().hasBackup());
+
+	p.revive();
+
+	REQUIRE(p.health.current == initialHealth);
+	REQUIRE(p.isAlive());
+	REQUIRE(p.inventory().hasBackup());
+	REQUIRE(p.getIframes() == 0.f);
+	REQUIRE_FALSE(p.isInvulnerable());
+}
+
 TEST_CASE("Player: zero damage does not arm i-frames (failure case)")
 {
 	Player p;

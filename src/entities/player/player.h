@@ -77,8 +77,8 @@ class Player : public BaseEntity {
 	void setDebugInvincible(bool value) noexcept { debugInvincible_ = value; }
 
 	void heal(int amount) noexcept { health.heal(amount); }
+	void revive();
 	void takeDamage(int amount) noexcept override;
-	void triggerIframes() noexcept { iframes = IFRAME_DURATION; }
 
 	// Applies knockback (base behaviour) and queues any status effect the hit carries.
 	void onHit(const Hitbox &hit) noexcept override;
@@ -121,6 +121,8 @@ class Player : public BaseEntity {
 	[[nodiscard]] float jumpMultiplier() const noexcept;
 	[[nodiscard]] float damageMultiplier() const noexcept;
 	[[nodiscard]] float damageResistance() const noexcept;
+
+	void triggerIframes() noexcept { iframes = IFRAME_DURATION; }
 
 	MeleeAttack meleeAttack;
 	HatAbility hatAbility;
