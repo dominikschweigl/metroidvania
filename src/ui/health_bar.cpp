@@ -2,7 +2,7 @@
 #include "../core/asset_manager.h"
 
 HealthBar::HealthBar(const float indicatorGap, const float indicatorVerticalOffset, const float indicatorSize)
-    : indicatorGap_(indicatorGap), indicatorSize_(indicatorSize), indicatorVerticalOffset_(indicatorVerticalOffset),
+    : indicatorGap_(indicatorGap), indicatorVerticalOffset_(indicatorVerticalOffset), indicatorSize_(indicatorSize),
       zeroSprite_(AssetManager::getInstance().getTexture(HEALTH_ZERO_BIT)),
       oneSprite_(AssetManager::getInstance().getTexture(HEALTH_ONE_BIT))
 {
