@@ -39,7 +39,6 @@ Player::Player()
 	headSprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	upperBodySprite.setOrigin({FRAME_SIZE / 2.f, static_cast<float>(FRAME_SIZE)});
 	lowerBodySprite.setPosition(position);
-	inventory_.addItem(std::make_unique<BackupDiskItem>());
 }
 
 void Player::update(float deltaTime, const World &world, bool attackTriggered, bool hatThrowTriggered)
