@@ -40,6 +40,7 @@ class GameScene : public Scene {
 	void handleRoomTransition();
 	void maybeTriggerStoryDialogue();
 	void pushStoryDialogue(std::vector<DialogueLine> lines);
+	[[nodiscard]] bool hasUsbKey() const;
 
 	SceneStack &sceneStack_;
 	sf::RenderWindow &window_;

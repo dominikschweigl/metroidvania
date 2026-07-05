@@ -82,3 +82,12 @@ TEST_CASE("Story snippets provide text for every story beat", "[dialogue_scene]"
 	REQUIRE_FALSE(StorySnippets::epilogue().empty());
 	REQUIRE_FALSE(StorySnippets::gameOver().empty());
 }
+
+TEST_CASE("Story snippets provide text for every gameplay hint", "[dialogue_scene]")
+{
+	REQUIRE_FALSE(StorySnippets::lockedDoorNoKey().empty());
+	REQUIRE_FALSE(StorySnippets::lockedDoorWithKey().empty());
+	REQUIRE_FALSE(StorySnippets::roomEnemiesRemain().empty());
+	REQUIRE_FALSE(StorySnippets::pickedUpHat().empty());
+	REQUIRE_FALSE(StorySnippets::pickedUpGum().empty());
+}

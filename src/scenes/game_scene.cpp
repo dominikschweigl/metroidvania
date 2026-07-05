@@ -227,9 +227,23 @@ void GameScene::updateItems(float deltaTime)
 		if (!peeked || !player_.inventory().canAdd(peeked->get()))
 			continue;
 		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
-		if (collected)
-			player_.inventory().addItem(std::move(collected));
+		if (!collected)
+			continue;
+
+		if (dynamic_cast<HatItem *>(collected.get()))
+			pushStoryDialogue(StorySnippets::pickedUpHat());
+		else if (dynamic_cast<ChewingGumItem *>(collected.get()))
+			pushStoryDialogue(StorySnippets::pickedUpGum());
+
+		player_.inventory().addItem(std::move(collected));
 	}
+}
+
+bool GameScene::hasUsbKey() const
+{
+	const std::vector<Item *> items = player_.inventory().flatten();
+	return std::any_of(items.begin(), items.end(),
+	                    [](const Item *item) { return dynamic_cast<const UsbKeyItem *>(item) != nullptr; });
 }
 
 void GameScene::resolveHitboxes()
@@ -259,10 +273,14 @@ void GameScene::handleRoomTransition()
 {
 	Door *door = world_.getTouchingDoor(player_.getBounds());
 	if (door) {
-		const bool canEnter =
-		    !door->locked && (!door->needsToClearAllEnemies || world_.getCurrentRoom()->enemies_.empty());
-		if (!canEnter)
+		if (door->locked) {
+			pushStoryDialogue(hasUsbKey() ? StorySnippets::lockedDoorWithKey() : StorySnippets::lockedDoorNoKey());
 			return;
+		}
+		if (door->needsToClearAllEnemies && !world_.getCurrentRoom()->enemies_.empty()) {
+			pushStoryDialogue(StorySnippets::roomEnemiesRemain());
+			return;
+		}
 
 		world_.requireLoad(door->targetRoomId);
 		world_.setCurrentRoom(door->targetRoomId);
