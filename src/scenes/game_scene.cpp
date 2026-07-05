@@ -32,11 +32,18 @@ std::uniform_real_distribution<float> speedDist(100.0f, 200.0f);
 static const std::string TRANSISTOR_BOSS_ROOM_ID = "8";
 static const std::string SEGFAULT_BOSS_ROOM_ID = "16";
 
+// The laboratory area (area 2) is the room chain reached from room 7 onwards,
+// distinguished in the maps by their use of the area-2 tileset.
+static bool isArea2Room(const std::string &roomId)
+{
+	return roomId == "11" || roomId == "13" || roomId == "14" || roomId == "15" || roomId == "16";
+}
+
 static MusicTrack musicTrackForRoom(const std::string &roomId)
 {
 	if (roomId == TRANSISTOR_BOSS_ROOM_ID || roomId == SEGFAULT_BOSS_ROOM_ID)
 		return MusicTrack::AREA_1_BOSS_THEME;
-	return MusicTrack::GAME_THEME;
+	return isArea2Room(roomId) ? MusicTrack::AREA_2_THEME : MusicTrack::AREA_1_THEME;
 }
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
