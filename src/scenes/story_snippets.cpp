@@ -32,7 +32,7 @@ std::vector<DialogueLine> beforeTransistorBoss()
 {
 	return {
 	    {PLAYER, "There is a strange humming noice and it is getting louder."},
-		{PLAYER, "Something in here must make... "},
+	    {PLAYER, "Something in here must make... "},
 	    {PLAYER, "That is the biggest transistor I have ever seen?! And it is glaring at me. No point in talking. "
 	             "Seems like it is ready to fight."},
 	};
@@ -54,7 +54,7 @@ std::vector<DialogueLine> beforeSegfaultBoss()
 	              "my beautiful hardware. You will pay for this!"},
 	    {PLAYER, "He is glitching apart and dragging the whole system down with him. "
 	             "I get the feeling he is at the center of all those strange things happening to me."},
-		{PLAYER, "Let's get this over with!"},
+	    {PLAYER, "Let's get this over with!"},
 	};
 }
 
@@ -81,7 +81,7 @@ std::vector<DialogueLine> lockedDoorNoKey()
 {
 	return {
 	    {PLAYER, "This door won't move at all. It's locked. I'll need to find something to open it."},
-		{PLAYER, "Weird. The lock somehow looks like a USB Port."},
+	    {PLAYER, "Weird. The lock somehow looks like a USB Port."},
 	};
 }
 
@@ -111,7 +111,7 @@ std::vector<DialogueLine> pickedUpHat()
 {
 	return {
 	    {PLAYER, "A hat? Doesn't look like much, but... wait is he talking to me??."},
-		{PLAYER, "It tells me to throw him around. I guess if that's what he wants..."},
+	    {PLAYER, "It tells me to throw him around. I guess if that's what he wants..."},
 	};
 }
 

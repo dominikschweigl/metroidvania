@@ -257,7 +257,7 @@ bool GameScene::hasUsbKey() const
 {
 	const std::vector<Item *> items = player_.inventory().flatten();
 	return std::any_of(items.begin(), items.end(),
-	                    [](const Item *item) { return dynamic_cast<const UsbKeyItem *>(item) != nullptr; });
+	                   [](const Item *item) { return dynamic_cast<const UsbKeyItem *>(item) != nullptr; });
 }
 
 void GameScene::resolveHitboxes()
