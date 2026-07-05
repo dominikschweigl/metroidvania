@@ -6,7 +6,7 @@
 #include <numbers>
 
 WorldItem::WorldItem(const sf::Vector2f spawnPos, const sf::Vector2f spawnVelocity, std::unique_ptr<Item> item)
-    : item_(std::move(item)), position_(spawnPos), velocity_(spawnVelocity),
+    : velocity_(spawnVelocity), item_(std::move(item)), position_(spawnPos),
       texture_(AssetManager::getInstance().getTexture(item_->textureAsset())), sprite_(texture_)
 {
 	sprite_.setOrigin({WIDTH / 2.f, HEIGHT});
@@ -99,5 +99,5 @@ std::unique_ptr<WorldItem> WorldItem::deserialize(const json &j)
 		worldItem->collected_ = j["collected"].get<bool>();
 	}
 
-	return std::move(worldItem);
+	return worldItem;
 }

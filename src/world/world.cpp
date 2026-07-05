@@ -299,9 +299,12 @@ void World::parseSavePoints(Room &room, tson::Map &map)
 				continue;
 
 			for (auto &obj : tile->getObjectgroup().getObjects()) {
-				room.savePoints.push_back(SavePoint{sf::FloatRect(
-				    {x * TILE_SIZE + float(obj.getPosition().x), y * TILE_SIZE + float(obj.getPosition().y)},
-				    {float(obj.getSize().x), float(obj.getSize().y)})});
+				room.savePoints.push_back(SavePoint{
+				    sf::FloatRect(
+				        {x * TILE_SIZE + float(obj.getPosition().x), y * TILE_SIZE + float(obj.getPosition().y)},
+				        {float(obj.getSize().x), float(obj.getSize().y)}),
+				    {},
+				});
 			}
 		}
 	}
@@ -550,7 +553,7 @@ void World::draw(sf::RenderWindow &window, const sf::View &view, const sf::Float
 	const int top = static_cast<int>((center.y - size.y * 0.5f) / TILE_SIZE);
 	const int bottom = static_cast<int>((center.y + size.y * 0.5f) / TILE_SIZE);
 
-	for (const std::string &layerName : {"Foreground", "Solid"}) {
+	for (const char *layerName : {"Foreground", "Solid"}) {
 		tson::Layer *layer = room->map->getLayer(layerName);
 		if (!layer)
 			continue;
