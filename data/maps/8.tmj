@@ -153,7 +153,7 @@
                         {
                          "name":"drop_items",
                          "type":"string",
-                         "value":"UsbKeyItem"
+                         "value":"UsbKeyItem,BackupDiskItem"
                         }],
                  "rotation":0,
                  "type":"enemy",
