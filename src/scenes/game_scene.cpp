@@ -32,11 +32,16 @@ std::uniform_real_distribution<float> speedDist(100.0f, 200.0f);
 static const std::string TRANSISTOR_BOSS_ROOM_ID = "8";
 static const std::string SEGFAULT_BOSS_ROOM_ID = "16";
 
+static MusicTrack musicTrackForRoom(const std::string &roomId)
+{
+	if (roomId == TRANSISTOR_BOSS_ROOM_ID || roomId == SEGFAULT_BOSS_ROOM_ID)
+		return MusicTrack::AREA_1_BOSS_THEME;
+	return MusicTrack::GAME_THEME;
+}
+
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
     : sceneStack_(sceneStack), window_(window), world_(gameName)
 {
-	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
-
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
@@ -61,6 +66,8 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 	else
 		this->loadGame();
 	storyIntroPending_ = makeNewGame;
+
+	AudioManager::getInstance().playMusic(musicTrackForRoom(world_.getCurrentRoomId()));
 
 	sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
 		return std::make_unique<InventoryScene>(player, stack, windowSize);
@@ -287,9 +294,7 @@ void GameScene::handleRoomTransition()
 		prefetchAdjacentRooms();
 		player_.setPosition(world_.getCurrentRoom()->playerSpawns[door->targetSpawnIdx]);
 
-		const MusicTrack track =
-		    (world_.getCurrentRoomId() == "boss_room") ? MusicTrack::AREA_1_BOSS_THEME : MusicTrack::GAME_THEME;
-		AudioManager::getInstance().playMusic(track);
+		AudioManager::getInstance().playMusic(musicTrackForRoom(world_.getCurrentRoomId()));
 
 	} else if (world_.isTouchingSavepoint(player_.getBounds())) {
 		world_.saveWorldData(player_);
