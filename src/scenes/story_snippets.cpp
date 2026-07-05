@@ -18,6 +18,16 @@ std::vector<DialogueLine> newGameIntro()
 	};
 }
 
+std::vector<DialogueLine> enteringArea2()
+{
+	return {
+	    {PLAYER, "The scenery changed. It feels cold and sterile..."},
+	    {PLAYER, "Cables run along the floor, all leading deeper in."},
+	    {PLAYER, "A laboratory. So this is where those glitches and bugs are coming from. "
+	             "I need to follow those trails and find out where they lead."},
+	};
+}
+
 std::vector<DialogueLine> beforeTransistorBoss()
 {
 	return {

@@ -6,6 +6,7 @@
 namespace StorySnippets {
 
 [[nodiscard]] std::vector<DialogueLine> newGameIntro();
+[[nodiscard]] std::vector<DialogueLine> enteringArea2();
 [[nodiscard]] std::vector<DialogueLine> beforeTransistorBoss();
 [[nodiscard]] std::vector<DialogueLine> afterTransistorBoss();
 [[nodiscard]] std::vector<DialogueLine> beforeSegfaultBoss();

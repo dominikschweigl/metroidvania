@@ -62,6 +62,7 @@ class GameScene : public Scene {
 	Direction lastPlayerDirection;
 
 	bool storyIntroPending_ = false;
+	bool storyEnteredArea2Shown_ = false;
 	bool storyBeforeTransistorShown_ = false;
 	bool storyBeforeSegfaultShown_ = false;
 };

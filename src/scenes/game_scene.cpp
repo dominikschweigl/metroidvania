@@ -316,6 +316,9 @@ void GameScene::maybeTriggerStoryDialogue()
 	if (storyIntroPending_) {
 		storyIntroPending_ = false;
 		pushStoryDialogue(StorySnippets::newGameIntro());
+	} else if (isArea2Room(roomId) && !storyEnteredArea2Shown_) {
+		storyEnteredArea2Shown_ = true;
+		pushStoryDialogue(StorySnippets::enteringArea2());
 	} else if (roomId == TRANSISTOR_BOSS_ROOM_ID && !storyBeforeTransistorShown_) {
 		storyBeforeTransistorShown_ = true;
 		pushStoryDialogue(StorySnippets::beforeTransistorBoss());
