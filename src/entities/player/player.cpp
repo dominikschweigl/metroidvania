@@ -57,7 +57,6 @@ void Player::update(float deltaTime, const World &world, bool attackTriggered, b
 		return effect.remainingDuration <= 0.f;
 	});
 
-	// Apply any status effect queued by onHit() (kept out of onHit to stay noexcept).
 	if (pendingSlow_) {
 		addEffect(Effect::slow());
 		pendingSlow_ = false;

@@ -24,13 +24,14 @@ shows where the player is currently located
 
 ## Dominik Schweigl
 
-(2) basic movement
+### Allocated Tasks:
+(2) basic player movement
 running left / right
 jumping
-interacting with game entities (doors, chests etc)
+interacting with game entities (doors, items etc)
 
 (1) one or more advanced movement mechanics
-eg double jump, wall jump, sliding
+wall jump, wall sliding
 needs to be unlocked
 
 (1) main combat
@@ -38,13 +39,33 @@ melee and/or ranged
 hitting enemies
 getting hit by enemies
 
-TODO:
-- coyote jump
-- faster down gravity during jump
+### Highlights:
 
-Project Setup with vcpkg, clang-format, editorconfig, git, Cmake.
+Player State System and 3-part Sprite
+- `src/entities/player/player.cpp:263-272`
+- `src/entities/player/states/player_state.h`
+- Other state files in `src/entities/player/states/`
 
-Catch2 Setup.
+Player Inventory
+- `src/entities/player/inventory.[h/cpp]`
+- `src/items/slot_ref.h`
+
+Items
+- `src/items/item.h`
+- `src/items/world_item.[h/cpp]`
+- Other item files in `src/items`
+
+### Other Implementations:
+- Player Effects - `src/effects/*`
+- Player Abilities - `src/entities/player/abilities/*`
+- Asset loading - `src/core/asset_manager.*`
+- Game Action abstraction from key inputs - `src/core/input_manager.*`
+- Key rebinding menu - `src/menus/key_bindings_menu.h`
+- Inventory menu - `src/scenes/inventory_scene.*`
+- Game item | health | effect hotbar - `src/ui/health_bar.*`, `src/ui/hotbar_hud.*`
+
+### Additional:
+Project Setup with vcpkg, clang-format, editorconfig, git, Cmake, Catch2.
 
 ## Lukas Schmölz
 
