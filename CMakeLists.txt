@@ -31,6 +31,8 @@ set(GAME_SOURCES
     src/scenes/menu_scene.cpp
     src/scenes/bluescreen_scene.cpp
     src/scenes/victory_scene.cpp
+    src/scenes/dialogue_scene.cpp
+    src/scenes/story_snippets.cpp
     src/scenes/game_scene.cpp
     src/scenes/inventory_scene.cpp
     src/world/Room.cpp
@@ -138,6 +140,7 @@ add_executable(metroidvania_tests
     tests/unit/interaction_indicator_tests.cpp
     tests/unit/entity_physics_tests.cpp
     tests/unit/world_item_tests.cpp
+    tests/unit/dialogue_scene_tests.cpp
     ${GAME_SOURCES})
 target_include_directories(metroidvania_tests PRIVATE src)
 target_include_directories(metroidvania_tests PRIVATE src external/tileson)

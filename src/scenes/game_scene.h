@@ -8,6 +8,7 @@
 #include "../ui/hotbar_hud.h"
 #include "../ui/minimap.h"
 #include "../world/world.h"
+#include "dialogue_scene.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
@@ -37,6 +38,9 @@ class GameScene : public Scene {
 	void resolveHitboxes();
 	void updateCamera();
 	void handleRoomTransition();
+	void maybeTriggerStoryDialogue();
+	void pushStoryDialogue(std::vector<DialogueLine> lines);
+	[[nodiscard]] bool hasUsbKey() const;
 
 	SceneStack &sceneStack_;
 	sf::RenderWindow &window_;
@@ -56,4 +60,9 @@ class GameScene : public Scene {
 	bool isPlayerFalling = false;
 	sf::Vector2f lastGroundPosition{15 * 32.f, 0.f};
 	Direction lastPlayerDirection;
+
+	bool storyIntroPending_ = false;
+	bool storyEnteredArea2Shown_ = false;
+	bool storyBeforeTransistorShown_ = false;
+	bool storyBeforeSegfaultShown_ = false;
 };

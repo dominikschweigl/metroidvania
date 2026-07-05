@@ -26,7 +26,14 @@ enum class SoundEffect {
 	TRANSISTOR_BOSS_EXPLOSION
 };
 
-enum class MusicTrack { MAIN_MENU_THEME, GAME_THEME, GAME_OVER_THEME, AREA_1_BOSS_THEME, TRANSISTOR_BOSS_VICTORY };
+enum class MusicTrack {
+	MAIN_MENU_THEME,
+	AREA_1_THEME,
+	AREA_2_THEME,
+	GAME_OVER_THEME,
+	AREA_1_BOSS_THEME,
+	TRANSISTOR_BOSS_VICTORY
+};
 
 enum class MusicStatus {
 	Stopped,

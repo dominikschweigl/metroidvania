@@ -1,39 +1,25 @@
 {
-    "currentRoom": "11",
+    "currentRoom": "5",
     "player": {
-        "direction": "Left",
+        "direction": "Right",
         "gravity": 1200.0,
         "health": {
-            "current": 3,
+            "current": 2,
             "max": 5
         },
         "inventory": {
             "backupSlot": null,
             "grid": [
                 {
-                    "type": "JumpPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
-                    "type": "HealingPotionItem"
-                },
-                {
                     "type": "SpeedPotionItem"
                 },
-                {
-                    "type": "SpeedPotionItem"
-                },
-                {
-                    "type": "ResistancePotionItem"
-                },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -51,12 +37,8 @@
                 null,
                 null
             ],
-            "gumSlot": {
-                "type": "ChewingGumItem"
-            },
-            "hatSlot": {
-                "type": "HatItem"
-            },
+            "gumSlot": null,
+            "hatSlot": null,
             "hotbar": [
                 null,
                 null,
@@ -69,8 +51,8 @@
         },
         "isOnGround": true,
         "position": [
-            1215.7950439453125,
-            448.0
+            973.9570922851563,
+            352.0
         ],
         "velocity": [
             0.0,
@@ -81,332 +63,140 @@
         {
             "enemies": [
                 {
-                    "direction": "Left",
-                    "drop_chance": 1.0,
-                    "drop_items": [],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 0,
-                        "max": 30
-                    },
-                    "isOnGround": true,
-                    "lootDropped": true,
-                    "position": [
-                        1127.713623046875,
-                        736.0
-                    ],
-                    "state": true,
-                    "type": "TransistorBoss",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            ],
-            "id": "8",
-            "items": []
-        },
-        {
-            "enemies": [
-                {
-                    "direction": "Left",
+                    "direction": "Right",
                     "drop_chance": 0.4000000059604645,
                     "drop_items": [
                         {
                             "type": "HealingPotionItem"
                         },
                         {
-                            "type": "ResistancePotionItem"
+                            "type": "SpeedPotionItem"
                         }
                     ],
-                    "gravity": 1200.0,
+                    "gravity": 0.0,
                     "health": {
                         "current": 3,
                         "max": 3
                     },
-                    "isOnGround": true,
+                    "isOnGround": false,
                     "lootDropped": false,
                     "position": [
-                        1521.1397705078125,
-                        512.0
+                        350.0,
+                        397.0
                     ],
-                    "size": 3,
                     "state": {
-                        "type": "GolemChaseState"
+                        "type": "HoverState"
                     },
-                    "type": "RecursionGolem",
+                    "type": "Capacitor",
                     "velocity": [
-                        -112.10000610351563,
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "SpeedPotionItem"
+                        }
+                    ],
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "lootDropped": false,
+                    "position": [
+                        323.0,
+                        252.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "SpeedPotionItem"
+                        }
+                    ],
+                    "gravity": 0.0,
+                    "health": {
+                        "current": 3,
+                        "max": 3
+                    },
+                    "isOnGround": false,
+                    "lootDropped": false,
+                    "position": [
+                        223.0,
+                        331.0
+                    ],
+                    "state": {
+                        "type": "HoverState"
+                    },
+                    "type": "Capacitor",
+                    "velocity": [
+                        0.0,
                         0.0
                     ]
                 }
             ],
-            "id": "11",
-            "items": []
-        },
-        {
-            "enemies": [],
             "id": "6",
-            "items": []
-        },
-        {
-            "enemies": [
+            "items": [
                 {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
+                    "collected": false,
+                    "hoverPhase": 0.0,
                     "isOnGround": false,
-                    "lootDropped": false,
+                    "item": {
+                        "type": "HatItem"
+                    },
                     "position": [
-                        616.0,
-                        684.0
+                        347.0,
+                        583.0
                     ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        1066.0,
-                        660.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        620.0,
-                        864.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        1018.0,
-                        870.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        1028.0,
-                        476.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        626.0,
-                        466.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        1006.0,
-                        296.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Right",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "DamagePotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": false,
-                    "lootDropped": false,
-                    "position": [
-                        708.0,
-                        294.0
-                    ],
-                    "state": {
-                        "type": "IdleState"
-                    },
-                    "type": "RaceConditionSlime",
                     "velocity": [
                         0.0,
                         0.0
                     ]
                 }
-            ],
-            "id": "13",
-            "items": []
+            ]
         },
         {
             "enemies": [],
             "id": "7",
-            "items": []
+            "items": [
+                {
+                    "collected": false,
+                    "hoverPhase": 0.0,
+                    "isOnGround": false,
+                    "item": {
+                        "type": "ChewingGumItem"
+                    },
+                    "position": [
+                        642.0,
+                        704.0
+                    ],
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ]
         },
         {
             "enemies": [],
@@ -434,7 +224,7 @@
                     "isOnGround": true,
                     "lootDropped": false,
                     "position": [
-                        767.5037841796875,
+                        999.037353515625,
                         416.0
                     ],
                     "state": {
@@ -459,13 +249,13 @@
                     ],
                     "gravity": 1200.0,
                     "health": {
-                        "current": 3,
+                        "current": 5,
                         "max": 5
                     },
                     "isOnGround": true,
                     "lootDropped": false,
                     "position": [
-                        459.4811706542969,
+                        327.6637878417969,
                         736.0
                     ],
                     "state": {
@@ -496,8 +286,8 @@
                     "isOnGround": true,
                     "lootDropped": false,
                     "position": [
-                        765.9631958007813,
-                        416.0
+                        997.7325439453125,
+                        576.0
                     ],
                     "state": {
                         "type": "ResistorChaseState"
@@ -527,8 +317,100 @@
                     "isOnGround": true,
                     "lootDropped": false,
                     "position": [
-                        1170.0,
-                        576.0
+                        304.955810546875,
+                        416.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "JumpPotionItem"
+                        }
+                    ],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": true,
+                    "lootDropped": false,
+                    "position": [
+                        301.8535461425781,
+                        416.0
+                    ],
+                    "state": {
+                        "type": "ResistorIdleState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "JumpPotionItem"
+                        }
+                    ],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": true,
+                    "lootDropped": false,
+                    "position": [
+                        995.9039916992188,
+                        256.0
+                    ],
+                    "state": {
+                        "type": "ResistorRecoverState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "id": "2",
+            "items": []
+        },
+        {
+            "enemies": [
+                {
+                    "direction": "Left",
+                    "drop_chance": 1.0,
+                    "drop_items": [],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": true,
+                    "lootDropped": false,
+                    "position": [
+                        978.0,
+                        736.0
                     ],
                     "state": {
                         "type": "ResistorJumpAttackState"
@@ -558,8 +440,8 @@
                     "isOnGround": false,
                     "lootDropped": false,
                     "position": [
-                        1148.850830078125,
-                        231.7512664794922
+                        888.257568359375,
+                        436.454345703125
                     ],
                     "state": {
                         "type": "ResistorJumpAttackState"
@@ -567,68 +449,7 @@
                     "type": "ResistorBug",
                     "velocity": [
                         220.0,
-                        -460.8123779296875
-                    ]
-                }
-            ],
-            "id": "2",
-            "items": []
-        },
-        {
-            "enemies": [
-                {
-                    "direction": "Left",
-                    "drop_chance": 1.0,
-                    "drop_items": [],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": true,
-                    "lootDropped": false,
-                    "position": [
-                        736.179931640625,
-                        736.0
-                    ],
-                    "state": {
-                        "type": "ResistorIdleState"
-                    },
-                    "type": "ResistorBug",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Left",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "JumpPotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": true,
-                    "lootDropped": false,
-                    "position": [
-                        731.81005859375,
-                        736.0
-                    ],
-                    "state": {
-                        "type": "ResistorIdleState"
-                    },
-                    "type": "ResistorBug",
-                    "velocity": [
-                        0.0,
-                        0.0
+                        -112.30082702636719
                     ]
                 },
                 {
@@ -651,103 +472,103 @@
                     "lootDropped": false,
                     "position": [
                         1038.0,
+                        512.0
+                    ],
+                    "state": {
+                        "type": "ResistorJumpAttackState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "JumpPotionItem"
+                        }
+                    ],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "lootDropped": false,
+                    "position": [
+                        926.7713623046875,
+                        459.6031188964844
+                    ],
+                    "state": {
+                        "type": "ResistorJumpAttackState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        220.0,
+                        -260.89215087890625
+                    ]
+                },
+                {
+                    "direction": "Right",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "JumpPotionItem"
+                        }
+                    ],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": false,
+                    "lootDropped": false,
+                    "position": [
+                        923.8974609375,
+                        431.6111145019531
+                    ],
+                    "state": {
+                        "type": "ResistorJumpAttackState"
+                    },
+                    "type": "ResistorBug",
+                    "velocity": [
+                        220.0,
+                        -32.06386184692383
+                    ]
+                },
+                {
+                    "direction": "Left",
+                    "drop_chance": 0.4000000059604645,
+                    "drop_items": [
+                        {
+                            "type": "HealingPotionItem"
+                        },
+                        {
+                            "type": "JumpPotionItem"
+                        }
+                    ],
+                    "gravity": 1200.0,
+                    "health": {
+                        "current": 5,
+                        "max": 5
+                    },
+                    "isOnGround": true,
+                    "lootDropped": false,
+                    "position": [
+                        978.0,
                         352.0
                     ],
                     "state": {
-                        "type": "ResistorIdleState"
-                    },
-                    "type": "ResistorBug",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Left",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "JumpPotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": true,
-                    "lootDropped": false,
-                    "position": [
-                        736.179931640625,
-                        736.0
-                    ],
-                    "state": {
-                        "type": "ResistorIdleState"
-                    },
-                    "type": "ResistorBug",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Left",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "JumpPotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": true,
-                    "lootDropped": false,
-                    "position": [
-                        736.179931640625,
-                        736.0
-                    ],
-                    "state": {
-                        "type": "ResistorIdleState"
-                    },
-                    "type": "ResistorBug",
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                {
-                    "direction": "Left",
-                    "drop_chance": 0.4000000059604645,
-                    "drop_items": [
-                        {
-                            "type": "HealingPotionItem"
-                        },
-                        {
-                            "type": "JumpPotionItem"
-                        }
-                    ],
-                    "gravity": 1200.0,
-                    "health": {
-                        "current": 5,
-                        "max": 5
-                    },
-                    "isOnGround": true,
-                    "lootDropped": false,
-                    "position": [
-                        789.38671875,
-                        544.0
-                    ],
-                    "state": {
-                        "type": "ResistorIdleState"
+                        "type": "ResistorJumpAttackState"
                     },
                     "type": "ResistorBug",
                     "velocity": [
@@ -774,22 +595,22 @@
                     ],
                     "gravity": 0.0,
                     "health": {
-                        "current": 1,
+                        "current": 3,
                         "max": 3
                     },
-                    "isOnGround": true,
+                    "isOnGround": false,
                     "lootDropped": false,
                     "position": [
-                        596.0,
-                        184.0
+                        549.388427734375,
+                        104.00672149658203
                     ],
                     "state": {
                         "type": "HoverState"
                     },
                     "type": "Capacitor",
                     "velocity": [
-                        0.0,
-                        0.0
+                        5.605193857299268e-45,
+                        -5.605193857299268e-45
                     ]
                 },
                 {
@@ -805,22 +626,22 @@
                     ],
                     "gravity": 0.0,
                     "health": {
-                        "current": 2,
+                        "current": 3,
                         "max": 3
                     },
                     "isOnGround": false,
                     "lootDropped": false,
                     "position": [
-                        742.2726440429688,
-                        110.99888610839844
+                        786.6856689453125,
+                        136.74806213378906
                     ],
                     "state": {
                         "type": "HoverState"
                     },
                     "type": "Capacitor",
                     "velocity": [
-                        4.438876945261508e-21,
-                        2.679699153211787e-22
+                        5.605193857299268e-45,
+                        5.605193857299268e-45
                     ]
                 }
             ],

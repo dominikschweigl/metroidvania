@@ -16,6 +16,7 @@
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
 #include "menus/victory_menu.h"
+#include "story_snippets.h"
 #include <algorithm>
 #include <cstdint>
 #include <numbers>
@@ -28,11 +29,26 @@ static std::mt19937 rng(rd());
 std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * std::numbers::pi_v<float>);
 std::uniform_real_distribution<float> speedDist(100.0f, 200.0f);
 
+static const std::string TRANSISTOR_BOSS_ROOM_ID = "8";
+static const std::string SEGFAULT_BOSS_ROOM_ID = "16";
+
+// The laboratory area (area 2) is the room chain reached from room 7 onwards,
+// distinguished in the maps by their use of the area-2 tileset.
+static bool isArea2Room(const std::string &roomId)
+{
+	return roomId == "11" || roomId == "13" || roomId == "14" || roomId == "15" || roomId == "16";
+}
+
+static MusicTrack musicTrackForRoom(const std::string &roomId)
+{
+	if (roomId == TRANSISTOR_BOSS_ROOM_ID || roomId == SEGFAULT_BOSS_ROOM_ID)
+		return MusicTrack::AREA_1_BOSS_THEME;
+	return isArea2Room(roomId) ? MusicTrack::AREA_2_THEME : MusicTrack::AREA_1_THEME;
+}
+
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
     : sceneStack_(sceneStack), window_(window), world_(gameName)
 {
-	AudioManager::getInstance().playMusic(MusicTrack::GAME_THEME);
-
 	const sf::Vector2u windowSize = window.getSize();
 	view_.setSize({static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
 	view_.setCenter(view_.getSize() / 2.f);
@@ -56,6 +72,9 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 		this->newGame();
 	else
 		this->loadGame();
+	storyIntroPending_ = makeNewGame;
+
+	AudioManager::getInstance().playMusic(musicTrackForRoom(world_.getCurrentRoomId()));
 
 	sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
 		return std::make_unique<InventoryScene>(player, stack, windowSize);
@@ -133,9 +152,12 @@ void GameScene::update(float deltaTime)
 	if (!player_.isAlive() && player_.inventory().hasBackup()) {
 		player_.revive();
 	}
-	if (!player_.isAlive())
+	if (!player_.isAlive()) {
 		sceneStack_.push([&] { return makeGameOverMenu(sceneStack_, window_); });
+		pushStoryDialogue(StorySnippets::gameOver());
+	}
 
+	maybeTriggerStoryDialogue();
 	updateCamera();
 }
 
@@ -198,11 +220,12 @@ void GameScene::processEnemyEvents()
 		if (enemy->isReadyForRemoval())
 			combat_.clearVictim(&enemy->health);
 
-		// Virtual — SegfaultBoss implements, BaseEnemy returns false
 		if (enemy->consumeBluescreenRequest())
 			sceneStack_.push([&] { return makeBluescreenMenu(sceneStack_, window_); });
 		if (enemy->consumeVictoryRequest())
 			sceneStack_.push([&] { return makeVictoryMenu(sceneStack_, window_); });
+		if (enemy->consumeDefeatStoryRequest())
+			pushStoryDialogue(StorySnippets::afterTransistorBoss());
 	}
 }
 
@@ -218,9 +241,23 @@ void GameScene::updateItems(float deltaTime)
 		if (!peeked || !player_.inventory().canAdd(peeked->get()))
 			continue;
 		std::unique_ptr<Item> collected = worldItem->tryCollect(player_.getBounds());
-		if (collected)
-			player_.inventory().addItem(std::move(collected));
+		if (!collected)
+			continue;
+
+		if (dynamic_cast<HatItem *>(collected.get()))
+			pushStoryDialogue(StorySnippets::pickedUpHat());
+		else if (dynamic_cast<ChewingGumItem *>(collected.get()))
+			pushStoryDialogue(StorySnippets::pickedUpGum());
+
+		player_.inventory().addItem(std::move(collected));
 	}
+}
+
+bool GameScene::hasUsbKey() const
+{
+	const std::vector<Item *> items = player_.inventory().flatten();
+	return std::any_of(items.begin(), items.end(),
+	                   [](const Item *item) { return dynamic_cast<const UsbKeyItem *>(item) != nullptr; });
 }
 
 void GameScene::resolveHitboxes()
@@ -250,23 +287,52 @@ void GameScene::handleRoomTransition()
 {
 	Door *door = world_.getTouchingDoor(player_.getBounds());
 	if (door) {
-		const bool canEnter =
-		    !door->locked && (!door->needsToClearAllEnemies || world_.getCurrentRoom()->enemies_.empty());
-		if (!canEnter)
+		if (door->locked) {
+			pushStoryDialogue(hasUsbKey() ? StorySnippets::lockedDoorWithKey() : StorySnippets::lockedDoorNoKey());
 			return;
+		}
+		if (door->needsToClearAllEnemies && !world_.getCurrentRoom()->enemies_.empty()) {
+			pushStoryDialogue(StorySnippets::roomEnemiesRemain());
+			return;
+		}
 
 		world_.requireLoad(door->targetRoomId);
 		world_.setCurrentRoom(door->targetRoomId);
 		prefetchAdjacentRooms();
 		player_.setPosition(world_.getCurrentRoom()->playerSpawns[door->targetSpawnIdx]);
 
-		const MusicTrack track =
-		    (world_.getCurrentRoomId() == "boss_room") ? MusicTrack::AREA_1_BOSS_THEME : MusicTrack::GAME_THEME;
-		AudioManager::getInstance().playMusic(track);
+		AudioManager::getInstance().playMusic(musicTrackForRoom(world_.getCurrentRoomId()));
 
 	} else if (world_.isTouchingSavepoint(player_.getBounds())) {
 		world_.saveWorldData(player_);
+		pushStoryDialogue(StorySnippets::checkpointSaved());
 	}
+}
+
+void GameScene::maybeTriggerStoryDialogue()
+{
+	const std::string &roomId = world_.getCurrentRoomId();
+
+	if (storyIntroPending_) {
+		storyIntroPending_ = false;
+		pushStoryDialogue(StorySnippets::newGameIntro());
+	} else if (isArea2Room(roomId) && !storyEnteredArea2Shown_) {
+		storyEnteredArea2Shown_ = true;
+		pushStoryDialogue(StorySnippets::enteringArea2());
+	} else if (roomId == TRANSISTOR_BOSS_ROOM_ID && !storyBeforeTransistorShown_) {
+		storyBeforeTransistorShown_ = true;
+		pushStoryDialogue(StorySnippets::beforeTransistorBoss());
+	} else if (roomId == SEGFAULT_BOSS_ROOM_ID && !storyBeforeSegfaultShown_) {
+		storyBeforeSegfaultShown_ = true;
+		pushStoryDialogue(StorySnippets::beforeSegfaultBoss());
+	}
+}
+
+void GameScene::pushStoryDialogue(std::vector<DialogueLine> lines)
+{
+	sceneStack_.push([this, lines = std::move(lines)]() {
+		return std::make_unique<DialogueScene>(sceneStack_, window_.getSize(), lines);
+	});
 }
 
 void GameScene::updateCamera()

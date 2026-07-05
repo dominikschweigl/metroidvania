@@ -201,8 +201,10 @@ std::string_view AudioManager::musicPath(const MusicTrack track)
 	switch (track) {
 	case MusicTrack::MAIN_MENU_THEME:
 		return "./assets/audio/music/main_menu_theme.ogg";
-	case MusicTrack::GAME_THEME:
-		return "./assets/audio/music/game_theme.ogg";
+	case MusicTrack::AREA_1_THEME:
+		return "./assets/audio/music/area_1_theme.ogg";
+	case MusicTrack::AREA_2_THEME:
+		return "./assets/audio/music/area_2_theme.ogg";
 	case MusicTrack::GAME_OVER_THEME:
 		return "./assets/audio/music/game_over_theme.ogg";
 	case MusicTrack::AREA_1_BOSS_THEME:

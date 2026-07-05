@@ -45,6 +45,12 @@ class RecursionGolem : public BaseEnemy {
 	static constexpr float EXPLODE_COUNTDOWN = 2.5f;
 	static constexpr float EXPLODE_RADIUS_FACTOR = 1.6f;
 	static constexpr int EXPLODE_DAMAGE = 2;
+	static constexpr float EXPLOSION_VOLUME = 45.f;
+
+	// Freshly split children are briefly invulnerable so the still-active swing
+	// that defeated the parent cannot immediately damage them too. Must outlast a
+	// full melee swing so a lingering hitbox never carries into the children.
+	static constexpr float SPAWN_PROTECTION_DUR = 0.75f;
 
 	static constexpr int EXPLOSION_FRAME_COUNT = 8;
 	static constexpr float EXPLOSION_FRAME_DURATION = 0.12f;
@@ -96,6 +102,8 @@ class RecursionGolem : public BaseEnemy {
 
 	void takeDamage(int amount) noexcept override;
 
+	[[nodiscard]] bool isInvulnerable() const noexcept override { return spawnProtectionTimer_ > 0.f; }
+
 	[[nodiscard]] bool isAlive() const noexcept override;
 
 	void drainSpawns(std::vector<std::unique_ptr<BaseEnemy>> &out) override;
@@ -119,6 +127,7 @@ class RecursionGolem : public BaseEnemy {
 	bool explosionFired_ = false;
 	bool explosionActive_ = false;
 	float explodeTimer_ = 0.f;
+	float spawnProtectionTimer_ = 0.f;
 	float explosionAnimTimer_ = 0.f;
 	int explosionAnimFrame_ = 0;
 	std::uint32_t attackSourceId = 0;
