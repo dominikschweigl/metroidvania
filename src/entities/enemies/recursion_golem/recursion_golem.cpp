@@ -70,6 +70,7 @@ void RecursionGolem::onPreUpdate(float deltaTime)
 {
 	attackCooldown = std::max(0.f, attackCooldown - deltaTime);
 	jumpCooldown = std::max(0.f, jumpCooldown - deltaTime);
+	spawnProtectionTimer_ = std::max(0.f, spawnProtectionTimer_ - deltaTime);
 	animClock_ += deltaTime;
 
 	if (defeated_ && !resolved_)
@@ -84,7 +85,7 @@ void RecursionGolem::onPreUpdate(float deltaTime)
 				explosionAnimTimer_ = 0.f;
 				explosionAnimFrame_ = 0;
 				explosionSourceId = nextSourceId();
-				AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_EXPLOSION);
+				AudioManager::getInstance().playSound(SoundEffect::TRANSISTOR_BOSS_EXPLOSION, EXPLOSION_VOLUME);
 			}
 		} else {
 			explosionAnimTimer_ += deltaTime;
@@ -140,6 +141,8 @@ void RecursionGolem::spawnChild(int childSize, float offsetX)
 	auto child = std::make_unique<RecursionGolem>(sf::Vector2f{position.x + offsetX, position.y}, childSize);
 	child->setVelocity({offsetX >= 0.f ? SPLIT_POP_X : -SPLIT_POP_X, -SPLIT_POP_Y});
 	child->setOnGround(false);
+	// Shield the child from the same swing that just defeated this golem.
+	child->spawnProtectionTimer_ = SPAWN_PROTECTION_DUR;
 	pendingSpawns_.push_back(std::move(child));
 }
 
