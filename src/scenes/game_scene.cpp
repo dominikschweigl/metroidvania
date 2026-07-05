@@ -305,6 +305,7 @@ void GameScene::handleRoomTransition()
 
 	} else if (world_.isTouchingSavepoint(player_.getBounds())) {
 		world_.saveWorldData(player_);
+		pushStoryDialogue(StorySnippets::checkpointSaved());
 	}
 }
 

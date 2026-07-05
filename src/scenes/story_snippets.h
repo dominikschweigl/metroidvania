@@ -15,6 +15,7 @@ namespace StorySnippets {
 [[nodiscard]] std::vector<DialogueLine> lockedDoorNoKey();
 [[nodiscard]] std::vector<DialogueLine> lockedDoorWithKey();
 [[nodiscard]] std::vector<DialogueLine> roomEnemiesRemain();
+[[nodiscard]] std::vector<DialogueLine> checkpointSaved();
 [[nodiscard]] std::vector<DialogueLine> pickedUpHat();
 [[nodiscard]] std::vector<DialogueLine> pickedUpGum();
 

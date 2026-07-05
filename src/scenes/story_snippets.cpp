@@ -89,6 +89,14 @@ std::vector<DialogueLine> roomEnemiesRemain()
 	};
 }
 
+std::vector<DialogueLine> checkpointSaved()
+{
+	return {
+	    {PLAYER, "This little terminal somehow feels... safe."},
+	    {PLAYER, "I'll sync my progress to it. If things go wrong, at least I won't have to start all over."},
+	};
+}
+
 std::vector<DialogueLine> pickedUpHat()
 {
 	return {
