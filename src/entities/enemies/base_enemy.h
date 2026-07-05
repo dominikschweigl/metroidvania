@@ -54,6 +54,7 @@ class BaseEnemy : public BaseEntity {
 	// BaseEnemy — no-op defaults
 	virtual bool consumeBluescreenRequest() noexcept { return false; }
 	virtual bool consumeVictoryRequest() noexcept { return false; }
+	virtual bool consumeDefeatStoryRequest() noexcept { return false; }
 
   protected:
 	BaseEnemy(sf::Vector2f spawnPos, float entityWidth, float entityHeight, int maxHealth = MAX_HEALTH,

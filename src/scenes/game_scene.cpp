@@ -16,6 +16,7 @@
 #include "menus/game_over_menu.h"
 #include "menus/pause_menu.h"
 #include "menus/victory_menu.h"
+#include "story_snippets.h"
 #include <algorithm>
 #include <cstdint>
 #include <numbers>
@@ -27,6 +28,9 @@ static std::mt19937 rng(rd());
 
 std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * std::numbers::pi_v<float>);
 std::uniform_real_distribution<float> speedDist(100.0f, 200.0f);
+
+static const std::string TRANSISTOR_BOSS_ROOM_ID = "8";
+static const std::string SEGFAULT_BOSS_ROOM_ID = "16";
 
 GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::string gameName, bool makeNewGame)
     : sceneStack_(sceneStack), window_(window), world_(gameName)
@@ -56,6 +60,7 @@ GameScene::GameScene(SceneStack &sceneStack, sf::RenderWindow &window, std::stri
 		this->newGame();
 	else
 		this->loadGame();
+	storyIntroPending_ = makeNewGame;
 
 	sceneStack_.push([&player = player_, &stack = sceneStack_, windowSize = window_.getSize()]() {
 		return std::make_unique<InventoryScene>(player, stack, windowSize);
@@ -133,9 +138,12 @@ void GameScene::update(float deltaTime)
 	if (!player_.isAlive() && player_.inventory().hasBackup()) {
 		player_.revive();
 	}
-	if (!player_.isAlive())
+	if (!player_.isAlive()) {
 		sceneStack_.push([&] { return makeGameOverMenu(sceneStack_, window_); });
+		pushStoryDialogue(StorySnippets::gameOver());
+	}
 
+	maybeTriggerStoryDialogue();
 	updateCamera();
 }
 
@@ -198,11 +206,12 @@ void GameScene::processEnemyEvents()
 		if (enemy->isReadyForRemoval())
 			combat_.clearVictim(&enemy->health);
 
-		// Virtual — SegfaultBoss implements, BaseEnemy returns false
 		if (enemy->consumeBluescreenRequest())
 			sceneStack_.push([&] { return makeBluescreenMenu(sceneStack_, window_); });
 		if (enemy->consumeVictoryRequest())
 			sceneStack_.push([&] { return makeVictoryMenu(sceneStack_, window_); });
+		if (enemy->consumeDefeatStoryRequest())
+			pushStoryDialogue(StorySnippets::afterTransistorBoss());
 	}
 }
 
@@ -267,6 +276,29 @@ void GameScene::handleRoomTransition()
 	} else if (world_.isTouchingSavepoint(player_.getBounds())) {
 		world_.saveWorldData(player_);
 	}
+}
+
+void GameScene::maybeTriggerStoryDialogue()
+{
+	const std::string &roomId = world_.getCurrentRoomId();
+
+	if (storyIntroPending_) {
+		storyIntroPending_ = false;
+		pushStoryDialogue(StorySnippets::newGameIntro());
+	} else if (roomId == TRANSISTOR_BOSS_ROOM_ID && !storyBeforeTransistorShown_) {
+		storyBeforeTransistorShown_ = true;
+		pushStoryDialogue(StorySnippets::beforeTransistorBoss());
+	} else if (roomId == SEGFAULT_BOSS_ROOM_ID && !storyBeforeSegfaultShown_) {
+		storyBeforeSegfaultShown_ = true;
+		pushStoryDialogue(StorySnippets::beforeSegfaultBoss());
+	}
+}
+
+void GameScene::pushStoryDialogue(std::vector<DialogueLine> lines)
+{
+	sceneStack_.push([this, lines = std::move(lines)]() {
+		return std::make_unique<DialogueScene>(sceneStack_, window_.getSize(), lines);
+	});
 }
 
 void GameScene::updateCamera()

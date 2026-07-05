@@ -110,6 +110,16 @@ class TransistorBoss : public BaseEnemy {
 	// and stays visible on its last frame, so it must report as alive throughout.
 	[[nodiscard]] bool isAlive() const noexcept override { return health.isAlive() || dying; }
 
+	// Raised by the death state once the explosion animation has finished, so
+	// the scene can show the after-boss story dialogue.
+	void requestDefeatStory() noexcept { defeatStoryRequested = true; }
+	[[nodiscard]] bool consumeDefeatStoryRequest() noexcept override
+	{
+		const bool requested = defeatStoryRequested;
+		defeatStoryRequested = false;
+		return requested;
+	}
+
 	[[nodiscard]] std::vector<std::unique_ptr<Item>> rollDrops() override;
 
 	json serialize() const override;
@@ -141,6 +151,8 @@ class TransistorBoss : public BaseEnemy {
 	bool stage2Triggered = false;
 	bool invincible = false;
 	bool dying = false;
+	// Raised by the death state once the explosion animation completes.
+	bool defeatStoryRequested = false;
 	// Facing locked at the moment of death so the defeat sprites do not
 	// follow the player he walks past the defeated boss.
 	Direction deathFacing = Direction::Right;

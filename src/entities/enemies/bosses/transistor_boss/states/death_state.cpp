@@ -79,6 +79,7 @@ void DeathState::updateAnimation(float deltaTime, BaseEnemy &enemy)
 		} else if (!victoryMusicStarted) {
 			AudioManager::getInstance().playMusic(MusicTrack::TRANSISTOR_BOSS_VICTORY);
 			victoryMusicStarted = true;
+			transistor_boss.requestDefeatStory();
 		}
 
 		transistor_boss.setAnimation(TransistorBoss::TransistorBossAnimation::Death, currentFrame);
