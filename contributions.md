@@ -1,5 +1,16 @@
 ## Emanuel Schöpf
 
+Asynchronous Room loading - world.cpp:108-176
+Entitiy creation - world.cpp:43-102
+Entity Collision detection - entity_physics.cpp:49-179
+
+Other implementations:
+rest of world.*
+room.*
+ItemFactory.*
+EnemyFactory.*
+EnemyStateFactory.*
+
 (2) two consecutive areas, each:
 with its own tone (architecture, sprites, music, enemies etc)
 with a handful of rooms each
@@ -9,7 +20,6 @@ a boss guarding an item / ability
 
 (1) map
 shows discovered rooms and their doorways
-shows discovered save points
 shows where the player is currently located
 
 ## Dominik Schweigl
