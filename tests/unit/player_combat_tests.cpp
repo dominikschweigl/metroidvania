@@ -4,7 +4,9 @@
 #include "combat/hitbox.h"
 #include "entities/base_entity.h"
 #include "entities/player/player.h"
+#include "items/backup_disk_item.h"
 #include "world_test_helpers.h"
+#include <memory>
 #include <type_traits>
 
 static_assert(std::is_base_of_v<BaseEntity, Player>, "Player must inherit from BaseEntity");
@@ -88,6 +90,7 @@ TEST_CASE("Player: dies when health reaches zero (boundary)")
 TEST_CASE("Player::revive restores one health, consumes backup, and arms i-frames")
 {
 	Player p;
+	p.inventory().addItem(std::make_unique<BackupDiskItem>());
 	p.health.damage(p.health.current);
 	REQUIRE_FALSE(p.isAlive());
 	REQUIRE(p.inventory().hasBackup());
@@ -104,6 +107,7 @@ TEST_CASE("Player::revive restores one health, consumes backup, and arms i-frame
 TEST_CASE("Player::revive does nothing while the player is already alive")
 {
 	Player p;
+	p.inventory().addItem(std::make_unique<BackupDiskItem>());
 	const int initialHealth = p.health.current;
 	REQUIRE(initialHealth == Player::MAX_HEALTH);
 	REQUIRE(p.inventory().hasBackup());
