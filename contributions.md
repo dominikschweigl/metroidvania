@@ -14,17 +14,17 @@ shows where the player is currently located
 
 ### Highlights:
 
-- Asynchronous Room loading - world.cpp:108-176  
-- Entitiy creation - world.cpp:43-102  
+- Asynchronous Room loading - world.cpp:108-176
+- Entitiy creation - world.cpp:43-102
 - Entity Collision detection - entity_physics.cpp:49-179
 - Save and load - serialize and deserialize functions
 
 ### Other implementations:
-- rest of world.*  
-- room.*  
+- rest of world.*
+- room.*
 - minimap.*
-- ItemFactory.*  
-- EnemyFactory.*  
+- ItemFactory.*
+- EnemyFactory.*
 - EnemyStateFactory.*
 
 ### Additional:
@@ -46,6 +46,7 @@ needs to be unlocked
 melee and/or ranged
 hitting enemies
 getting hit by enemies
+(Shared with Lukas - combat_system.cpp)
 
 ### Highlights:
 
@@ -65,12 +66,12 @@ Items
 
 ### Other Implementations:
 - Player Effects - `src/effects/*`
-- Player Abilities - `src/entities/player/abilities/*`
-- Asset loading - `src/core/asset_manager.*`
-- Game Action abstraction from key inputs - `src/core/input_manager.*`
+- Player Attack Abilities - `src/entities/player/abilities/*`
+- Asset loading - `src/core/asset_manager.[h/cpp]`
+- Game Action abstraction from key inputs - `src/core/input_manager.[h/cpp]`
 - Key rebinding menu - `src/menus/key_bindings_menu.h`
-- Inventory menu - `src/scenes/inventory_scene.*`
-- Game item | health | effect hotbar - `src/ui/health_bar.*`, `src/ui/hotbar_hud.*`
+- Inventory menu - `src/scenes/inventory_scene.[h/cpp]`
+- Game item | health | effect hotbar - `src/ui/health_bar.[h/cpp]`, `src/ui/hotbar_hud.[h/cpp]`
 
 ### Additional:
 Project Setup with vcpkg, clang-format, editorconfig, git, Cmake, Catch2.
