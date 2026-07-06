@@ -1,16 +1,6 @@
 ## Emanuel Schöpf
 
-Asynchronous Room loading - world.cpp:108-176
-Entitiy creation - world.cpp:43-102
-Entity Collision detection - entity_physics.cpp:49-179
-
-Other implementations:
-rest of world.*
-room.*
-ItemFactory.*
-EnemyFactory.*
-EnemyStateFactory.*
-
+### Allocated Tasks:
 (2) two consecutive areas, each:
 with its own tone (architecture, sprites, music, enemies etc)
 with a handful of rooms each
@@ -21,6 +11,24 @@ a boss guarding an item / ability
 (1) map
 shows discovered rooms and their doorways
 shows where the player is currently located
+
+### Highlights:
+
+- Asynchronous Room loading - world.cpp:108-176  
+- Entitiy creation - world.cpp:43-102  
+- Entity Collision detection - entity_physics.cpp:49-179
+- Save and load - serialize and deserialize functions
+
+### Other implementations:
+- rest of world.*  
+- room.*  
+- minimap.*
+- ItemFactory.*  
+- EnemyFactory.*  
+- EnemyStateFactory.*
+
+### Additional:
+- Tileset, Room and Map designs to ensure a fun gaming experience.
 
 ## Dominik Schweigl
 
