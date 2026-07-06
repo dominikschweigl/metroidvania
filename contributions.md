@@ -83,16 +83,38 @@ variants with melee attacks
 variants with ranged attacks
 bosses are capable of using different attacks
 
+Done in `src/entities/enemies/*`
+
 (1) menus
-main menu
-new game
-load game
-exit
-pause menu
-shows player stats
-inventory management
-continue
-go to main menu
-game over
-player dies
-player defeats final boss
+- Main Menu
+- Settings
+- New Game
+- Pause Menu
+- Game Over
+- Victory Menu
+- Dialogue Menus
+
+Done in `src/scenes/*` (except `inventory_scene` done by Dominik) and
+in `src/ui/*`
+
+### Highlights:
+
+Central Combat System with per-attack hit deduplication
+- `src/combat/combat_system.cpp:5-31`
+- `src/combat/hitbox.h`
+
+Enemy State Machines
+- `src/entities/enemies/enemy_state.h`
+- `src/entities/enemies/base_enemy.cpp:6-35`
+- `src/entities/enemies/bosses/transistor_boss/*` for enemy implementation highlight
+
+Scenes and Scene-Stack System
+- `src/core/scene_actions.h`
+- `src/core/scene_stack.cpp:23-89`
+
+### Other Implementations:
+- Central audio manager with volume settings - `src/core/audio_manager.*`
+- Story dialogue scene - `src/scenes/dialogue_scene.*`, `src/scenes/story_snippets.*`
+
+### Organisational:
+CI pipeline in Github Repository
