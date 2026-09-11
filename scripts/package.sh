@@ -74,6 +74,24 @@ if [[ "${OS_NAME}" == "linux" ]] && command -v ldd >/dev/null 2>&1; then
     rmdir "${STAGE_DIR}/lib" 2>/dev/null || true
 fi
 
+# --- macOS: add a double-clickable launcher -----------------------------
+# A raw Unix executable launched from Finder starts with the working directory
+# at "/", which breaks the game's relative ./assets and ./data lookups. Ship a
+# .command launcher that cd's into its own folder first. vcpkg's *-osx triplets
+# link SFML/fmt/OpenAL statically, and everything else the binary needs is a
+# system framework, so no dependency collection is required on macOS.
+if [[ "${OS_NAME}" == "macos" ]]; then
+    echo "==> Adding macOS launcher"
+    LAUNCHER="${STAGE_DIR}/Metroidvania.command"
+    cat > "${LAUNCHER}" <<'LAUNCH'
+#!/usr/bin/env bash
+# Run the game from its own folder so it finds assets/ and data/.
+cd "$(dirname "$0")"
+exec ./metroidvania
+LAUNCH
+    chmod +x "${LAUNCHER}"
+fi
+
 # --- Ensure the executable is runnable after extraction (Itch.io) --------
 chmod +x "${BINARY}"
 

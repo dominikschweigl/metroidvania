@@ -1,9 +1,10 @@
 name: Release Packages
 
-# Produces the two Itch.io-ready archives — metroidvania-windows.zip and
-# metroidvania-linux.zip — by building on each target OS. Run it manually from
-# the Actions tab (workflow_dispatch) or by pushing a version tag (e.g. v1.0.0),
-# in which case the archives are also attached to a GitHub Release.
+# Produces the Itch.io-ready archives — metroidvania-windows.zip,
+# metroidvania-linux.zip and metroidvania-macos.zip — by building on each target
+# OS. Run it manually from the Actions tab (workflow_dispatch) or by pushing a
+# version tag (e.g. v1.0.0), in which case the archives are also attached to a
+# GitHub Release.
 
 on:
         workflow_dispatch:
@@ -94,9 +95,44 @@ jobs:
                                   path: dist/metroidvania-windows.zip
                                   if-no-files-found: error
 
+        package-macos:
+                name: Package (macOS)
+                runs-on: macos-latest
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+
+                        - name: Install macOS Dependencies
+                          run: brew install ninja
+
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p ~/.cache/vcpkg
+
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ~/.cache/vcpkg
+                                  key: vcpkg-macos-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-macos-
+
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+
+                        - name: Build & Package
+                          run: ./scripts/package.sh vcpkg-macos macos
+
+                        - name: Upload Artifact
+                          uses: actions/upload-artifact@v4
+                          with:
+                                  name: metroidvania-macos
+                                  path: dist/metroidvania-macos.zip
+                                  if-no-files-found: error
+
         release:
                 name: Attach to GitHub Release
-                needs: [package-linux, package-windows]
+                needs: [package-linux, package-windows, package-macos]
                 if: startsWith(github.ref, 'refs/tags/v')
                 runs-on: ubuntu-latest
                 permissions:
@@ -113,3 +149,4 @@ jobs:
                                   files: |
                                           artifacts/metroidvania-linux/metroidvania-linux.zip
                                           artifacts/metroidvania-windows/metroidvania-windows.zip
+                                          artifacts/metroidvania-macos/metroidvania-macos.zip

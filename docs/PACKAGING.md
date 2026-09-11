@@ -1,6 +1,6 @@
 # Packaging for distribution (Itch.io)
 
-This project ships as two self-contained archives that a player can download,
+This project ships as self-contained archives that a player can download,
 extract, and run with **no system dependencies** — no SFML, no fmt, and no
 Microsoft VC++ Redistributable:
 
@@ -8,17 +8,19 @@ Microsoft VC++ Redistributable:
 | -------- | --------------------------- |
 | Windows  | `metroidvania-windows.zip`  |
 | Linux    | `metroidvania-linux.zip`    |
+| macOS    | `metroidvania-macos.zip`    |
 
 Each archive extracts to a single folder laid out exactly how the game expects
 its files at runtime:
 
 ```
 metroidvania-<os>/
-  metroidvania[.exe]   # the game
-  *.dll                # SFML / fmt / OpenAL DLLs (Windows dynamic builds only)
-  assets/              # textures, audio, manifest.json  (loaded via ./assets/...)
-  data/                # Tiled maps + tilesets           (loaded via ./data/...)
-  saves/               # empty, writable — the game saves here at runtime
+  metroidvania[.exe]     # the game
+  Metroidvania.command   # macOS only: double-clickable launcher
+  *.dll                  # SFML / fmt / OpenAL DLLs (Windows dynamic builds only)
+  assets/                # textures, audio, manifest.json  (loaded via ./assets/...)
+  data/                  # Tiled maps + tilesets           (loaded via ./data/...)
+  saves/                 # empty, writable — the game saves here at runtime
 ```
 
 > The game resolves `assets/` and `data/` **relative to the working directory**,
@@ -46,6 +48,12 @@ metroidvania-<os>/
 ```powershell
 # From a "Developer PowerShell for VS" (so cl.exe is on PATH):
 .\scripts\package.ps1             # → dist\metroidvania-windows.zip
+```
+
+### macOS
+
+```bash
+./scripts/package.sh vcpkg-macos macos    # → dist/metroidvania-macos.zip
 ```
 
 Both scripts run configure → build → `cmake --install` into `dist/<name>/` →
@@ -86,6 +94,20 @@ layout is identical no matter how you invoke them.
 - The script sets the executable bit (`chmod +x`) before zipping so players do
   not hit "Permission denied" after extracting on Itch.io.
 
+### macOS
+
+- The vcpkg `arm64-osx` / `x64-osx` triplets build SFML, fmt and OpenAL as
+  **static** libraries, and the remaining dependencies are system frameworks
+  (Cocoa, OpenGL, IOKit) present on every Mac — so nothing needs bundling.
+- The archive includes a `Metroidvania.command` launcher, because a raw
+  executable opened from Finder starts with its working directory at `/`, which
+  would break the relative `./assets` / `./data` lookups. The launcher `cd`s
+  into its own folder first. Both it and the binary are marked executable.
+- **Gatekeeper:** the app is unsigned, so on first launch macOS shows
+  "unidentified developer". Players right-click → **Open** (once), or run
+  `xattr -dr com.apple.quarantine <extracted folder>`. Removing this friction
+  entirely requires an Apple Developer ID plus code-signing and notarization.
+
 ---
 
 ## Continuous delivery
@@ -106,5 +128,6 @@ to download and upload to Itch.io.
 ## Fonts (note)
 
 The UI font is loaded from the operating system (Arial on Windows, Liberation/
-DejaVu Sans on Linux) rather than bundled. These are present on all standard
-Windows and desktop-Linux installs, so no action is needed for typical players.
+DejaVu Sans on Linux, Arial/Helvetica on macOS) rather than bundled. These are
+present on all standard Windows, desktop-Linux and macOS installs, so no action
+is needed for typical players.

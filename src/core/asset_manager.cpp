@@ -59,6 +59,13 @@ std::span<const char *const> AssetManager::fontCandidates(const FontAsset asset)
 		    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
 		    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
 		};
+#elif defined(__APPLE__)
+		static constexpr std::array<const char *, 4> candidates = {
+		    "/System/Library/Fonts/Supplemental/Arial.ttf",
+		    "/Library/Fonts/Arial.ttf",
+		    "/System/Library/Fonts/Supplemental/Verdana.ttf",
+		    "/System/Library/Fonts/Helvetica.ttc",
+		};
 #else
 		static constexpr std::array<const char *, 1> candidates = {"assets/fonts/fallback.ttf"};
 #endif

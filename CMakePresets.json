@@ -44,6 +44,16 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
+    },
+    {
+      "name": "vcpkg-macos",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -65,6 +75,11 @@
     {
       "name": "windows-mingw",
       "configurePreset": "vcpkg-windows-mingw",
+      "configuration": "Release"
+    },
+    {
+      "name": "macos",
+      "configurePreset": "vcpkg-macos",
       "configuration": "Release"
     }
   ]
