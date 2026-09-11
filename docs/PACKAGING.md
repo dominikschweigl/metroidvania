@@ -112,16 +112,28 @@ layout is identical no matter how you invoke them.
 
 ## Continuous delivery
 
-`.github/workflows/release.yml` builds and uploads both archives on each target
-OS. Trigger it manually from the **Actions** tab, or push a version tag:
+`.github/workflows/release.yml` builds and uploads all three archives on each
+target OS.
+
+**A GitHub Release is only cut from a version tag that lives on `main`.** The
+workflow's `guard` job checks that the tagged commit is reachable from
+`origin/main` and fails otherwise, so tagging a feature branch cannot publish a
+release. The intended flow is therefore: merge to `main` first, then tag `main`:
 
 ```bash
+# after the packaging PR is merged into main
+git checkout main
+git pull
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-On a tag push the archives are additionally attached to a GitHub Release, ready
-to download and upload to Itch.io.
+On such a tag push the archives are attached to a GitHub Release, ready to
+download and upload to Itch.io.
+
+You can also trigger the workflow manually from the **Actions** tab
+(`workflow_dispatch`) for an artifact-only build — this uploads the zips as run
+artifacts but does not create a Release.
 
 ---
 
