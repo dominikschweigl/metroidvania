@@ -24,12 +24,33 @@
       }
     },
     {
+      "name": "vcpkg-windows-msvc-static",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-msvc-static",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
       "name": "vcpkg-windows-mingw",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/windows-mingw",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "vcpkg-macos",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
@@ -47,8 +68,18 @@
       "configuration": "Release"
     },
     {
+      "name": "windows-msvc-static",
+      "configurePreset": "vcpkg-windows-msvc-static",
+      "configuration": "Release"
+    },
+    {
       "name": "windows-mingw",
       "configurePreset": "vcpkg-windows-mingw",
+      "configuration": "Release"
+    },
+    {
+      "name": "macos",
+      "configurePreset": "vcpkg-macos",
       "configuration": "Release"
     }
   ]

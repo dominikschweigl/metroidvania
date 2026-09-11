@@ -1,0 +1,177 @@
+name: Release Packages
+
+# Produces the Itch.io-ready archives — metroidvania-windows.zip,
+# metroidvania-linux.zip and metroidvania-macos.zip — by building on each target
+# OS.
+#
+# A GitHub Release is only ever cut from a version tag (e.g. v1.0.0) that lives
+# on the main branch: the `guard` job refuses to proceed if the tagged commit is
+# not reachable from origin/main, so tagging a feature branch cannot publish a
+# release. `workflow_dispatch` still allows manual, artifact-only builds.
+
+on:
+        workflow_dispatch:
+        push:
+                tags: ["v*"]
+
+jobs:
+        guard:
+                name: Verify tag is on main
+                runs-on: ubuntu-latest
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  fetch-depth: 0
+
+                        - name: Refuse tags that are not on main
+                          if: startsWith(github.ref, 'refs/tags/')
+                          run: |
+                                  if git merge-base --is-ancestor "${{ github.sha }}" origin/main; then
+                                    echo "OK: tag ${{ github.ref_name }} is on main."
+                                  else
+                                    echo "::error::Tag ${{ github.ref_name }} is not on the main branch; refusing to build/release."
+                                    exit 1
+                                  fi
+
+        package-linux:
+                name: Package (Linux)
+                runs-on: ubuntu-latest
+                needs: guard
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+
+                        - name: Install Linux Dependencies
+                          run: |
+                                  sudo apt-get update
+                                  sudo apt-get install -y \
+                                    build-essential \
+                                    ninja-build \
+                                    zip \
+                                    libx11-dev \
+                                    libxi-dev \
+                                    libxrandr-dev \
+                                    libxcursor-dev \
+                                    libudev-dev \
+                                    libgl1-mesa-dev
+
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p ~/.cache/vcpkg
+
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ~/.cache/vcpkg
+                                  key: vcpkg-linux-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-linux-
+
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+
+                        - name: Build & Package
+                          run: ./scripts/package.sh vcpkg-linux linux
+
+                        - name: Upload Artifact
+                          uses: actions/upload-artifact@v4
+                          with:
+                                  name: metroidvania-linux
+                                  path: dist/metroidvania-linux.zip
+                                  if-no-files-found: error
+
+        package-windows:
+                name: Package (Windows MSVC)
+                runs-on: windows-latest
+                needs: guard
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p "$env:VCPKG_ROOT\installed" -ErrorAction SilentlyContinue
+
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ${{ env.VCPKG_ROOT }}\installed
+                                  key: vcpkg-msvc-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-msvc-
+
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+
+                        - name: Setup MSVC environment
+                          uses: ilammy/msvc-dev-cmd@v1
+                          with:
+                                  arch: x64
+
+                        - name: Build & Package
+                          run: .\scripts\package.ps1 -ConfigurePreset vcpkg-windows-msvc -BuildPreset windows-msvc
+
+                        - name: Upload Artifact
+                          uses: actions/upload-artifact@v4
+                          with:
+                                  name: metroidvania-windows
+                                  path: dist/metroidvania-windows.zip
+                                  if-no-files-found: error
+
+        package-macos:
+                name: Package (macOS)
+                runs-on: macos-latest
+                needs: guard
+                steps:
+                        - name: Checkout Code
+                          uses: actions/checkout@v4
+                          with:
+                                  submodules: recursive
+
+                        - name: Install macOS Dependencies
+                          run: brew install ninja
+
+                        - name: Create vcpkg cache directory
+                          run: mkdir -p ~/.cache/vcpkg
+
+                        - name: Restore vcpkg cache
+                          uses: actions/cache@v4
+                          with:
+                                  path: ~/.cache/vcpkg
+                                  key: vcpkg-macos-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-macos-
+
+                        - name: Setup vcpkg
+                          uses: lukka/run-vcpkg@v11
+
+                        - name: Build & Package
+                          run: ./scripts/package.sh vcpkg-macos macos
+
+                        - name: Upload Artifact
+                          uses: actions/upload-artifact@v4
+                          with:
+                                  name: metroidvania-macos
+                                  path: dist/metroidvania-macos.zip
+                                  if-no-files-found: error
+
+        release:
+                name: Attach to GitHub Release
+                needs: [guard, package-linux, package-windows, package-macos]
+                if: startsWith(github.ref, 'refs/tags/v')
+                runs-on: ubuntu-latest
+                permissions:
+                        contents: write
+                steps:
+                        - name: Download Artifacts
+                          uses: actions/download-artifact@v4
+                          with:
+                                  path: artifacts
+
+                        - name: Publish Release
+                          uses: softprops/action-gh-release@v2
+                          with:
+                                  files: |
+                                          artifacts/metroidvania-linux/metroidvania-linux.zip
+                                          artifacts/metroidvania-windows/metroidvania-windows.zip
+                                          artifacts/metroidvania-macos/metroidvania-macos.zip
