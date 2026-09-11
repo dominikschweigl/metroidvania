@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.10)
+# 3.21 is required for the $<TARGET_RUNTIME_DLLS:...> generator expression used by
+# the packaging rules below to bundle SFML/fmt/OpenAL DLLs on Windows.
+cmake_minimum_required(VERSION 3.21)
 
-project(Metroidvania)
+project(Metroidvania VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Honour MSVC_RUNTIME_LIBRARY (static-CRT selection). NEW by default on 3.21,
+# set explicitly so intent is documented and robust against policy changes.
+cmake_policy(SET CMP0091 NEW)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Window System Audio)
@@ -116,6 +122,28 @@ add_executable(metroidvania src/main.cpp ${GAME_SOURCES})
 target_include_directories(metroidvania PRIVATE src external/tileson)
 target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window SFML::System SFML::Audio)
 
+# ---------------------------------------------------------------------------
+# Self-contained runtime linking (so end users need no system dependencies)
+# ---------------------------------------------------------------------------
+if (MSVC)
+    # Link the static C runtime (/MT, /MTd) so the Microsoft VC++ Redistributable
+    # (msvcp140.dll / vcruntime140.dll) is NOT required to run the game.
+    set_target_properties(metroidvania PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+elseif (MINGW)
+    # MinGW/GCC on Windows: fold libstdc++, libgcc and libwinpthread into the exe
+    # so no MinGW runtime DLLs need to ship alongside it.
+    target_link_options(metroidvania PRIVATE -static -static-libgcc -static-libstdc++)
+elseif (UNIX AND NOT APPLE)
+    # Linux: statically link the GCC/C++ runtimes, and make the binary look for
+    # any remaining shared libraries next to itself (./ and ./lib) via $ORIGIN,
+    # so a bundled lib/ folder is found without setting LD_LIBRARY_PATH.
+    target_link_options(metroidvania PRIVATE -static-libgcc -static-libstdc++)
+    set_target_properties(metroidvania PROPERTIES
+        INSTALL_RPATH "$ORIGIN;$ORIGIN/lib"
+        BUILD_WITH_INSTALL_RPATH ON)
+endif()
+
 add_executable(metroidvania_tests
     tests/unit/player_state_tests.cpp
     tests/unit/base_entity_tests.cpp
@@ -155,5 +183,45 @@ if (NOT CMAKE_CXX_CLANG_TIDY)
     else()
         target_compile_options(metroidvania PRIVATE -Wall -Wextra)
         target_compile_options(metroidvania_tests PRIVATE -Wall -Wextra)
+    endif()
+endif()
+
+# ===========================================================================
+# Installation & packaging (produces the Itch.io distributable layout)
+#
+#   <prefix>/
+#     metroidvania[.exe]      <- the game
+#     *.dll                   <- SFML/fmt/OpenAL DLLs (Windows dynamic builds)
+#     assets/                 <- textures, audio, manifest (loaded via ./assets)
+#     data/                   <- Tiled maps + tilesets (loaded via ./data)
+#     saves/                  <- writable, empty; the game saves here at runtime
+#
+# `cmake --install <build> --prefix <stage>` lays this out; the scripts in
+# scripts/ then zip <stage> into metroidvania-<os>.zip. See docs/PACKAGING.md.
+# ===========================================================================
+
+# The game itself, at the archive root.
+install(TARGETS metroidvania RUNTIME DESTINATION ".")
+
+# Runtime data the game opens through relative paths — must sit beside the exe.
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ".")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/data"   DESTINATION ".")
+
+# World::saveWorldData writes to "saves/<world>.json" but does not create the
+# folder, so ship an empty one; otherwise saving fails on a fresh extract.
+install(DIRECTORY DESTINATION "saves")
+
+# Windows dynamic builds (e.g. the x64-windows MSVC triplet): copy every DLL the
+# executable actually depends on (sfml-*, fmt, openal32, …) next to it. For a
+# fully static build (x64-mingw-static / x64-windows-static) this list is empty.
+if (WIN32)
+    install(FILES $<TARGET_RUNTIME_DLLS:metroidvania> DESTINATION ".")
+
+    # If any bundled DLL was built against the dynamic CRT, ship that runtime too
+    # (msvcp140.dll / vcruntime140.dll) so no VC++ Redistributable install is needed.
+    if (MSVC)
+        set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP OFF)
+        set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
+        include(InstallRequiredSystemLibraries)
     endif()
 endif()

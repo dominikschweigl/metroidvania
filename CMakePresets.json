@@ -24,6 +24,17 @@
       }
     },
     {
+      "name": "vcpkg-windows-msvc-static",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-msvc-static",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
       "name": "vcpkg-windows-mingw",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/windows-mingw",
@@ -44,6 +55,11 @@
     {
       "name": "windows-msvc",
       "configurePreset": "vcpkg-windows-msvc",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-msvc-static",
+      "configurePreset": "vcpkg-windows-msvc-static",
       "configuration": "Release"
     },
     {

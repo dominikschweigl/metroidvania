@@ -1,0 +1,110 @@
+# Packaging for distribution (Itch.io)
+
+This project ships as two self-contained archives that a player can download,
+extract, and run with **no system dependencies** — no SFML, no fmt, and no
+Microsoft VC++ Redistributable:
+
+| Platform | Archive                     |
+| -------- | --------------------------- |
+| Windows  | `metroidvania-windows.zip`  |
+| Linux    | `metroidvania-linux.zip`    |
+
+Each archive extracts to a single folder laid out exactly how the game expects
+its files at runtime:
+
+```
+metroidvania-<os>/
+  metroidvania[.exe]   # the game
+  *.dll                # SFML / fmt / OpenAL DLLs (Windows dynamic builds only)
+  assets/              # textures, audio, manifest.json  (loaded via ./assets/...)
+  data/                # Tiled maps + tilesets           (loaded via ./data/...)
+  saves/               # empty, writable — the game saves here at runtime
+```
+
+> The game resolves `assets/` and `data/` **relative to the working directory**,
+> so these folders must stay next to the executable. The launcher on Itch.io runs
+> the binary from its own folder, so this layout works out of the box.
+
+---
+
+## Building the archives
+
+### Prerequisites
+
+- [vcpkg](https://github.com/microsoft/vcpkg) with `VCPKG_ROOT` set
+- CMake ≥ 3.21, Ninja
+- A toolchain for the target platform (MSVC or MinGW on Windows, GCC on Linux)
+
+### Linux
+
+```bash
+./scripts/package.sh              # → dist/metroidvania-linux.zip
+```
+
+### Windows
+
+```powershell
+# From a "Developer PowerShell for VS" (so cl.exe is on PATH):
+.\scripts\package.ps1             # → dist\metroidvania-windows.zip
+```
+
+Both scripts run configure → build → `cmake --install` into `dist/<name>/` →
+`zip`. They are thin wrappers around the CMake install rules, so the archive
+layout is identical no matter how you invoke them.
+
+---
+
+## How dependencies are made self-contained
+
+### Windows
+
+- **`MSVC_RUNTIME_LIBRARY = MultiThreaded`** links the **static C runtime** (`/MT`),
+  so `msvcp140.dll` / `vcruntime140.dll` and the VC++ Redistributable are **not**
+  needed for the game itself.
+- With the default **`x64-windows`** (dynamic) triplet, SFML/fmt/OpenAL are DLLs.
+  The install step copies every DLL the executable actually needs — resolved via
+  `$<TARGET_RUNTIME_DLLS:metroidvania>` — next to the `.exe`, plus the CRT those
+  DLLs need (via `InstallRequiredSystemLibraries`).
+- For a **single dependency-free executable**, build fully static instead:
+
+  ```powershell
+  .\scripts\package.ps1 vcpkg-windows-msvc-static windows-msvc-static   # /MT + static SFML
+  # or MinGW:
+  .\scripts\package.ps1 vcpkg-windows-mingw       windows-mingw         # -static everything
+  ```
+
+### Linux
+
+- The vcpkg **`x64-linux`** triplet builds SFML, fmt and OpenAL as **static**
+  libraries, so they are baked into the binary.
+- `-static-libgcc -static-libstdc++` fold the GCC/C++ runtimes in too.
+- An **`$ORIGIN` RPATH** makes the binary look for any remaining shared libraries
+  in its own folder and `./lib`. `scripts/package.sh` uses `ldd` to collect any
+  **non-system** shared object into `lib/` as a safety net.
+- Base-OS libraries (glibc, libGL, X11, libudev, …) are intentionally **not**
+  bundled — they must come from the host, as on every desktop Linux install.
+- The script sets the executable bit (`chmod +x`) before zipping so players do
+  not hit "Permission denied" after extracting on Itch.io.
+
+---
+
+## Continuous delivery
+
+`.github/workflows/release.yml` builds and uploads both archives on each target
+OS. Trigger it manually from the **Actions** tab, or push a version tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+On a tag push the archives are additionally attached to a GitHub Release, ready
+to download and upload to Itch.io.
+
+---
+
+## Fonts (note)
+
+The UI font is loaded from the operating system (Arial on Windows, Liberation/
+DejaVu Sans on Linux) rather than bundled. These are present on all standard
+Windows and desktop-Linux installs, so no action is needed for typical players.
