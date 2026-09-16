@@ -201,6 +201,17 @@ endif()
 # ===========================================================================
 
 # The game itself, at the archive root.
+#
+# On Windows dynamic builds, tell the vcpkg toolchain to also copy every DLL the
+# executable transitively needs into the install tree. Unlike
+# $<TARGET_RUNTIME_DLLS> (which only sees the exe's DIRECT link dependencies —
+# sfml-*, fmt), this walks the full dependency chain with dumpbin, so the DLLs
+# that the SFML DLLs themselves pull in (freetype, ogg/vorbis/FLAC, openal32)
+# are bundled too. No effect on static builds or non-vcpkg configs.
+if (WIN32)
+    set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
+endif()
+
 install(TARGETS metroidvania RUNTIME DESTINATION ".")
 
 # Runtime data the game opens through relative paths — must sit beside the exe.
@@ -211,9 +222,9 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/data"   DESTINATION ".")
 # folder, so ship an empty one; otherwise saving fails on a fresh extract.
 install(DIRECTORY DESTINATION "saves")
 
-# Windows dynamic builds (e.g. the x64-windows MSVC triplet): copy every DLL the
-# executable actually depends on (sfml-*, fmt, openal32, …) next to it. For a
-# fully static build (x64-mingw-static / x64-windows-static) this list is empty.
+# $<TARGET_RUNTIME_DLLS> covers the exe's direct dependencies (sfml-*, fmt) as a
+# fallback; the vcpkg app-local step above is what pulls in the transitive DLLs.
+# For a fully static build (x64-mingw-static / x64-windows-static) both are empty.
 if (WIN32)
     install(FILES $<TARGET_RUNTIME_DLLS:metroidvania> DESTINATION ".")
 

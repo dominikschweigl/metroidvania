@@ -70,9 +70,14 @@ layout is identical no matter how you invoke them.
   so `msvcp140.dll` / `vcruntime140.dll` and the VC++ Redistributable are **not**
   needed for the game itself.
 - With the default **`x64-windows`** (dynamic) triplet, SFML/fmt/OpenAL are DLLs.
-  The install step copies every DLL the executable actually needs — resolved via
-  `$<TARGET_RUNTIME_DLLS:metroidvania>` — next to the `.exe`, plus the CRT those
-  DLLs need (via `InstallRequiredSystemLibraries`).
+  The install step bundles **every DLL the game needs, recursively**, next to the
+  `.exe`: vcpkg's app-local deployment (`X_VCPKG_APPLOCAL_DEPS_INSTALL`) walks the
+  full dependency chain with `dumpbin`, so not just `sfml-*`/`fmt` but also the
+  DLLs *they* pull in — `freetype`, `openal32`, and the `ogg`/`vorbis`/`FLAC`
+  codecs — are copied, and `package.ps1` mirrors any stragglers from the build
+  tree. `InstallRequiredSystemLibraries` adds the CRT (`msvcp140`/`vcruntime140`).
+  (`$<TARGET_RUNTIME_DLLS>` alone only sees the exe's *direct* deps and misses the
+  second-level ones — that is why the app-local step is needed.)
 - For a **single dependency-free executable**, build fully static instead:
 
   ```powershell
