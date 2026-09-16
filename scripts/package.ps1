@@ -59,6 +59,23 @@ if (-not (Test-Path $Executable)) {
     throw "Expected executable not found at $Executable"
 }
 
+# Safety net for dynamic builds: vcpkg's build-time app-local deployment copies
+# every transitive DLL (sfml-*, fmt, freetype, ogg/vorbis/FLAC, openal32, CRT)
+# next to the built exe. Mirror any that aren't already staged, so the archive
+# is never missing a dependency even if an install-time copy was skipped.
+$stagedDlls = @{}
+Get-ChildItem -Path $StageDir -Filter *.dll -File -ErrorAction SilentlyContinue |
+    ForEach-Object { $stagedDlls[$_.Name] = $true }
+$missing = 0
+Get-ChildItem -Path $BuildDir -Filter *.dll -File -ErrorAction SilentlyContinue | ForEach-Object {
+    if (-not $stagedDlls.ContainsKey($_.Name)) {
+        Copy-Item $_.FullName -Destination $StageDir -Force
+        Write-Host "    + bundled missing DLL: $($_.Name)"
+        $missing++
+    }
+}
+Write-Host "==> DLL check: copied $missing DLL(s) that install had missed"
+
 Write-Host "==> Creating $ZipPath"
 Compress-Archive -Path $StageDir -DestinationPath $ZipPath -Force
 
