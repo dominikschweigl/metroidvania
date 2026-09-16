@@ -11,6 +11,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set explicitly so intent is documented and robust against policy changes.
 cmake_policy(SET CMP0091 NEW)
 
+# Match the C runtime to the vcpkg triplet's CRT linkage, project-wide (game AND
+# tests), set before any target is created. The x64-windows-static triplet links
+# everything (SFML, Catch2, fmt) against the STATIC CRT, so our objects must use
+# /MT too or the linker raises LNK2038 (MT vs MD mismatch). The default dynamic
+# triplet keeps CMake's default (/MD), matching the DLL/import-lib dependencies.
+# A static build therefore needs no VC++ Redistributable; the dynamic build ships
+# the CRT DLLs instead (see InstallRequiredSystemLibraries below).
+if (MSVC AND VCPKG_TARGET_TRIPLET MATCHES "static")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 find_package(fmt CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Window System Audio)
 find_package(Catch2 CONFIG REQUIRED)
@@ -124,13 +135,9 @@ target_link_libraries(metroidvania PRIVATE fmt::fmt SFML::Graphics SFML::Window 
 
 # ---------------------------------------------------------------------------
 # Self-contained runtime linking (so end users need no system dependencies)
+# The MSVC static CRT is configured project-wide above (CMAKE_MSVC_RUNTIME_LIBRARY).
 # ---------------------------------------------------------------------------
-if (MSVC)
-    # Link the static C runtime (/MT, /MTd) so the Microsoft VC++ Redistributable
-    # (msvcp140.dll / vcruntime140.dll) is NOT required to run the game.
-    set_target_properties(metroidvania PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-elseif (MINGW)
+if (MINGW)
     # MinGW/GCC on Windows: fold libstdc++, libgcc and libwinpthread into the exe
     # so no MinGW runtime DLLs need to ship alongside it.
     target_link_options(metroidvania PRIVATE -static -static-libgcc -static-libstdc++)

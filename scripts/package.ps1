@@ -45,7 +45,7 @@ cmake --preset $ConfigurePreset
 if ($LASTEXITCODE -ne 0) { throw "cmake configure failed" }
 
 Write-Host "==> Building ($BuildPreset)"
-cmake --build --preset $BuildPreset
+cmake --build --preset $BuildPreset --target metroidvania
 if ($LASTEXITCODE -ne 0) { throw "cmake build failed" }
 
 Write-Host "==> Staging into $StageDir"
