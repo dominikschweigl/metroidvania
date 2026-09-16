@@ -228,9 +228,11 @@ install(DIRECTORY DESTINATION "saves")
 if (WIN32)
     install(FILES $<TARGET_RUNTIME_DLLS:metroidvania> DESTINATION ".")
 
-    # If any bundled DLL was built against the dynamic CRT, ship that runtime too
-    # (msvcp140.dll / vcruntime140.dll) so no VC++ Redistributable install is needed.
-    if (MSVC)
+    # Only needed for DYNAMIC builds: the /MD-built SFML DLLs require the shared
+    # CRT (msvcp140.dll / vcruntime140.dll), so ship it — then no VC++
+    # Redistributable install is required. A static triplet (x64-windows-static)
+    # bakes everything into the exe, so skip it and keep the archive DLL-free.
+    if (MSVC AND NOT VCPKG_TARGET_TRIPLET MATCHES "static")
         set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP OFF)
         set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
         include(InstallRequiredSystemLibraries)

@@ -66,25 +66,37 @@ layout is identical no matter how you invoke them.
 
 ### Windows
 
-- **`MSVC_RUNTIME_LIBRARY = MultiThreaded`** links the **static C runtime** (`/MT`),
-  so `msvcp140.dll` / `vcruntime140.dll` and the VC++ Redistributable are **not**
-  needed for the game itself.
-- With the default **`x64-windows`** (dynamic) triplet, SFML/fmt/OpenAL are DLLs.
-  The install step bundles **every DLL the game needs, recursively**, next to the
-  `.exe`: vcpkg's app-local deployment (`X_VCPKG_APPLOCAL_DEPS_INSTALL`) walks the
-  full dependency chain with `dumpbin`, so not just `sfml-*`/`fmt` but also the
-  DLLs *they* pull in — `freetype`, `openal32`, and the `ogg`/`vorbis`/`FLAC`
-  codecs — are copied, and `package.ps1` mirrors any stragglers from the build
-  tree. `InstallRequiredSystemLibraries` adds the CRT (`msvcp140`/`vcruntime140`).
-  (`$<TARGET_RUNTIME_DLLS>` alone only sees the exe's *direct* deps and misses the
-  second-level ones — that is why the app-local step is needed.)
-- For a **single dependency-free executable**, build fully static instead:
+The release pipeline ships a **fully static** build: the
+**`x64-windows-static`** triplet links SFML, fmt, freetype, the ogg/vorbis/FLAC
+codecs and OpenAL directly into `metroidvania.exe`, and
+**`MSVC_RUNTIME_LIBRARY = MultiThreaded`** (`/MT`) links the C runtime statically
+too. The result is a **single self-contained `.exe`** — no DLLs, and no VC++
+Redistributable required. Build it with:
 
-  ```powershell
-  .\scripts\package.ps1 vcpkg-windows-msvc-static windows-msvc-static   # /MT + static SFML
-  # or MinGW:
-  .\scripts\package.ps1 vcpkg-windows-mingw       windows-mingw         # -static everything
-  ```
+```powershell
+.\scripts\package.ps1 vcpkg-windows-msvc-static windows-msvc-static
+# or MinGW, also fully static:
+.\scripts\package.ps1 vcpkg-windows-mingw       windows-mingw
+```
+
+> **Note on OpenAL:** OpenAL-soft is LGPL. Static linking is fine for most
+> distribution but carries LGPL relinking obligations; the dynamic option below
+> (shipping `openal32.dll` separately) avoids that if it ever matters to you.
+
+**Dynamic alternative** — the default **`x64-windows`** triplet builds SFML/fmt/
+OpenAL as DLLs. In that mode the install step bundles **every DLL the game needs,
+recursively**, next to the `.exe`: vcpkg's app-local deployment
+(`X_VCPKG_APPLOCAL_DEPS_INSTALL`) walks the full dependency chain with `dumpbin`,
+so not just `sfml-*`/`fmt` but also the DLLs *they* pull in — `freetype`,
+`openal32`, and the `ogg`/`vorbis`/`FLAC` codecs — are copied, `package.ps1`
+mirrors any stragglers from the build tree, and `InstallRequiredSystemLibraries`
+adds the CRT (`msvcp140`/`vcruntime140`). (`$<TARGET_RUNTIME_DLLS>` alone only
+sees the exe's *direct* deps and misses the second-level ones — that is why the
+app-local step is needed.) Build it with:
+
+```powershell
+.\scripts\package.ps1 vcpkg-windows-msvc windows-msvc
+```
 
 ### Linux
 
