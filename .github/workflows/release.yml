@@ -82,7 +82,7 @@ jobs:
                                   if-no-files-found: error
 
         package-windows:
-                name: Package (Windows MSVC)
+                name: Package (Windows MSVC, static)
                 runs-on: windows-latest
                 needs: guard
                 steps:
@@ -98,8 +98,8 @@ jobs:
                           uses: actions/cache@v4
                           with:
                                   path: ${{ env.VCPKG_ROOT }}\installed
-                                  key: vcpkg-msvc-${{ hashFiles('vcpkg.json') }}
-                                  restore-keys: vcpkg-msvc-
+                                  key: vcpkg-msvc-static-${{ hashFiles('vcpkg.json') }}
+                                  restore-keys: vcpkg-msvc-static-
 
                         - name: Setup vcpkg
                           uses: lukka/run-vcpkg@v11
@@ -110,7 +110,7 @@ jobs:
                                   arch: x64
 
                         - name: Build & Package
-                          run: .\scripts\package.ps1 -ConfigurePreset vcpkg-windows-msvc -BuildPreset windows-msvc
+                          run: .\scripts\package.ps1 -ConfigurePreset vcpkg-windows-msvc-static -BuildPreset windows-msvc-static
 
                         - name: Upload Artifact
                           uses: actions/upload-artifact@v4
