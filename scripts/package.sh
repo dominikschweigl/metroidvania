@@ -37,7 +37,7 @@ echo "==> Configuring (${CONFIGURE_PRESET})"
 cmake --preset "${CONFIGURE_PRESET}"
 
 echo "==> Building (${BUILD_PRESET})"
-cmake --build --preset "${BUILD_PRESET}"
+cmake --build --preset "${BUILD_PRESET}" --target metroidvania
 
 echo "==> Staging into ${STAGE_DIR}"
 rm -rf "${STAGE_DIR}" "${ZIP_PATH}"
